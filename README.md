@@ -37,21 +37,22 @@ Check that your prompt changed to
 (patate_for_kids) $
 ```
 
+You are good to go !!
 ========================
 
-Stop the environnement :
+#### Stop the environnement :
 
 ```
 source deactivate
 ```
 
-- deactivate the environment (Windows 10):
+#### deactivate the environment (Windows 10):
 
 ```
 deactivate patate_for_kids
 ```
 
-- delete the environment:
+#### delete the environment:
 
 ```
 conda env remove patate_for_kids
