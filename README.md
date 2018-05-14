@@ -37,6 +37,12 @@ Check that your prompt changed to
 (patate_for_kids) $
 ```
 
+### And then start the program:
+
+```
+(patate_for_kids) $python Patate_for_kids.py
+```
+
 You are good to go !!
 ========================
 
