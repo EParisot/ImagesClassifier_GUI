@@ -13,7 +13,7 @@ https://www.continuum.io/downloads
 cd patate_for_kids
 ```
 
-#### Create the environment
+### Create the environment
 
 ```
 conda env create

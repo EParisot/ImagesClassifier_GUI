@@ -17,6 +17,8 @@ import cv2
 import numpy as np
 import threading
 
+import Tk_Tooltips
+
 #################################################################################
 '''
 This is a graphic implementation of the famous "Patate42"
@@ -32,9 +34,8 @@ class App(tk.Tk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-
-        self.lang_pic = ImageTk.PhotoImage(Image.open('Pictures\\lang.png'))
-        self.dir_open_pic = ImageTk.PhotoImage(Image.open('Pictures\\dir_open.png'))
+        self.lang_pic = ImageTk.PhotoImage(Image.open('assets\\lang.png'))
+        self.dir_open_pic = ImageTk.PhotoImage(Image.open('assets\\dir_open.png'))
         
         self.cfg = configparser.ConfigParser()
         self.cfg.read('config.cfg')
@@ -120,7 +121,6 @@ class App(tk.Tk):
         elif self.cfg.get('general', 'language') == 'fr-FR':
             option_fr.select()
 
-
         paths_label = Label(self.options_frame, text='Default Folders : ', font=("Helvetica", 16))
         paths_label.grid(row=2, column=0, padx=10, sticky='w')
 
@@ -148,7 +148,6 @@ class App(tk.Tk):
         path1_button.config(text='Browse', font=("Helvetica", 14), command=self.Get_IN_Folder)
         path1_button.grid(row=0, column=3, padx=10)
 
-
         path2_pic = Label(paths_frame, image=self.dir_open_pic)
         path2_pic.grid(row=1, column=0, padx=10, pady=10)
         path2_label = Label(paths_frame)
@@ -164,7 +163,6 @@ class App(tk.Tk):
         path2_button.config(text='Browse', font=("Helvetica", 14), command=self.Get_OUT_Folder)
         path2_button.grid(row=1, column=3, padx=10)
 
-        
         handler = lambda: self.Close_options(self.options_frame, lang_int)
         btn = Button(self.options_frame, text="Save / Close", font=("Helvetica", 16), command=handler)
         btn.grid(row=6, column=0)
@@ -222,33 +220,72 @@ class FirstTab():
         self.panel = None
         self.image = None
 
+        self.none_pic = ImageTk.PhotoImage(Image.open('assets\prev.png'))
+        self.cam_pic = ImageTk.PhotoImage(Image.open('assets\webcam.png'))
+        self.stop_pic = ImageTk.PhotoImage(Image.open('assets\stop.png'))
+        self.snap_pic = ImageTk.PhotoImage(Image.open('assets\snap.png'))
+        self.del_pic = ImageTk.PhotoImage(Image.open('assets\pass.png'))
+
         self.video_frame = Frame(self.snap_frame)
         self.video_frame.config(borderwidth=2, relief="sunken", height=640, width=810)
         self.video_frame.grid(row=0, column=0)
+
+        self.count = IntVar()
+        self.count.set(0)
 
         command_frame = Frame(self.snap_frame)
         command_frame.grid(row=1, column=0, sticky='n')
         command_frame.grid_columnconfigure(0, weight=1)
         command_frame.grid_columnconfigure(1, weight=1)
         command_frame.grid_columnconfigure(2, weight=1)
+        command_frame.grid_columnconfigure(3, weight=1)
+        command_frame.grid_columnconfigure(4, weight=1)
+        command_frame.grid_columnconfigure(5, weight=1)
         command_frame.grid_rowconfigure(0, weight=1)
 
         cam_handler = lambda: self.open_cam(self)
         stop_handler = lambda: self.stop(self)
         snap_handler = lambda: self.snap(self)
+        del_handler = lambda: self.del_snap(self)
 
         play_but = Button(command_frame)
-        play_but.config(text='Play', font=("Helvetica", 14), command=cam_handler)
-        play_but.grid(row=1, column=0, padx=10)
+        play_but.config(image=self.cam_pic, command=cam_handler)
+        play_but.grid(row=0, column=0, padx=10)
+        play_ttp = Tk_Tooltips.ToolTip(play_but, 'Start Camera', msgFunc=None, delay=1, follow=True)
 
         stop_but = Button(command_frame)
-        stop_but.config(text='Stop', font=("Helvetica", 14), command=stop_handler)
-        stop_but.grid(row=1, column=1, padx=10) 
+        stop_but.config(image=self.stop_pic, command=stop_handler)
+        stop_but.grid(row=0, column=1, padx=10)
+        stop_ttp = Tk_Tooltips.ToolTip(stop_but, 'Stop Camera', msgFunc=None, delay=1, follow=True)
 
         snap_but = Button(command_frame)
-        snap_but.config(text='Snap', font=("Helvetica", 14), command=snap_handler)
-        snap_but.grid(row=1, column=2, padx=10)
+        snap_but.config(image=self.snap_pic, command=snap_handler)
+        snap_but.grid(row=0, column=2, padx=10)
+        snap_ttp = Tk_Tooltips.ToolTip(snap_but, 'Snapshot', msgFunc=None, delay=1, follow=True)
 
+        self.prev_frame = Label(command_frame, image=self.none_pic)
+        self.prev_frame.config(borderwidth=2, relief="sunken", height=120, width=160)
+        self.prev_frame.grid(row=0, column=3)
+
+        del_but = Button(command_frame)
+        del_but.config(image=self.del_pic, command=del_handler)
+        del_but.grid(row=0, column=4, sticky="se")
+        del_but = Tk_Tooltips.ToolTip(del_but, 'Remove last snapshot', msgFunc=None, delay=1, follow=True)
+        
+        count_frame = Frame(command_frame)
+        count_frame.grid(row=0, column=5, sticky='w')
+        count_frame.grid_columnconfigure(0, weight=1)
+        count_frame.grid_rowconfigure(0, weight=1)
+        count_frame.grid_rowconfigure(0, weight=1)
+
+        snap_count_title = Label(count_frame)
+        snap_count_title.config(text="Snapshots :", font=("Helvetica", 16))
+        snap_count_title.grid(row=0, column=0, padx=10)
+        
+        snap_count = Label(count_frame)
+        snap_count.config(font=("Helvetica", 16), textvariable=self.count)
+        snap_count.grid(row=1, column=0, padx=10)
+        
     def videoLoop(self):
         while not self.stopEvent.is_set():
             if self.stopEvent.is_set():
@@ -264,7 +301,7 @@ class FirstTab():
                 except RuntimeError:
                     break
                 if self.panel is None:
-                    self.panel = tk.Label(self.video_frame, image=image)
+                    self.panel = Label(self.video_frame, image=image)
                     self.panel.image = image
                     self.panel.grid()
                 else:
@@ -289,10 +326,28 @@ class FirstTab():
             
     def stop(event, self):
         self.stopEvent.set()
+        self.prev_frame.config(image=self.none_pic)
+        self.count.set(0)
 
     def snap(event, self):
-        picname = app.snap_path + "/" + str(time()) + ".jpg"
-        cv2.imwrite(picname, self.video)
+        if self.thread.is_alive():
+            self.picname = app.snap_path + "/" + str(time()) + ".jpg"
+            pic = self.video
+            cv2.imwrite(self.picname, pic)
+            pic = imutils.resize(pic, width=160)
+            pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
+            pic = Image.fromarray(pic)
+            pic = ImageTk.PhotoImage(pic)
+            self.prev_frame.config(image=pic)
+            self.prev_frame.image = pic
+            self.count.set(self.count.get() + 1)
+        else:
+            showwarning("No video running", "Please start the video before you take a snap")
+
+    def del_snap(event, self):
+        os.remove(self.picname)
+        self.count.set(self.count.get() - 1)
+        self.prev_frame.config(image=self.none_pic)
 
     def onQuit(self):
         if self.thread.is_alive():
@@ -319,7 +374,6 @@ class ThirdTab():
         top_panel.grid(row=0, column=0, stick='n')
         top_panel.grid_columnconfigure(0, weight=1)
         top_panel.grid_rowconfigure(0, weight=1)
-
 
 ################################################################################
 

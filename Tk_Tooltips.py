@@ -1,3 +1,7 @@
+from tkinter import Toplevel, StringVar
+from tkinter.filedialog import *
+from time import time
+
 class ToolTip( Toplevel ):
     """
     Provides a ToolTip widget for Tkinter.
@@ -31,7 +35,7 @@ class ToolTip( Toplevel ):
         self.follow = follow
         self.visible = 0
         self.lastMotion = 0
-        Message( self, textvariable=self.msgVar, bg='#FFFFDD',
+        Message( self, textvariable=self.msgVar, bg='#FFFFFF',
                  aspect=1000 ).grid()                                           # The test of the ToolTip is displayed in a Message widget
         self.wdgt.bind( '<Enter>', self.spawn, '+' )                            # Add bindings to the widget.  This will NOT override bindings that the widget already has
         self.wdgt.bind( '<Leave>', self.hide, '+' )
