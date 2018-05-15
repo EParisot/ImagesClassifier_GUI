@@ -65,10 +65,16 @@ class App(tk.Tk):
         self.second_tab.grid_rowconfigure(1, weight=100)
 
         self.third_tab = ttk.Frame(self.tabs)
-        self.tabs.add(self.third_tab, text='Train', compound=LEFT)
+        self.tabs.add(self.third_tab, text='Model', compound=LEFT)
         self.third_tab.grid_columnconfigure(0, weight=1)
         self.third_tab.grid_rowconfigure(0, weight=1)
         self.third_tab.grid_rowconfigure(1, weight=100)
+
+        self.fourth_tab = ttk.Frame(self.tabs)
+        self.tabs.add(self.fourth_tab, text='Train', compound=LEFT)
+        self.fourth_tab.grid_columnconfigure(0, weight=1)
+        self.fourth_tab.grid_rowconfigure(0, weight=1)
+        self.fourth_tab.grid_rowconfigure(1, weight=100)
 
         
     def Open_options(self):
@@ -370,18 +376,30 @@ class SecondTab():
 class ThirdTab():
     
     def __init__(self):
-        top_panel = Frame(app.third_tab)
-        top_panel.grid(row=0, column=0, stick='n')
-        top_panel.grid_columnconfigure(0, weight=1)
-        top_panel.grid_rowconfigure(0, weight=1)
+        self.model_frame = Frame(app.third_tab)
+        self.model_frame.grid(row=0, column=0, stick='n')
+        self.model_frame.grid_columnconfigure(0, weight=1)
+        self.model_frame.grid_rowconfigure(0, weight=1)
 
 ################################################################################
+
+class FourthTab():
+    
+    def __init__(self):
+        self.train_frame = Frame(app.fourth_tab)
+        self.train_frame.grid(row=0, column=0, stick='n')
+        self.train_frame.grid_columnconfigure(0, weight=1)
+        self.train_frame.grid_rowconfigure(0, weight=1)
+
+################################################################################
+
 
 app = App()
 
 app.first_tab = FirstTab()
 app.second_tab = SecondTab()
 app.third_tab = ThirdTab()
+app.fourth_tab = FourthTab()
 
 app.mainloop()
 
