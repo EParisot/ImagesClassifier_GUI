@@ -34,6 +34,9 @@ class App(tk.Tk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
+        style = ttk.Style()
+        current_theme =style.theme_use()
+
         self.lang_pic = ImageTk.PhotoImage(Image.open('assets\\lang.png'))
         self.dir_open_pic = ImageTk.PhotoImage(Image.open('assets\\dir_open.png'))
         
@@ -50,6 +53,7 @@ class App(tk.Tk):
         self.tabs.grid(row=0, column=0, sticky='nsew')
         self.tabs.grid_columnconfigure(0, weight=1)
         self.tabs.grid_rowconfigure(0, weight=1)
+        style.theme_settings(current_theme, {"TNotebook.Tab": {"configure": {"padding": [20, 5]}}})
 
         self.first_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.first_tab, text='Snap', compound=LEFT)
@@ -79,7 +83,7 @@ class App(tk.Tk):
         
     def Open_options(self):
         self.options_frame = Toplevel()
-        self.options_frame.geometry("900x600")
+        self.options_frame.geometry("800x600")
         self.options_frame.title("Options")
 
         self.options_frame.grid()
