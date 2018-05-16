@@ -51,4 +51,6 @@ if __name__ == '__main__':
     app.third_tab = ThirdTab(app)
     app.fourth_tab = FourthTab(app)
 
+    app.wm_protocol("WM_DELETE_WINDOW", app.on_Quit)
+
     app.mainloop()

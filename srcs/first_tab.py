@@ -28,7 +28,7 @@ class FirstTab():
     def __init__(self, app):
         self.app = app
         self.snap_frame = Frame(self.app.first_tab)
-        self.snap_frame.grid(row=0, column=0, sticky='n')
+        self.snap_frame.grid(row=0, column=1)
         self.snap_frame.grid_columnconfigure(0, weight=1)
         self.snap_frame.grid_rowconfigure(0, weight=1)
         self.snap_frame.grid_rowconfigure(1, weight=1)
@@ -37,7 +37,6 @@ class FirstTab():
         self.vs = None
         self.thread = threading.Thread(target=self.videoLoop, args=())
         self.stopEvent = threading.Event()
-        self.app.wm_protocol("WM_DELETE_WINDOW", self.onQuit)
         self.panel = None
         self.image = None
 
@@ -48,8 +47,9 @@ class FirstTab():
         self.del_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
         self.video_frame = Frame(self.snap_frame)
-        self.video_frame.config(borderwidth=2, relief="sunken", height=640, width=810)
+        self.video_frame.config(borderwidth=2, relief="sunken", height=500, width=810)
         self.video_frame.grid(row=0, column=0)
+        self.video_frame.grid_propagate(0)
 
         self.count = IntVar()
         self.count.set(0)
@@ -170,7 +170,7 @@ class FirstTab():
         self.count.set(self.count.get() - 1)
         self.prev_frame.config(image=self.none_pic)
 
-    def onQuit(self):
+    def on_quit(self):
         if self.thread.is_alive():
             showwarning("Video running", "Please stop the video before you quit")
         else:

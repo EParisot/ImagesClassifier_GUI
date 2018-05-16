@@ -33,9 +33,10 @@ class App(tk.Tk):
         self.title("Patate for Kids")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1000)
 
         style = ttk.Style()
-        current_theme =style.theme_use()
+        current_theme = style.theme_use()
 
         self.lang_pic = ImageTk.PhotoImage(Image.open('assets/lang.png'))
         self.dir_open_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
@@ -45,40 +46,23 @@ class App(tk.Tk):
         self.lang = self.cfg.get('general', 'language')
         self.snap_path = self.cfg.get('paths', 'snap_path')
 
-        self.menu = Menu(self)
-        self.menu.add_command(label="Options", command=self.Open_options)
-        self.config(menu=self.menu)
+        self.options_but = Button(self, text="Options", font=("Helvetica", 16), command=self.open_options)
+        self.options_but.grid(row=0, column=0, sticky="nw")
 
         self.tabs = ttk.Notebook(self)
-        self.tabs.grid(row=0, column=0, sticky='nsew')
+        self.tabs.grid(row=1, column=0, sticky='nsew')
         self.tabs.grid_columnconfigure(0, weight=1)
         self.tabs.grid_rowconfigure(0, weight=1)
         style.theme_settings(current_theme, {"TNotebook.Tab": {"configure": {"padding": [20, 5]}}})
 
         self.first_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.first_tab, text='Snap', compound=LEFT)
-        self.first_tab.grid_columnconfigure(0, weight=1)
-        self.first_tab.grid_rowconfigure(0, weight=1)
-        self.first_tab.grid_rowconfigure(1, weight=10)
-        self.first_tab.grid_rowconfigure(2, weight=1)
-
         self.second_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.second_tab, text='Labelize', compound=LEFT)
-        self.second_tab.grid_columnconfigure(0, weight=1)
-        self.second_tab.grid_rowconfigure(0, weight=1)
-        self.second_tab.grid_rowconfigure(1, weight=100)
-
         self.third_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.third_tab, text='Model', compound=LEFT)
-        self.third_tab.grid_columnconfigure(0, weight=1)
-        self.third_tab.grid_rowconfigure(0, weight=1)
-        self.third_tab.grid_rowconfigure(1, weight=100)
-
         self.fourth_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.fourth_tab, text='Train', compound=LEFT)
-        self.fourth_tab.grid_columnconfigure(0, weight=1)
-        self.fourth_tab.grid_rowconfigure(0, weight=1)
-        self.fourth_tab.grid_rowconfigure(1, weight=100)
 
     def onKeyPress(self, event):
         """
@@ -87,7 +71,7 @@ class App(tk.Tk):
         if event.char == KEY_OPTION:
             self.Open_options()
 
-    def Open_options(self):
+    def open_options(self):
         self.options_frame = Toplevel()
         self.options_frame.geometry("800x600")
         self.options_frame.title("Options")
@@ -161,7 +145,7 @@ class App(tk.Tk):
         self.path1_result.grid_columnconfigure(1, weight=1)
         self.path1_result.grid_rowconfigure(0, weight=1)
         path1_button = Button(paths_frame)
-        path1_button.config(text='Browse', font=("Helvetica", 14), command=self.Get_IN_Folder)
+        path1_button.config(text='Browse', font=("Helvetica", 14), command=self.get_IN_Folder)
         path1_button.grid(row=0, column=3, padx=10)
 
         path2_pic = Label(paths_frame, image=self.dir_open_pic)
@@ -176,21 +160,21 @@ class App(tk.Tk):
         self.path2_result.grid_columnconfigure(1, weight=1)
         self.path2_result.grid_rowconfigure(0, weight=1)
         path2_button = Button(paths_frame)
-        path2_button.config(text='Browse', font=("Helvetica", 14), command=self.Get_OUT_Folder)
+        path2_button.config(text='Browse', font=("Helvetica", 14), command=self.get_OUT_Folder)
         path2_button.grid(row=1, column=3, padx=10)
 
-        handler = lambda: self.Close_options(self.options_frame, lang_int)
+        handler = lambda: self.close_options(self.options_frame, lang_int)
         btn = Button(self.options_frame, text="Save / Close", font=("Helvetica", 16), command=handler)
         btn.grid(row=6, column=0)
 
-    def Get_IN_Folder(self):
+    def get_IN_Folder(self):
         IN_path = askdirectory()
         self.options_frame.focus_set()
         if len(IN_path) != 0:
             self.path1_result.delete(0, END)
             self.path1_result.insert(END, IN_path)
 
-    def Get_OUT_Folder(self):
+    def get_OUT_Folder(self):
         OUT_path = askdirectory()
         self.options_frame.focus_set()
         if len(OUT_path) != 0:
@@ -198,7 +182,7 @@ class App(tk.Tk):
             self.path2_result.insert(END, OUT_path)
 
 
-    def Close_options(self, options_frame, lang_int):
+    def close_options(self, options_frame, lang_int):
         if lang_int.get() == 1:
             self.cfg.set('general', 'language', 'en-EN')
             self.lang = 'en-EN'
@@ -213,5 +197,8 @@ class App(tk.Tk):
         with open(FILE_CONFIG, 'w') as f:
             self.cfg.write(f)
 
-        if options_frame :
+        if options_frame:
             options_frame.destroy()
+
+    def on_Quit(self):
+        self.first_tab.on_quit()
