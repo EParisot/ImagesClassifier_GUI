@@ -31,9 +31,10 @@ class App(tk.Tk):
         self.title("Patate for Kids")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
         style = ttk.Style()
-        current_theme =style.theme_use()
+        current_theme = style.theme_use()
 
         self.lang_pic = ImageTk.PhotoImage(Image.open('assets/lang.png'))
         self.dir_open_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
@@ -43,12 +44,15 @@ class App(tk.Tk):
         self.lang = self.cfg.get('general', 'language')
         self.snap_path = self.cfg.get('paths', 'snap_path')
 
-        self.menu = Menu(self)
-        self.menu.add_command(label="Options", command=self.Open_options)
-        self.config(menu=self.menu)
+        #self.menu = Menu(self)
+        #self.menu.add_command(label="Options", command=self.Open_options)
+        #self.config(menu=self.menu)
+
+        self.options_but = Button(self, text="Options", font=("Helvetica", 16), command=self.Open_options)
+        self.options_but.grid(row=0, column=0, sticky="nw")
 
         self.tabs = ttk.Notebook(self)
-        self.tabs.grid(row=0, column=0, sticky='nsew')
+        self.tabs.grid(row=1, column=0, sticky='nsew')
         self.tabs.grid_columnconfigure(0, weight=1)
         self.tabs.grid_rowconfigure(0, weight=1)
         style.theme_settings(current_theme, {"TNotebook.Tab": {"configure": {"padding": [20, 5]}}})
@@ -190,7 +194,7 @@ class App(tk.Tk):
             self.path2_result.insert(END, OUT_path)
 
 
-    def Close_options(self,options_frame, lang_int):
+    def Close_options(self, options_frame, lang_int):
         if lang_int.get() == 1:
             self.cfg.set('general', 'language', 'en-EN')
             self.lang = 'en-EN'
@@ -205,5 +209,5 @@ class App(tk.Tk):
         with open(FILE_CONFIG, 'w') as f:
             self.cfg.write(f)
 
-        if options_frame :
+        if options_frame:
             options_frame.destroy()
