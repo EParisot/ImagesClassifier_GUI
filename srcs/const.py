@@ -10,3 +10,6 @@ FILE_CONFIG = 'config.cfg'
 
 SUCCESS = 0
 ERROR = 1
+
+##### shortcut
+KEY_OPTION = ',' # open option menu
