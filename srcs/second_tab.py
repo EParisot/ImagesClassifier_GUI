@@ -67,7 +67,6 @@ class SecondTab(object):
         self.dir_dest = self.app.cfg.get('paths', 'out_path')
         self.photos = os.listdir(self.dir_srcs)
         self.photo_act = 0
-        print('ok')
         if len(self.photos) == 0:
             print(RED + 'ERROR: ' + EOC + 'first tab -> no photos')
 
