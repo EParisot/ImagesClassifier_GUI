@@ -39,7 +39,7 @@ class App(tk.Tk):
 
         self.lang_pic = ImageTk.PhotoImage(Image.open('assets\\lang.png'))
         self.dir_open_pic = ImageTk.PhotoImage(Image.open('assets\\dir_open.png'))
-        
+
         self.cfg = configparser.ConfigParser()
         self.cfg.read('config.cfg')
         self.lang = self.cfg.get('general', 'language')
