@@ -68,8 +68,12 @@ class App(tk.Tk):
         """
         define action with keyboard shortcut
         """
-        if event.char == KEY_OPTION:
-            self.Open_options()
+        if event.keysym == KEY_OPTION:
+            self.open_options()
+        elif event.keysym == KEY_QUIT:
+            self.on_Quit()
+        else:
+            print(YELLOW + 'key press: ' + EOC + event.keysym)
 
     def open_options(self):
         self.options_frame = Toplevel()

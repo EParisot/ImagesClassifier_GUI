@@ -12,4 +12,5 @@ SUCCESS = 0
 ERROR = 1
 
 ##### shortcut
-KEY_OPTION = ',' # open option menu
+KEY_OPTION = 'comma' # open option menu
+KEY_QUIT = 'Escape'
