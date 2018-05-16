@@ -28,6 +28,8 @@ class App(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
+        self.bind("<Key>", self.onKeyPress)
+
         self.title("Patate for Kids")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -78,6 +80,12 @@ class App(tk.Tk):
         self.fourth_tab.grid_rowconfigure(0, weight=1)
         self.fourth_tab.grid_rowconfigure(1, weight=100)
 
+    def onKeyPress(self, event):
+        """
+        define action with keyboard shortcut
+        """
+        if event.char == KEY_OPTION:
+            self.Open_options()
 
     def Open_options(self):
         self.options_frame = Toplevel()
