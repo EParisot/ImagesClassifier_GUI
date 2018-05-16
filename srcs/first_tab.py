@@ -25,7 +25,6 @@ import Tk_Tooltips
 
 class FirstTab():
 
-
     def __init__(self, app):
         self.app = app
         self.snap_frame = Frame(self.app.first_tab)
