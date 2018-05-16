@@ -57,12 +57,20 @@ class App(tk.Tk):
 
         self.first_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.first_tab, text='Snap', compound=LEFT)
+        self.first_tab.grid_columnconfigure(0, weight=1)
+        self.first_tab.grid_rowconfigure(0, weight=1)
         self.second_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.second_tab, text='Labelize', compound=LEFT)
+        self.second_tab.grid_columnconfigure(0, weight=1)
+        self.second_tab.grid_rowconfigure(0, weight=1)
         self.third_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.third_tab, text='Model', compound=LEFT)
+        self.third_tab.grid_columnconfigure(0, weight=1)
+        self.third_tab.grid_rowconfigure(0, weight=1)
         self.fourth_tab = ttk.Frame(self.tabs)
         self.tabs.add(self.fourth_tab, text='Train', compound=LEFT)
+        self.fourth_tab.grid_columnconfigure(0, weight=1)
+        self.fourth_tab.grid_rowconfigure(0, weight=1)
 
     def onKeyPress(self, event):
         """
