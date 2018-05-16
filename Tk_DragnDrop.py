@@ -100,9 +100,6 @@ active; it will never call dnd_commit().
 """
 
 
-import tkinter
-
-
 # The factory function
 
 def dnd_start(source, event):
@@ -200,15 +197,11 @@ class DndHandler:
         finally:
             source.dnd_end(target, event)
 
-
-
-# ----------------------------------------------------------------------
-# The rest is here for testing and demonstration purposes only!
-
 class Icon:
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, img, tk):
+        self.img = img
+        self.tk = tk
         self.canvas = self.label = self.id = None
 
     def attach(self, canvas, x=10, y=10):
@@ -219,8 +212,7 @@ class Icon:
             self.detach()
         if not canvas:
             return
-        label = tkinter.Label(canvas, text=self.name,
-                              borderwidth=2, relief="raised")
+        label = self.tk.Label(canvas, image=self.img, borderwidth=2, relief="raised")
         id = canvas.create_window(x, y, window=label, anchor="nw")
         self.canvas = canvas
         self.label = label
@@ -265,12 +257,11 @@ class Icon:
     def dnd_end(self, target, event):
         pass
 
-class Tester:
+class DnD_Container:
 
-    def __init__(self, root):
-        self.top = tkinter.Toplevel(root)
-        self.canvas = tkinter.Canvas(self.top, width=100, height=100)
-        self.canvas.pack(fill="both", expand=1)
+    def __init__(self, root, canvas, tk):
+        self.top = root
+        self.canvas = canvas
         self.canvas.dnd_accept = self.dnd_accept
 
     def dnd_accept(self, source, event):
@@ -298,24 +289,3 @@ class Tester:
         self.dnd_leave(source, event)
         x, y = source.where(self.canvas, event)
         source.attach(self.canvas, x, y)
-
-def test():
-    root = tkinter.Tk()
-    root.geometry("+1+1")
-    tkinter.Button(command=root.quit, text="Quit").pack()
-    t1 = Tester(root)
-    t1.top.geometry("+1+60")
-    t2 = Tester(root)
-    t2.top.geometry("+120+60")
-    t3 = Tester(root)
-    t3.top.geometry("+240+60")
-    i1 = Icon("ICON1")
-    i2 = Icon("ICON2")
-    i3 = Icon("ICON3")
-    i1.attach(t1.canvas)
-    i2.attach(t2.canvas)
-    i3.attach(t3.canvas)
-    root.mainloop()
-
-if __name__ == '__main__':
-    test()
