@@ -198,7 +198,7 @@ class App(tk.Tk):
             self.path2_result.insert(END, OUT_path)
 
 
-    def Close_options(self,options_frame, lang_int):
+    def Close_options(self, options_frame, lang_int):
         if lang_int.get() == 1:
             self.cfg.set('general', 'language', 'en-EN')
             self.lang = 'en-EN'

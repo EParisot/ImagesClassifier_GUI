@@ -24,6 +24,7 @@ import Tk_Tooltips
 class ThirdTab(object):
 
     def __init__(self, app):
+        self.app = app
         self.model_frame = Frame(app.third_tab)
         self.model_frame.grid(row=0, column=0, stick='n')
         self.model_frame.grid_columnconfigure(0, weight=1)
