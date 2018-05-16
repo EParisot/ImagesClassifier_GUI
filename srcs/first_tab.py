@@ -28,9 +28,9 @@ class FirstTab():
     def __init__(self, app):
         self.app = app
         self.snap_frame = Frame(self.app.first_tab)
-        self.snap_frame.grid(row=0, column=1)
+        self.snap_frame.grid(row=0, column=0, sticky="n")
         self.snap_frame.grid_columnconfigure(0, weight=1)
-        self.snap_frame.grid_rowconfigure(0, weight=1)
+        self.snap_frame.grid_rowconfigure(0, weight=1000)
         self.snap_frame.grid_rowconfigure(1, weight=1)
 
         self.frame = None
