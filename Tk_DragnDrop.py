@@ -256,8 +256,9 @@ class Icon:
         return x - self.x_off, y - self.y_off
 
     def dnd_end(self, target, event):
-        if target.canvas == self.root.third_tab.trash_canvas:
-            self.label.destroy()
+        if target:
+            if target.canvas == self.root.third_tab.trash_canvas:
+                self.label.destroy()
 
 class DnD_Container:
 
