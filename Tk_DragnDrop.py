@@ -199,9 +199,10 @@ class DndHandler:
 
 class Icon:
 
-    def __init__(self, img, tk):
+    def __init__(self, root, img, tk):
         self.img = img
         self.tk = tk
+        self.root = root
         self.canvas = self.label = self.id = None
 
     def attach(self, canvas, x=10, y=10):
@@ -255,7 +256,8 @@ class Icon:
         return x - self.x_off, y - self.y_off
 
     def dnd_end(self, target, event):
-        pass
+        if target.canvas == self.root.third_tab.trash_canvas:
+            self.label.destroy()
 
 class DnD_Container:
 
