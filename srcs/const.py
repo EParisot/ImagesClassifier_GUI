@@ -28,6 +28,7 @@ HEIGHT_IMG_INFO = 35
 ##### shortcut
 KEY_OPTION = 'comma' # open option menu
 KEY_QUIT = 'Escape' # quit windows
+KEY_CTRL_L = 'Control_L'
     ##### label shortcut
 NEXT_PHOTO = 'd'
 LAST_PHOTO = 'a'

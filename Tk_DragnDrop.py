@@ -100,9 +100,6 @@ active; it will never call dnd_commit().
 """
 
 
-import tkinter
-
-
 # The factory function
 
 def dnd_start(source, event):
@@ -200,15 +197,12 @@ class DndHandler:
         finally:
             source.dnd_end(target, event)
 
-
-
-# ----------------------------------------------------------------------
-# The rest is here for testing and demonstration purposes only!
-
 class Icon:
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, root, img, tk):
+        self.img = img
+        self.tk = tk
+        self.root = root
         self.canvas = self.label = self.id = None
 
     def attach(self, canvas, x=10, y=10):
@@ -219,8 +213,7 @@ class Icon:
             self.detach()
         if not canvas:
             return
-        label = tkinter.Label(canvas, text=self.name,
-                              borderwidth=2, relief="raised")
+        label = self.tk.Label(canvas, image=self.img, borderwidth=2, relief="raised")
         id = canvas.create_window(x, y, window=label, anchor="nw")
         self.canvas = canvas
         self.label = label
@@ -231,11 +224,15 @@ class Icon:
         canvas = self.canvas
         if not canvas:
             return
-        id = self.id
-        label = self.label
-        self.canvas = self.label = self.id = None
-        canvas.delete(id)
-        label.destroy()
+        if self.canvas != self.root.third_tab.layers_canvas:
+            id = self.id
+            label = self.label
+            self.canvas = self.label = self.id = None
+            canvas.delete(id)
+            label.destroy()
+        else:
+            label = Icon(self.root, self.img, self.tk)
+            label.attach(self.canvas, x=self.x_orig, y=self.y_orig)
 
     def press(self, event):
         if dnd_start(self, event):
@@ -263,59 +260,45 @@ class Icon:
         return x - self.x_off, y - self.y_off
 
     def dnd_end(self, target, event):
-        pass
+        if target:
+            if target.canvas == self.root.third_tab.trash_canvas:
+                self.label.destroy()
+                
+class DnD_Container:
 
-class Tester:
-
-    def __init__(self, root):
-        self.top = tkinter.Toplevel(root)
-        self.canvas = tkinter.Canvas(self.top, width=100, height=100)
-        self.canvas.pack(fill="both", expand=1)
+    def __init__(self, root, canvas, tk):
+        self.top = root
+        self.canvas = canvas
         self.canvas.dnd_accept = self.dnd_accept
 
     def dnd_accept(self, source, event):
         return self
 
     def dnd_enter(self, source, event):
-        self.canvas.focus_set() # Show highlight border
-        x, y = source.where(self.canvas, event)
-        x1, y1, x2, y2 = source.canvas.bbox(source.id)
-        dx, dy = x2-x1, y2-y1
-        self.dndid = self.canvas.create_rectangle(x, y, x+dx, y+dy)
-        self.dnd_motion(source, event)
+        if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
+            self.canvas.focus_set() # Show highlight border
+            x, y = source.where(self.canvas, event)
+            x1, y1, x2, y2 = source.canvas.bbox(source.id)
+            dx, dy = x2-x1, y2-y1
+            self.dndid = self.canvas.create_rectangle(x, y, x+dx, y+dy)
+            self.dnd_motion(source, event)
 
     def dnd_motion(self, source, event):
-        x, y = source.where(self.canvas, event)
-        x1, y1, x2, y2 = self.canvas.bbox(self.dndid)
-        self.canvas.move(self.dndid, x-x1, y-y1)
+        if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
+            x, y = source.where(self.canvas, event)
+            x1, y1, x2, y2 = self.canvas.bbox(self.dndid)
+            self.canvas.move(self.dndid, x-x1, y-y1)
 
     def dnd_leave(self, source, event):
-        self.top.focus_set() # Hide highlight border
-        self.canvas.delete(self.dndid)
-        self.dndid = None
+        if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
+            self.top.focus_set() # Hide highlight border
+            self.canvas.delete(self.dndid)
+            self.dndid = None
 
     def dnd_commit(self, source, event):
-        self.dnd_leave(source, event)
-        x, y = source.where(self.canvas, event)
-        source.attach(self.canvas, x, y)
-
-def test():
-    root = tkinter.Tk()
-    root.geometry("+1+1")
-    tkinter.Button(command=root.quit, text="Quit").pack()
-    t1 = Tester(root)
-    t1.top.geometry("+1+60")
-    t2 = Tester(root)
-    t2.top.geometry("+120+60")
-    t3 = Tester(root)
-    t3.top.geometry("+240+60")
-    i1 = Icon("ICON1")
-    i2 = Icon("ICON2")
-    i3 = Icon("ICON3")
-    i1.attach(t1.canvas)
-    i2.attach(t2.canvas)
-    i3.attach(t3.canvas)
-    root.mainloop()
-
-if __name__ == '__main__':
-    test()
+        if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
+            self.dnd_leave(source, event)
+            x, y = source.where(self.canvas, event)
+            source.attach(self.canvas, x, y)
+        else:
+            source.putback()

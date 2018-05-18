@@ -28,7 +28,10 @@ class App(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
-        self.bind("<Key>", self.onKeyPress)
+        self.bind("<KeyPress>", self.onKeyPress)
+        self.bind("<KeyRelease>", self.onKeyRelease)
+
+        self.l_ctrl_pressed = False;
 
         self.title("Patate for Kids")
         self.grid_columnconfigure(0, weight=1)
@@ -72,6 +75,7 @@ class App(tk.Tk):
         self.fourth_tab.grid_columnconfigure(0, weight=1)
         self.fourth_tab.grid_rowconfigure(0, weight=1)
 
+
     def onKeyPress(self, event):
         """
         define action with keyboard shortcut
@@ -80,6 +84,9 @@ class App(tk.Tk):
             self.open_options()
         elif event.keysym == KEY_QUIT:
             self.on_Quit()
+        elif event.keysym == KEY_CTRL_L:
+            self.l_ctrl_pressed = True;
+            print(YELLOW + "key press: " + EOC + "Control_L")
         else:
             print(YELLOW + 'key press: ' + EOC + event.keysym)
 
@@ -89,6 +96,11 @@ class App(tk.Tk):
                 self.second_tab.next_photo()
             elif event.keysym == LAST_PHOTO:
                 self.second_tab.last_photo()
+            
+    def onKeyRelease(self, event):
+        if event.keysym == KEY_CTRL_L:
+            self.l_ctrl_pressed = False;
+            print(YELLOW + "key release: " + EOC + "Control_L")
 
 
     def open_options(self):
