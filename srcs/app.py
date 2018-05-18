@@ -56,19 +56,19 @@ class App(tk.Tk):
         style.theme_settings(current_theme, {"TNotebook.Tab": {"configure": {"padding": [20, 5]}}})
 
         self.first_tab = ttk.Frame(self.tabs)
-        self.tabs.add(self.first_tab, text='Snap', compound=LEFT)
+        self.tabs.add(self.first_tab, text=SNAP_NAME, compound=LEFT)
         self.first_tab.grid_columnconfigure(0, weight=1)
         self.first_tab.grid_rowconfigure(0, weight=1)
         self.second_tab = ttk.Frame(self.tabs)
-        self.tabs.add(self.second_tab, text='Labelize', compound=LEFT)
+        self.tabs.add(self.second_tab, text=LABEL_NAME, compound=LEFT)
         self.second_tab.grid_columnconfigure(0, weight=1)
         self.second_tab.grid_rowconfigure(0, weight=1)
         self.third_tab = ttk.Frame(self.tabs)
-        self.tabs.add(self.third_tab, text='Model', compound=LEFT)
+        self.tabs.add(self.third_tab, text=MODEL_NAME, compound=LEFT)
         self.third_tab.grid_columnconfigure(0, weight=1)
         self.third_tab.grid_rowconfigure(0, weight=1)
         self.fourth_tab = ttk.Frame(self.tabs)
-        self.tabs.add(self.fourth_tab, text='Train', compound=LEFT)
+        self.tabs.add(self.fourth_tab, text=TRAIN_NAME, compound=LEFT)
         self.fourth_tab.grid_columnconfigure(0, weight=1)
         self.fourth_tab.grid_rowconfigure(0, weight=1)
 
@@ -82,6 +82,14 @@ class App(tk.Tk):
             self.on_Quit()
         else:
             print(YELLOW + 'key press: ' + EOC + event.keysym)
+
+        # if we are in label
+        if self.tabs.tab(self.tabs.select(), "text") == LABEL_NAME:
+            if event.keysym == NEXT_PHOTO:
+                self.second_tab.next_photo()
+            elif event.keysym == LAST_PHOTO:
+                self.second_tab.last_photo()
+
 
     def open_options(self):
         self.options_frame = Toplevel()

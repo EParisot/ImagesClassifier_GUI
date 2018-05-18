@@ -35,8 +35,19 @@ class SecondTab(object):
         self.label_frame.grid_columnconfigure(0, weight=1)
         self.label_frame.grid_rowconfigure(0, weight=1)
 
+        self.fen = {
+            'fen' : None,
+            'lab_photo' : None,
+            'photo' : None,
+            'lab_info' : None
+        }
+        self.fen['fen'] = Frame(self.label_frame,
+                width=WIDTH_IMG, height=HEIGHT_IMG)
+        self.fen['fen'].grid(row=0, column=0, sticky='n')
+
+
         self.command_frame = Frame(self.label_frame)
-        self.command_frame.grid(row=0, column=0, sticky='n')
+        self.command_frame.grid(row=1, column=0, sticky='n')
         self.command_frame.grid_columnconfigure(0, weight=1)
         self.command_frame.grid_columnconfigure(1, weight=1)
         self.command_frame.grid_columnconfigure(2, weight=1)
@@ -60,6 +71,7 @@ class SecondTab(object):
         self.photos = None    # list with all photos
 
         self.load()
+        self.print_win()
 
 
     def load(self, event=None):
@@ -69,6 +81,56 @@ class SecondTab(object):
         self.photo_act = 0
         if len(self.photos) == 0:
             print(RED + 'ERROR: ' + EOC + 'first tab -> no photos')
+            return
+
+        for i in range(len(self.photos) - 1, -1, -1):
+            remove = 1
+            for ext in EXT_PHOTOS:
+                if len(self.photos[i]) > len(ext) and self.photos[i][-len(ext):] == ext:
+                    remove = 0
+                    break
+            if remove == 1:
+                self.photos.pop(i)
+            else:
+                self.photos[i] = self.dir_srcs + '/' + self.photos[i]
+
+
+
+    def print_win(self):
+        if self.fen['lab_photo'] != None:
+            self.fen['lab_photo'].destroy()
+        if self.fen['lab_info'] != None:
+            self.fen['lab_info'].destroy()
+        image = Image.open(self.photos[self.photo_act])
+        image = image.resize((WIDTH_IMG, HEIGHT_IMG - 50), Image.ANTIALIAS)
+        self.fen['photo'] = ImageTk.PhotoImage(image)
+        self.fen['lab_photo'] = Label(self.fen['fen'], image=self.fen['photo'])
+        self.fen['lab_photo'].pack(side=TOP)
+        self.fen['lab_info'] = Label(self.fen['fen'], width=32, height=2, font=("Courier", 40))
+        self.fen['lab_info']['text'] = "self.get_label()" + '\t\t' + str(self.photo_act) + '/' + str(len(self.photos))
+        self.fen['lab_info'].pack(side=BOTTOM)
+
+
+#    def init_key(self):
+#        self.fen['fen'].bind("<Escape>", self.quit_win)
+#        self.fen['fen'].bind("<Right>", self.next_photo)
+#        self.fen['fen'].bind("<Left>", self.last_photo)
+#        self.fen['fen'].bind("<Up>", self.del_photo)
+#        self.fen['fen'].bind("<KeyPress>", self.event_win)
+
+
+    def last_photo(self):
+        self.photo_act -= 1
+        if self.photo_act < 0:
+            self.photo_act = len(self.photos) - 1
+        self.print_win()
+
+    def next_photo(self):
+        self.photo_act += 1
+        if self.photo_act >= len(self.photos):
+            self.photo_act = 0
+        self.print_win()
+
 
 
 #    def __init__(self, photos, auto_next=True, width=800, height=600):
@@ -128,17 +190,6 @@ class SecondTab(object):
 #            self.photo_act = 0
 #        self.print_win()
 #
-#    def last_photo(self, event):
-#        self.photo_act -= 1
-#        if self.photo_act < 0:
-#            self.photo_act = len(self.photos) - 1
-#        self.print_win()
-#
-#    def next_photo(self, event):
-#        self.photo_act += 1
-#        if self.photo_act >= len(self.photos):
-#            self.photo_act = 0
-#        self.print_win()
 #
 #    def print_win(self):
 #        if self.fen['lab_photo'] != None:
