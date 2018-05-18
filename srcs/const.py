@@ -14,3 +14,4 @@ ERROR = 1
 ##### shortcut
 KEY_OPTION = 'comma' # open option menu
 KEY_QUIT = 'Escape' # quit windows
+KEY_CTRL_L = 'Control_L'
