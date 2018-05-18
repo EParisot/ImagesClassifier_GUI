@@ -224,11 +224,15 @@ class Icon:
         canvas = self.canvas
         if not canvas:
             return
-        id = self.id
-        label = self.label
-        self.canvas = self.label = self.id = None
-        canvas.delete(id)
-        label.destroy()
+        if self.canvas != self.root.third_tab.layers_canvas:
+            id = self.id
+            label = self.label
+            self.canvas = self.label = self.id = None
+            canvas.delete(id)
+            label.destroy()
+        else:
+            label = Icon(self.root, self.img, self.tk)
+            label.attach(self.canvas, x=self.x_orig, y=self.y_orig)
 
     def press(self, event):
         if dnd_start(self, event):
@@ -259,7 +263,7 @@ class Icon:
         if target:
             if target.canvas == self.root.third_tab.trash_canvas:
                 self.label.destroy()
-
+                
 class DnD_Container:
 
     def __init__(self, root, canvas, tk):
@@ -271,24 +275,30 @@ class DnD_Container:
         return self
 
     def dnd_enter(self, source, event):
-        self.canvas.focus_set() # Show highlight border
-        x, y = source.where(self.canvas, event)
-        x1, y1, x2, y2 = source.canvas.bbox(source.id)
-        dx, dy = x2-x1, y2-y1
-        self.dndid = self.canvas.create_rectangle(x, y, x+dx, y+dy)
-        self.dnd_motion(source, event)
+        if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
+            self.canvas.focus_set() # Show highlight border
+            x, y = source.where(self.canvas, event)
+            x1, y1, x2, y2 = source.canvas.bbox(source.id)
+            dx, dy = x2-x1, y2-y1
+            self.dndid = self.canvas.create_rectangle(x, y, x+dx, y+dy)
+            self.dnd_motion(source, event)
 
     def dnd_motion(self, source, event):
-        x, y = source.where(self.canvas, event)
-        x1, y1, x2, y2 = self.canvas.bbox(self.dndid)
-        self.canvas.move(self.dndid, x-x1, y-y1)
+        if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
+            x, y = source.where(self.canvas, event)
+            x1, y1, x2, y2 = self.canvas.bbox(self.dndid)
+            self.canvas.move(self.dndid, x-x1, y-y1)
 
     def dnd_leave(self, source, event):
-        self.top.focus_set() # Hide highlight border
-        self.canvas.delete(self.dndid)
-        self.dndid = None
+        if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
+            self.top.focus_set() # Hide highlight border
+            self.canvas.delete(self.dndid)
+            self.dndid = None
 
     def dnd_commit(self, source, event):
-        self.dnd_leave(source, event)
-        x, y = source.where(self.canvas, event)
-        source.attach(self.canvas, x, y)
+        if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
+            self.dnd_leave(source, event)
+            x, y = source.where(self.canvas, event)
+            source.attach(self.canvas, x, y)
+        else:
+            source.putback()

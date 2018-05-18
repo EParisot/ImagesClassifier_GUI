@@ -67,23 +67,23 @@ class ThirdTab(object):
         self.trash_canvas.grid(row=1, column=2, padx=20, pady=20, stick='w')
         self.trash_canvas.grid_propagate(0)
 
-        in_layer = Tk_DragnDrop.Icon(self.app, self.in_layer_pic, tk)
-        in_layer.attach(self.layers_canvas)
+        self.in_layer = Tk_DragnDrop.Icon(self.app, self.in_layer_pic, tk)
+        self.in_layer.attach(self.layers_canvas)
 
-        conv2d_layer = Tk_DragnDrop.Icon(self.app, self.conv2d_layer_pic, tk)
-        conv2d_layer.attach(self.layers_canvas, x=70)
+        self.conv2d_layer = Tk_DragnDrop.Icon(self.app, self.conv2d_layer_pic, tk)
+        self.conv2d_layer.attach(self.layers_canvas, x=70)
 
-        flatten_layer = Tk_DragnDrop.Icon(self.app, self.flatten_layer_pic, tk)
-        flatten_layer.attach(self.layers_canvas, x=130)
+        self.flatten_layer = Tk_DragnDrop.Icon(self.app, self.flatten_layer_pic, tk)
+        self.flatten_layer.attach(self.layers_canvas, x=130)
 
-        dense_layer = Tk_DragnDrop.Icon(self.app, self.dense_layer_pic, tk)
-        dense_layer.attach(self.layers_canvas, x=190)
+        self.dense_layer = Tk_DragnDrop.Icon(self.app, self.dense_layer_pic, tk)
+        self.dense_layer.attach(self.layers_canvas, x=190)
 
-        out_layer = Tk_DragnDrop.Icon(self.app, self.out_layer_pic, tk)
-        out_layer.attach(self.layers_canvas, x=250)
+        self.out_layer = Tk_DragnDrop.Icon(self.app, self.out_layer_pic, tk)
+        self.out_layer.attach(self.layers_canvas, x=250)
 
-        sig_activation = Tk_DragnDrop.Icon(self.app, self.sig_activation_pic, tk)
-        sig_activation.attach(self.layers_canvas, x=310)
+        self.sig_activation = Tk_DragnDrop.Icon(self.app, self.sig_activation_pic, tk)
+        self.sig_activation.attach(self.layers_canvas, x=310)
 
-        relu_activation = Tk_DragnDrop.Icon(self.app, self.relu_activation_pic, tk)
-        relu_activation.attach(self.layers_canvas, x=370)
+        self.relu_activation = Tk_DragnDrop.Icon(self.app, self.relu_activation_pic, tk)
+        self.relu_activation.attach(self.layers_canvas, x=370)
