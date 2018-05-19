@@ -13,9 +13,6 @@ import os
 import configparser
 from time import time, localtime, strftime, sleep
 
-import imutils
-from imutils.video import VideoStream
-import cv2
 import numpy as np
 import threading
 
