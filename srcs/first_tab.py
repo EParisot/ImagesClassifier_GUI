@@ -56,7 +56,7 @@ class FirstTab():
         if SYSTEM == "Rpi":
             self.camera = PiCamera()
             self.camera.resolution = (810, 500)
-            self.camera.framerate(60)
+            self.camera.framerate = 60
             self.camera.hflip = True
             self.camera.vflip = True
             self.rawCapture = PiRGBArray(self.camera, size=(810, 500))
