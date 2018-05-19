@@ -111,14 +111,6 @@ class SecondTab(object):
         self.fen['lab_info'].pack(side=BOTTOM)
 
 
-#    def init_key(self):
-#        self.fen['fen'].bind("<Escape>", self.quit_win)
-#        self.fen['fen'].bind("<Right>", self.next_photo)
-#        self.fen['fen'].bind("<Left>", self.last_photo)
-#        self.fen['fen'].bind("<Up>", self.del_photo)
-#        self.fen['fen'].bind("<KeyPress>", self.event_win)
-
-
     def last_photo(self):
         self.photo_act -= 1
         if self.photo_act < 0:
@@ -147,6 +139,14 @@ class SecondTab(object):
 #        self.width_img = self.width
 #        self.height_img = self.height - 50
 #        self.auto_next = auto_next
+#
+#
+#    def init_key(self):
+#        self.fen['fen'].bind("<Escape>", self.quit_win)
+#        self.fen['fen'].bind("<Right>", self.next_photo)
+#        self.fen['fen'].bind("<Left>", self.last_photo)
+#        self.fen['fen'].bind("<Up>", self.del_photo)
+#        self.fen['fen'].bind("<KeyPress>", self.event_win)
 #
 #
 #    def init_win(self, width=0, height=0):
