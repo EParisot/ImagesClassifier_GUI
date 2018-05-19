@@ -13,11 +13,18 @@ import os
 import configparser
 from time import time, localtime, strftime, sleep
 
-import imutils
 from PIL import Image, ImageTk
 import configparser
-from imutils.video import VideoStream
-import cv2
+
+import imutils
+
+if SYSTEM == "Win":
+    from imutils.video import VideoStream
+    import cv2
+elif SYSTEM == "Rpi":
+    from picamera import PiCamera
+    from picamera.array import PiRGBArray
+
 import numpy as np
 import threading
 
@@ -46,6 +53,14 @@ class FirstTab():
         self.snap_pic = ImageTk.PhotoImage(Image.open('assets/snap.png'))
         self.del_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
+        if SYSTEM == "Rpi":
+            self.camera = PiCamera()
+            self.camera.resolution = (810, 500)
+            self.camera.framerate(60)
+            self.camera.hflip = True
+            self.camera.vflip = True
+            self.rawCapture = PiRGBArray(self.camera, size=(810, 500))
+        
         self.video_frame = Frame(self.snap_frame)
         self.video_frame.config(borderwidth=2, relief="sunken", height=500, width=810)
         self.video_frame.grid(row=0, column=0)
@@ -108,15 +123,41 @@ class FirstTab():
         snap_count.grid(row=1, column=0, padx=10)
 
     def videoLoop(self):
-        while not self.stopEvent.is_set():
-            if self.stopEvent.is_set():
-                break
-            #####SYSTEM DEPENDENT
-            ret, self.video = self.vs.read()
-            if ret is True:
-                self.video = imutils.resize(self.video, width=800)
-                image = cv2.cvtColor(self.video, cv2.COLOR_BGR2RGB)
-                image = Image.fromarray(image)
+        if SYSTEM == "Win":
+            while not self.stopEvent.is_set():
+                if self.stopEvent.is_set():
+                    break
+                #####SYSTEM DEPENDENT
+                ret, self.video = self.vs.read()
+                if ret is True:
+                    self.video = imutils.resize(self.video, width=800)
+                    image = cv2.cvtColor(self.video, cv2.COLOR_BGR2RGB)
+                    image = Image.fromarray(image)
+                    try:
+                        image = ImageTk.PhotoImage(image)
+                    except RuntimeError:
+                        break
+                    if self.panel is None:
+                        self.panel = Label(self.video_frame, image=image)
+                        self.panel.image = image
+                        self.panel.grid()
+                    else:
+                        self.panel.configure(image=image)
+                        self.panel.image = image
+                else:
+                    self.stop(self, self.path)
+                    break
+            self.panel.image = None
+            self.vs.release()
+            self.frame = None
+            
+        elif SYSTEM == "Rpi":
+            for frame in self.camera.capture_continuous(self.rawCapture, format="rgb", use_video_port=True):
+                if self.stopEvent.is_set():
+                    self.rawCapture.truncate(0)
+                    break
+                self.image = frame.array
+                image = Image.fromarray(self.image)
                 try:
                     image = ImageTk.PhotoImage(image)
                 except RuntimeError:
@@ -128,12 +169,9 @@ class FirstTab():
                 else:
                     self.panel.configure(image=image)
                     self.panel.image = image
-            else:
-                self.stop(self, self.path)
-                break
-        self.panel.image = None
-        self.vs.release()
-        self.frame = None
+                self.rawCapture.truncate(0)
+            self.panel.image = None
+            self.frame = None
 
     def open_cam(event, self):
         if self.thread.is_alive():
@@ -141,7 +179,8 @@ class FirstTab():
         else:
             self.thread = threading.Thread(target=self.videoLoop, args=())
             self.stopEvent = threading.Event()
-            self.vs = cv2.VideoCapture(0)
+            if SYSTEM == "Win":
+                self.vs = cv2.VideoCapture(0)
             sleep(0.2)
             self.thread.start()
 
@@ -153,10 +192,14 @@ class FirstTab():
     def snap(event, self):
         if self.thread.is_alive():
             self.picname = self.app.snap_path + "/" + str(time()) + ".jpg"
-            pic = self.video
-            cv2.imwrite(self.picname, pic)
+            if SYSTEM == "Win":
+                pic = self.video
+                cv2.imwrite(self.picname, pic)
+                pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
+            else:
+                pic = self.image
+                self.camera.capture(self.picname)
             pic = imutils.resize(pic, width=160)
-            pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
             pic = Image.fromarray(pic)
             pic = ImageTk.PhotoImage(pic)
             self.prev_frame.config(image=pic)

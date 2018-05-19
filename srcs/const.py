@@ -6,6 +6,8 @@ from srcs.color import *
 This file contains all constant
 """
 
+SYSTEM = 'Win'
+
 FILE_CONFIG = 'config.cfg'
 
 SUCCESS = 0
