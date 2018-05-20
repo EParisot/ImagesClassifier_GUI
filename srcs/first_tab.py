@@ -18,10 +18,10 @@ import configparser
 
 import imutils
 
-if SYSTEM == "Win":
+if SYSTEM != 'Rpi':
     from imutils.video import VideoStream
     import cv2
-elif SYSTEM == "Rpi":
+else:
     from picamera import PiCamera
     from picamera.array import PiRGBArray
 
@@ -53,7 +53,7 @@ class FirstTab():
         self.snap_pic = ImageTk.PhotoImage(Image.open('assets/snap.png'))
         self.del_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
-        if SYSTEM == "Rpi":
+        if SYSTEM == 'Rpi':
             self.camera = PiCamera()
             self.camera.resolution = (810, 500)
             self.camera.framerate = 60
@@ -123,7 +123,7 @@ class FirstTab():
         snap_count.grid(row=1, column=0, padx=10)
 
     def videoLoop(self):
-        if SYSTEM == "Win":
+        if SYSTEM != 'Rpi':
             while not self.stopEvent.is_set():
                 if self.stopEvent.is_set():
                     break
@@ -151,7 +151,7 @@ class FirstTab():
             self.vs.release()
             self.frame = None
             
-        elif SYSTEM == "Rpi":
+        else:
             for frame in self.camera.capture_continuous(self.rawCapture, format="rgb", use_video_port=True):
                 if self.stopEvent.is_set():
                     self.rawCapture.truncate(0)
@@ -179,7 +179,7 @@ class FirstTab():
         else:
             self.thread = threading.Thread(target=self.videoLoop, args=())
             self.stopEvent = threading.Event()
-            if SYSTEM == "Win":
+            if SYSTEM != 'Rpi':
                 self.vs = cv2.VideoCapture(0)
             sleep(0.2)
             self.thread.start()
@@ -192,7 +192,7 @@ class FirstTab():
     def snap(event, self):
         if self.thread.is_alive():
             self.picname = self.app.snap_path + "/" + str(time()) + ".jpg"
-            if SYSTEM == "Win":
+            if SYSTEM != 'Rpi':
                 pic = self.video
                 cv2.imwrite(self.picname, pic)
                 pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
