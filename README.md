@@ -15,7 +15,7 @@ git clone "https://github.com/EParisot/Patate_for_kids.git"
 #### Change to repo's folder:
 
 ```
-cd patate_for_kids
+cd Patate_for_kids
 ```
 
 #### Install for your system (WIN, MACOS, RPI):
