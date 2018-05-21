@@ -3,11 +3,16 @@ Graphic implementation of the famous "Patate42"
 
 
 
-#### Download and Install Anaconda Python 3.6
+#### Download and Install Anaconda Python 3
 
 https://www.continuum.io/downloads
 
-#### Change to desired folder:
+#### Clone Repo
+```
+git clone "https://github.com/EParisot/Patate_for_kids.git"
+```
+
+#### Change to repo's folder:
 
 ```
 cd patate_for_kids
@@ -16,14 +21,14 @@ cd patate_for_kids
 #### Install for your system (WIN, MACOS, RPI):
 
 ```
-sh install_???.sh
+./install_???.sh
 ```
 wait for Anaconda to build environnement
 
 #### Start program:
 
 ```
-sh run.sh
+./run.sh
 ```
 
 ### Enjoy !!
