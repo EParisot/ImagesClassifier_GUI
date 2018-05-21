@@ -28,7 +28,7 @@ else:
 import numpy as np
 import threading
 
-import Tk_Tooltips
+import srcs.Tk_Tooltips as ttp
 
 class FirstTab():
 
@@ -87,17 +87,17 @@ class FirstTab():
         play_but = Button(command_frame)
         play_but.config(image=self.cam_pic, command=cam_handler)
         play_but.grid(row=0, column=0, padx=10)
-        play_ttp = Tk_Tooltips.ToolTip(play_but, 'Start Camera', msgFunc=None, delay=1, follow=True)
+        play_ttp = ttp.ToolTip(play_but, 'Start Camera', msgFunc=None, delay=1, follow=True)
 
         stop_but = Button(command_frame)
         stop_but.config(image=self.stop_pic, command=stop_handler)
         stop_but.grid(row=0, column=1, padx=10)
-        stop_ttp = Tk_Tooltips.ToolTip(stop_but, 'Stop Camera', msgFunc=None, delay=1, follow=True)
+        stop_ttp = ttp.ToolTip(stop_but, 'Stop Camera', msgFunc=None, delay=1, follow=True)
 
         snap_but = Button(command_frame)
         snap_but.config(image=self.snap_pic, command=snap_handler)
         snap_but.grid(row=0, column=2, padx=10)
-        snap_ttp = Tk_Tooltips.ToolTip(snap_but, 'Snapshot', msgFunc=None, delay=1, follow=True)
+        snap_ttp = ttp.ToolTip(snap_but, 'Snapshot', msgFunc=None, delay=1, follow=True)
 
         self.prev_frame = Label(command_frame, image=self.none_pic)
         self.prev_frame.config(borderwidth=2, relief="sunken", height=120, width=160)
@@ -106,7 +106,7 @@ class FirstTab():
         del_but = Button(command_frame)
         del_but.config(image=self.del_pic, command=del_handler)
         del_but.grid(row=0, column=4, sticky="se")
-        del_but = Tk_Tooltips.ToolTip(del_but, 'Remove last snapshot', msgFunc=None, delay=1, follow=True)
+        del_but = ttp.ToolTip(del_but, 'Remove last snapshot', msgFunc=None, delay=1, follow=True)
  
         count_frame = Frame(command_frame)
         count_frame.grid(row=0, column=5, sticky='w')

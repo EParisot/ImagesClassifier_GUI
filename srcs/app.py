@@ -14,11 +14,6 @@ import configparser
 from time import time, localtime, strftime, sleep
 
 from PIL import Image, ImageTk
-import configparser
-import numpy as np
-import threading
-
-import Tk_Tooltips
 
 class App(tk.Tk):
 

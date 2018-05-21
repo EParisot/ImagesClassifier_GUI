@@ -13,10 +13,7 @@ import os
 import configparser
 from time import time, localtime, strftime, sleep
 
-import numpy as np
-import threading
-
-import Tk_Tooltips
+import srcs.Tk_Tooltips as ttp
 
 class FourthTab(object):
 

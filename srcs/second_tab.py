@@ -14,10 +14,8 @@ import configparser
 from time import time, localtime, strftime, sleep
 
 from PIL import ImageTk, Image
-import numpy as np
-import threading
 
-import Tk_Tooltips
+import srcs.Tk_Tooltips as ttp
 
 """
 labelisation
@@ -60,7 +58,7 @@ class SecondTab(object):
         self.reload_but = Button(self.command_frame)
         self.reload_but.config(image=self.reload_pic, command=load_handler)
         self.reload_but.grid(row=0, column=0, padx=10)
-        reload_ttp = Tk_Tooltips.ToolTip(self.reload_but, 'Reload labelisation',
+        reload_ttp = ttp.ToolTip(self.reload_but, 'Reload labelisation',
                 msgFunc=None, delay=1, follow=True)
 
         self.dir_srcs = None  # directory with photos
