@@ -36,23 +36,26 @@ class ThirdTab(object):
         self.conv2d_layer_pic = ImageTk.PhotoImage(Image.open('assets/hidden_layer1.png'))
         self.dense_layer_pic = ImageTk.PhotoImage(Image.open('assets/hidden_layer2.png'))
         self.flatten_layer_pic = ImageTk.PhotoImage(Image.open('assets/hidden_layer3.png'))
+        self.max_p_layer_pic = ImageTk.PhotoImage(Image.open('assets/hidden_layer4.png'))
         self.out_layer_pic = ImageTk.PhotoImage(Image.open('assets/out_layer3.png'))
         self.sig_activation_pic = ImageTk.PhotoImage(Image.open('assets/sig_activation.png'))
         self.relu_activation_pic = ImageTk.PhotoImage(Image.open('assets/relu_activation.png'))
+        self.max_activation_pic = ImageTk.PhotoImage(Image.open('assets/softmax_activation.png'))
+        self.dropout_pic = ImageTk.PhotoImage(Image.open('assets/dropout.png'))
 
         self.photo_label = Label(self.model_frame, image=self.input_pic)
-        self.photo_label.grid(row=0, column=0, padx=20, pady=20, stick='e')
+        self.photo_label.grid(row=0, column=0, padx=20, pady=10, stick='e')
 
         self.model_canvas = Canvas(self.model_frame)
         self.model_canvas_dnd = dnd.DnD_Container(self.model_frame, self.model_canvas, tk)
         self.model_canvas.config(borderwidth=2, relief="sunken", height=400, width=800)
-        self.model_canvas.grid(row=0, column=1, padx=20, pady=20, sticky="w")
+        self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
         self.model_canvas.grid_propagate(0)
 
         self.layers_canvas = Canvas(self.model_frame)
         self.layers_canvas_dnd = dnd.DnD_Container(self.model_frame, self.layers_canvas, tk)
-        self.layers_canvas.config(borderwidth=2, relief="sunken", height=300, width=600)
-        self.layers_canvas.grid(row=1, column=1, padx=20, pady=20)
+        self.layers_canvas.config(borderwidth=2, relief="sunken", height=235, width=600)
+        self.layers_canvas.grid(row=1, column=1, padx=20, pady=10)
         self.layers_canvas.grid_propagate(0)
 
         self.trash_canvas = Canvas(self.model_frame)
@@ -68,17 +71,26 @@ class ThirdTab(object):
         self.conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, tk)
         self.conv2d_layer.attach(self.layers_canvas, x=70)
 
+        self.max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, tk)
+        self.max_p_layer.attach(self.layers_canvas, x=130)
+
         self.flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, tk)
-        self.flatten_layer.attach(self.layers_canvas, x=130)
+        self.flatten_layer.attach(self.layers_canvas, x=190)
 
         self.dense_layer = dnd.Icon(self.app, self.dense_layer_pic, tk)
-        self.dense_layer.attach(self.layers_canvas, x=190)
+        self.dense_layer.attach(self.layers_canvas, x=250)
 
         self.out_layer = dnd.Icon(self.app, self.out_layer_pic, tk)
-        self.out_layer.attach(self.layers_canvas, x=250)
-
-        self.sig_activation = dnd.Icon(self.app, self.sig_activation_pic, tk)
-        self.sig_activation.attach(self.layers_canvas, x=310)
+        self.out_layer.attach(self.layers_canvas, x=310)
 
         self.relu_activation = dnd.Icon(self.app, self.relu_activation_pic, tk)
         self.relu_activation.attach(self.layers_canvas, x=370)
+
+        self.sig_activation = dnd.Icon(self.app, self.sig_activation_pic, tk)
+        self.sig_activation.attach(self.layers_canvas, x=430)
+
+        self.max_activation = dnd.Icon(self.app, self.max_activation_pic, tk)
+        self.max_activation.attach(self.layers_canvas, x=490)
+
+        self.dropout = dnd.Icon(self.app, self.dropout_pic, tk)
+        self.dropout.attach(self.layers_canvas, x=550)
