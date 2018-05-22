@@ -205,6 +205,7 @@ class Icon:
         self.root = root
         self.canvas = self.label = self.id = None
 
+
     def attach(self, canvas, x=10, y=10):
         if canvas is self.canvas:
             self.canvas.coords(self.id, x, y)
@@ -295,10 +296,34 @@ class DnD_Container:
             self.canvas.delete(self.dndid)
             self.dndid = None
 
+    def check_n_offset(self, canvas, source, x, y):
+        ret = False
+        source_bbox = source.canvas.bbox(source.id)
+        source_w = source_bbox[2] - source_bbox[0]
+        source_h = source_bbox[3] - source_bbox[1]
+        if len(canvas.find_overlapping(x, y, x + source_w, y + source_h)) > 0:
+            items = canvas.find_overlapping(x, y, x + source_w, y + source_h)
+            if source.id != items[0]:
+                item_under = items[0]
+            elif len(canvas.find_overlapping(x, y, x + source_w, y + source_h)) > 1:
+                item_under = items[1]
+            else:
+                return (x, y)
+            x_under, y_under = canvas.coords(item_under)
+            item_bbox = canvas.bbox(item_under)
+            item_w = item_bbox[2] - item_bbox[0]
+            item_h = item_bbox[3] - item_bbox[1]
+            if x >= x_under:
+                x = x + ((x_under + item_w) - x)
+            elif x < x_under:
+                x = x - ((x + item_w) - x_under)
+        return (x, y)
+
     def dnd_commit(self, source, event):
         if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
             self.dnd_leave(source, event)
             x, y = source.where(self.canvas, event)
+            x, y = self.check_n_offset(self.canvas, source, x, y)
             source.attach(self.canvas, x, y)
         else:
             source.putback()
