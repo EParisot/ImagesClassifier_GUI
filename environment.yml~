@@ -1,0 +1,13 @@
+name: patate_for_kids
+channels:
+- !!python/unicode
+  'defaults'
+dependencies:
+- pip
+- numpy
+- pandas
+- h5py
+- pip:
+  - imutils
+  - tensorflow
+  - keras

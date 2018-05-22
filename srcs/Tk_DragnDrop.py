@@ -301,22 +301,35 @@ class DnD_Container:
         source_bbox = source.canvas.bbox(source.id)
         source_w = source_bbox[2] - source_bbox[0]
         source_h = source_bbox[3] - source_bbox[1]
-        if len(canvas.find_overlapping(x, y, x + source_w, y + source_h)) > 0:
-            items = canvas.find_overlapping(x, y, x + source_w, y + source_h)
-            if source.id != items[0]:
-                item_under = items[0]
-            elif len(canvas.find_overlapping(x, y, x + source_w, y + source_h)) > 1:
-                item_under = items[1]
-            else:
-                return (x, y)
+        if len([z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]) > 0:
+            items = [z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]
+            item_under = items[0]
             x_under, y_under = canvas.coords(item_under)
             item_bbox = canvas.bbox(item_under)
             item_w = item_bbox[2] - item_bbox[0]
             item_h = item_bbox[3] - item_bbox[1]
             if x >= x_under:
-                x = x + ((x_under + item_w) - x)
+                x = x_bis = x + ((x_under + item_w) - x)
+                while len([z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]) > 0:
+                    items = [z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]
+                    item_under = items[0]
+                    x_under, y_under = canvas.coords(item_under)
+                    item_bbox = canvas.bbox(item_under)
+                    item_w = item_bbox[2] - item_bbox[0]
+                    item_h = item_bbox[3] - item_bbox[1]
+                    canvas.move(item_under, item_w, 0)
+                    x_bis = x_under + item_w
             elif x < x_under:
-                x = x - ((x + item_w) - x_under)
+                x = x_bis = x - ((x + item_w) - x_under)
+                while len([z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]) > 0:
+                    items = [z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]
+                    item_under = items[0]
+                    x_under, y_under = canvas.coords(item_under)
+                    item_bbox = canvas.bbox(item_under)
+                    item_w = item_bbox[2] - item_bbox[0]
+                    item_h = item_bbox[3] - item_bbox[1]
+                    canvas.move(item_under, -item_w, 0)
+                    x_bis = x_under - item_w
         return (x, y)
 
     def dnd_commit(self, source, event):
