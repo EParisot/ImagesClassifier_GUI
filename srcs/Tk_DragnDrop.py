@@ -297,7 +297,6 @@ class DnD_Container:
             self.dndid = None
 
     def check_n_offset(self, canvas, source, x, y):
-        ret = False
         source_bbox = source.canvas.bbox(source.id)
         source_w = source_bbox[2] - source_bbox[0]
         source_h = source_bbox[3] - source_bbox[1]
@@ -336,7 +335,8 @@ class DnD_Container:
         if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
             self.dnd_leave(source, event)
             x, y = source.where(self.canvas, event)
-            x, y = self.check_n_offset(self.canvas, source, x, y)
+            if self.canvas != self.top.master.master.master.third_tab.trash_canvas:
+                x, y = self.check_n_offset(self.canvas, source, x, y)
             source.attach(self.canvas, x, y)
         else:
             source.putback()
