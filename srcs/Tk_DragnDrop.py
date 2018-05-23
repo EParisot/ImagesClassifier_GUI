@@ -1,107 +1,11 @@
-"""Drag-and-drop support for Tkinter.
-
-This is very preliminary.  I currently only support dnd *within* one
-application, between different windows (or within the same window).
-
-I am trying to make this as generic as possible -- not dependent on
-the use of a particular widget or icon type, etc.  I also hope that
-this will work with Pmw.
-
-To enable an object to be dragged, you must create an event binding
-for it that starts the drag-and-drop process. Typically, you should
-bind <ButtonPress> to a callback function that you write. The function
-should call Tkdnd.dnd_start(source, event), where 'source' is the
-object to be dragged, and 'event' is the event that invoked the call
-(the argument to your callback function).  Even though this is a class
-instantiation, the returned instance should not be stored -- it will
-be kept alive automatically for the duration of the drag-and-drop.
-
-When a drag-and-drop is already in process for the Tk interpreter, the
-call is *ignored*; this normally averts starting multiple simultaneous
-dnd processes, e.g. because different button callbacks all
-dnd_start().
-
-The object is *not* necessarily a widget -- it can be any
-application-specific object that is meaningful to potential
-drag-and-drop targets.
-
-Potential drag-and-drop targets are discovered as follows.  Whenever
-the mouse moves, and at the start and end of a drag-and-drop move, the
-Tk widget directly under the mouse is inspected.  This is the target
-widget (not to be confused with the target object, yet to be
-determined).  If there is no target widget, there is no dnd target
-object.  If there is a target widget, and it has an attribute
-dnd_accept, this should be a function (or any callable object).  The
-function is called as dnd_accept(source, event), where 'source' is the
-object being dragged (the object passed to dnd_start() above), and
-'event' is the most recent event object (generally a <Motion> event;
-it can also be <ButtonPress> or <ButtonRelease>).  If the dnd_accept()
-function returns something other than None, this is the new dnd target
-object.  If dnd_accept() returns None, or if the target widget has no
-dnd_accept attribute, the target widget's parent is considered as the
-target widget, and the search for a target object is repeated from
-there.  If necessary, the search is repeated all the way up to the
-root widget.  If none of the target widgets can produce a target
-object, there is no target object (the target object is None).
-
-The target object thus produced, if any, is called the new target
-object.  It is compared with the old target object (or None, if there
-was no old target widget).  There are several cases ('source' is the
-source object, and 'event' is the most recent event object):
-
-- Both the old and new target objects are None.  Nothing happens.
-
-- The old and new target objects are the same object.  Its method
-dnd_motion(source, event) is called.
-
-- The old target object was None, and the new target object is not
-None.  The new target object's method dnd_enter(source, event) is
-called.
-
-- The new target object is None, and the old target object is not
-None.  The old target object's method dnd_leave(source, event) is
-called.
-
-- The old and new target objects differ and neither is None.  The old
-target object's method dnd_leave(source, event), and then the new
-target object's method dnd_enter(source, event) is called.
-
-Once this is done, the new target object replaces the old one, and the
-Tk mainloop proceeds.  The return value of the methods mentioned above
-is ignored; if they raise an exception, the normal exception handling
-mechanisms take over.
-
-The drag-and-drop processes can end in two ways: a final target object
-is selected, or no final target object is selected.  When a final
-target object is selected, it will always have been notified of the
-potential drop by a call to its dnd_enter() method, as described
-above, and possibly one or more calls to its dnd_motion() method; its
-dnd_leave() method has not been called since the last call to
-dnd_enter().  The target is notified of the drop by a call to its
-method dnd_commit(source, event).
-
-If no final target object is selected, and there was an old target
-object, its dnd_leave(source, event) method is called to complete the
-dnd sequence.
-
-Finally, the source object is notified that the drag-and-drop process
-is over, by a call to source.dnd_end(target, event), specifying either
-the selected target object, or None if no target object was selected.
-The source object can use this to implement the commit action; this is
-sometimes simpler than to do it in the target's dnd_commit().  The
-target's dnd_commit() method could then simply be aliased to
-dnd_leave().
-
-At any time during a dnd sequence, the application can cancel the
-sequence by calling the cancel() method on the object returned by
-dnd_start().  This will call dnd_leave() if a target is currently
-active; it will never call dnd_commit().
-
-"""
+# -*- coding: utf-8 -*-
 
 import srcs.layers
 import tkinter as tk
 from tkinter import ttk
+from tkinter.messagebox import *
+
+from srcs.layers import layers_list
 
 # The factory function
 
@@ -352,8 +256,11 @@ class DnD_Container:
         return (x, y)
 
     def set_layer_params(self, event, source):
-        if ("layer" in source.tags and "Flatten" not in source.tags) or "Dropout" in source.tags:
-            self.param_frame = tk.Toplevel()
+        if type(self) == srcs.Tk_DragnDrop.DnD_Container:
+            test_val = self.root.master.master.master.third_tab.model_canvas
+        else:
+            test_val = self.canvas
+        if test_val == source.root.third_tab.model_canvas and ("layer" in source.tags and "Flatten" not in source.tags) or "Dropout" in source.tags:
             if type(self) == srcs.Tk_DragnDrop.DnD_Container:
                 x = self.root.master.master.master.winfo_x()
                 y = self.root.master.master.master.winfo_y()
@@ -363,6 +270,8 @@ class DnD_Container:
                 y = self.root.winfo_y()
                 x_clic = event.x
                 y_clic = event.y
+            self.param_frame = tk.Toplevel()
+            
             self.param_frame.geometry("%dx%d+%d+%d" % (250, 250, x + x_clic, y + y_clic))
             self.param_frame.title(source.tags[0] + " parameters")
             self.param_frame.transient(self.root)
@@ -416,8 +325,11 @@ class DnD_Container:
                 val_3bis.config(text="No", variable=self.pix_type, value=2)
                 val_3bis.grid(row=3, column=2, sticky='nse', padx=5, pady=10)
 
+                save_in = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0],
+                                                     width=self.width, heigth=self.heigth, pix_type=self.pix_type)
+
                 save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16))
+                save_but.config(text='Save', font=("Helvetica", 16), command=save_in)
                 save_but.grid(row=4, column=1, sticky='nsew', padx=5, pady=10)
                 
             elif source.tags[0] == "Conv2d":
@@ -459,8 +371,12 @@ class DnD_Container:
                 val_2_y = tk.Entry(labels, width=10, textvariable=self.kernel_size_y)
                 val_2_y.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
 
+
+                save_conv2d = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0],
+                                                     filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y)
+                
                 save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16))
+                save_but.config(text='Save', font=("Helvetica", 16), command=save_conv2d)
                 save_but.grid(row=3, column=1, sticky='nsew', pady=10)
             
             elif source.tags[0] == "Dense":
@@ -487,8 +403,11 @@ class DnD_Container:
                 val_1 = tk.Entry(labels, width=10, textvariable=self.neurons)
                 val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
 
+
+                save_dense = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0], neurons=self.neurons)
+                
                 save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16))
+                save_but.config(text='Save', font=("Helvetica", 16), command=save_dense)
                 save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
                 
             elif source.tags[0] == "Max_pooling":
@@ -535,8 +454,12 @@ class DnD_Container:
                 val_2_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
                 val_2_y.grid(row=2, column=2, sticky='nsw', pady=10)
 
+                save_max_p = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0],
+                                                     pool_size_x=self.pool_size_x, pool_size_y=self.pool_size_y,
+                                                     stride_x=self.stride_x, stride_y=self.stride_y)
+
                 save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16))
+                save_but.config(text='Save', font=("Helvetica", 16), command=save_max_p)
                 save_but.grid(row=3, column=1, sticky='nsew', padx=5, pady=10)
             
             elif source.tags[0] == "Out":
@@ -580,8 +503,10 @@ class DnD_Container:
                 val_1bis.config(text="Values", variable=self.out_type, value=2)
                 val_1bis.grid(row=3, column=1, sticky='nsw', padx=5, pady=10)
 
+                save_out = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0], out_type=self.out_type, out_nb=self.out_nb)
+
                 save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16))
+                save_but.config(text='Save', font=("Helvetica", 16), command=save_out)
                 save_but.grid(row=4, column=0, columnspan=2, padx=5, pady=10)
           
             elif source.tags[0] == "Dropout":
@@ -609,6 +534,18 @@ class DnD_Container:
                 val_1 = tk.Entry(labels, width=10, textvariable=self.ratio)
                 val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
 
+                save_dropout = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0], ratio=self.ratio)
+
                 save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16))
+                save_but.config(text='Save', font=("Helvetica", 16), command=save_dropout)
                 save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
+
+    def save_layer(self, layers_list, id, tag, **kwargs):
+        
+        if id in layers_list:
+            res = askquestion("Modify Layer", "Layer already exists and will be overwriten...", icon='warning')
+            if res == "no":
+                self.param_frame.destroy()
+                return
+        layers_list[id] = {} #TODO: Save the layer
+        self.param_frame.destroy()

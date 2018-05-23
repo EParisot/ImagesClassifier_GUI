@@ -16,13 +16,19 @@ from PIL import Image, ImageTk
 
 import srcs.Tk_Tooltips as ttp
 
+
+global layers_list
+layers_list = {}
+
+# Mother Class:
 class Layers(object):
 
-    def __init__(self, root, id):
+    def __init__(self, root, id, tag):
         self.id = id
-        sel.root = root
-    
+        self.root = root
+        self.tag = tag
 
+# Children Classes:
 class In_layer(Layers):
 
     def __init__(self, width, heigth, pix_type):

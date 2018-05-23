@@ -18,6 +18,8 @@ from PIL import Image, ImageTk
 import srcs.Tk_Tooltips as ttp
 import srcs.Tk_DragnDrop as dnd
 
+from srcs.layers import layers_list
+
 class ThirdTab(object):
 
     def __init__(self, app):
@@ -134,6 +136,7 @@ class ThirdTab(object):
             res = askquestion("Clear Model", "Modifications not saved, \nare you sure ?", icon='warning')
             if res == 'yes':
                 self.model_canvas.delete("all")
+                layers_list = {}
         else:
             self.model_canvas.delete("all")
 
