@@ -22,6 +22,9 @@ class ThirdTab(object):
 
     def __init__(self, app):
         self.app = app
+
+        self.saved = False
+        
         self.model_frame = Frame(app.third_tab)
         self.model_frame.grid(row=0, column=0, stick='n')
         self.model_frame.grid_columnconfigure(0, weight=1)
@@ -42,15 +45,46 @@ class ThirdTab(object):
         self.relu_activation_pic = ImageTk.PhotoImage(Image.open('assets/relu_activation.png'))
         self.max_activation_pic = ImageTk.PhotoImage(Image.open('assets/softmax_activation.png'))
         self.dropout_pic = ImageTk.PhotoImage(Image.open('assets/dropout.png'))
+        self.load_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
+        self.save_pic = ImageTk.PhotoImage(Image.open('assets/save.png'))
+        self.clear_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
         self.photo_label = Label(self.model_frame, image=self.input_pic)
         self.photo_label.grid(row=0, column=0, padx=20, pady=10, stick='e')
 
         self.model_canvas = Canvas(self.model_frame)
+        self.model_canvas.bind("<Enter>", self.modified)
         self.model_canvas_dnd = dnd.DnD_Container(self.model_frame, self.model_canvas, tk)
-        self.model_canvas.config(borderwidth=2, relief="sunken", height=400, width=800)
+        self.model_canvas.config(borderwidth=2, relief="sunken", height=400, width=900)
         self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
         self.model_canvas.grid_propagate(0)
+
+        command_frame = Frame(self.model_frame)
+        command_frame.grid(row=0, column=2, sticky='nsw')
+        command_frame.grid_rowconfigure(0, weight=1)
+        command_frame.grid_rowconfigure(1, weight=1)
+        command_frame.grid_rowconfigure(2, weight=1)
+        command_frame.grid_columnconfigure(0, weight=1)
+        command_frame.grid_columnconfigure(1, weight=1)
+
+        load_handler = lambda: self.load(self)
+        save_handler = lambda: self.save(self)
+        clear_handler = lambda: self.clear(self)
+
+        load_but = Button(command_frame)
+        load_but.config(image=self.load_pic, command=load_handler)
+        load_but.grid(row=0, column=1, padx=10, pady=10)
+        load_but = ttp.ToolTip(load_but, 'Load Model', msgFunc=None, delay=1, follow=True)
+
+        save_but = Button(command_frame)
+        save_but.config(image=self.save_pic, command=save_handler)
+        save_but.grid(row=1, column=1, padx=10, pady=10)
+        save_but = ttp.ToolTip(save_but, 'Save Model', msgFunc=None, delay=1, follow=True)
+
+        clear_but = Button(command_frame)
+        clear_but.config(image=self.clear_pic, command=clear_handler)
+        clear_but.grid(row=2, column=0, pady=10, sticky="sw")
+        clear_but = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
 
         self.layers_canvas = Canvas(self.model_frame)
         self.layers_canvas_dnd = dnd.DnD_Container(self.model_frame, self.layers_canvas, tk)
@@ -94,3 +128,24 @@ class ThirdTab(object):
 
         self.dropout = dnd.Icon(self.app, self.dropout_pic, tk)
         self.dropout.attach(self.layers_canvas, x=550)
+
+    def clear(self, event):
+        if self.saved == False:
+            res = askquestion("Clear Model", "Modifications not saved, \nare you sure ?", icon='warning')
+            if res == 'yes':
+                self.model_canvas.delete("all")
+        else:
+            self.model_canvas.delete("all")
+
+    def load(self, event):
+        filename =  askopenfilename(title = "Select Model",filetypes = (("json files","*.json"),("all files","*.*")))
+        if filename is not None:
+            pass
+
+    def save(self, event):
+        filename = asksaveasfilename(title = "Save Model",filetypes = (("json files","*.json"),("all files","*.*")))
+        if filename is not None:
+            self.saved = True
+
+    def modified(self, event):
+        self.saved = False
