@@ -99,34 +99,34 @@ class ThirdTab(object):
         self.trash_canvas.grid(row=1, column=2, padx=20, pady=20, stick='w')
         self.trash_canvas.grid_propagate(0)
 
-        self.in_layer = dnd.Icon(self.app, self.in_layer_pic, tk)
+        self.in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"), tk)
         self.in_layer.attach(self.layers_canvas)
 
-        self.conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, tk)
+        self.conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, ("Conv2d", "layer"), tk)
         self.conv2d_layer.attach(self.layers_canvas, x=70)
 
-        self.max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, tk)
+        self.max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"), tk)
         self.max_p_layer.attach(self.layers_canvas, x=130)
 
-        self.flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, tk)
+        self.flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, ("Flatten", "layer"), tk)
         self.flatten_layer.attach(self.layers_canvas, x=190)
 
-        self.dense_layer = dnd.Icon(self.app, self.dense_layer_pic, tk)
+        self.dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"), tk)
         self.dense_layer.attach(self.layers_canvas, x=250)
 
-        self.out_layer = dnd.Icon(self.app, self.out_layer_pic, tk)
+        self.out_layer = dnd.Icon(self.app, self.out_layer_pic, ("Out", "layer"), tk)
         self.out_layer.attach(self.layers_canvas, x=310)
 
-        self.relu_activation = dnd.Icon(self.app, self.relu_activation_pic, tk)
+        self.relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"), tk)
         self.relu_activation.attach(self.layers_canvas, x=370)
 
-        self.sig_activation = dnd.Icon(self.app, self.sig_activation_pic, tk)
+        self.sig_activation = dnd.Icon(self.app, self.sig_activation_pic, ("Sigmoid", "activation"), tk)
         self.sig_activation.attach(self.layers_canvas, x=430)
 
-        self.max_activation = dnd.Icon(self.app, self.max_activation_pic, tk)
+        self.max_activation = dnd.Icon(self.app, self.max_activation_pic, ("Softmax", "activation"), tk)
         self.max_activation.attach(self.layers_canvas, x=490)
 
-        self.dropout = dnd.Icon(self.app, self.dropout_pic, tk)
+        self.dropout = dnd.Icon(self.app, self.dropout_pic, ("Dropout", "activation"), tk)
         self.dropout.attach(self.layers_canvas, x=550)
 
     def clear(self, event):
@@ -137,15 +137,22 @@ class ThirdTab(object):
         else:
             self.model_canvas.delete("all")
 
+    def parse(self, filename):
+        pass
+
     def load(self, event):
         filename =  askopenfilename(title = "Select Model",filetypes = (("json files","*.json"),("all files","*.*")))
         if filename is not None:
-            pass
+            self.parse(filename)
 
+    def write(self, filename):
+        pass
+    
     def save(self, event):
         filename = asksaveasfilename(title = "Save Model",filetypes = (("json files","*.json"),("all files","*.*")))
         if filename is not None:
             self.saved = True
+            self.write(filename)
 
     def modified(self, event):
         self.saved = False

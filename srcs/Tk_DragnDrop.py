@@ -99,6 +99,7 @@ active; it will never call dnd_commit().
 
 """
 
+import srcs.layers
 
 # The factory function
 
@@ -199,14 +200,17 @@ class DndHandler:
 
 class Icon:
 
-    def __init__(self, root, img, tk):
+    def __init__(self, root, img, tags, tk):
         self.img = img
+        self.tags = tags
         self.tk = tk
         self.root = root
         self.canvas = self.label = self.id = None
 
 
     def attach(self, canvas, x=10, y=10):
+        self.x = x
+        self.y = y
         if canvas is self.canvas:
             self.canvas.coords(self.id, x, y)
             return
@@ -215,11 +219,14 @@ class Icon:
         if not canvas:
             return
         label = self.tk.Label(canvas, image=self.img, borderwidth=2, relief="raised")
-        id = canvas.create_window(x, y, window=label, anchor="nw")
+        id = canvas.create_window(x, y, window=label, anchor="nw", tags=self.tags)
         self.canvas = canvas
         self.label = label
         self.id = id
         label.bind("<ButtonPress>", self.press)
+        double_clic_handler = lambda event: DnD_Container.set_layer_params(self, self, self)
+        label.bind("<Double-Button-1>", double_clic_handler)
+        
 
     def detach(self):
         canvas = self.canvas
@@ -232,7 +239,7 @@ class Icon:
             canvas.delete(id)
             label.destroy()
         else:
-            label = Icon(self.root, self.img, self.tk)
+            label = Icon(self.root, self.img, self.tags, self.tk)
             label.attach(self.canvas, x=self.x_orig, y=self.y_orig)
 
     def press(self, event):
@@ -268,6 +275,7 @@ class Icon:
 class DnD_Container:
 
     def __init__(self, root, canvas, tk):
+        self.tk = tk
         self.top = root
         self.canvas = canvas
         self.canvas.dnd_accept = self.dnd_accept
@@ -331,12 +339,29 @@ class DnD_Container:
                     x_bis = x_under - item_w
         return (x, y)
 
+    def set_layer_params(self, event, source):
+        if "layer" in source.tags or "Dropout" in source.tags:
+            self.param_frame = self.tk.Toplevel()
+            if type(self) == srcs.Tk_DragnDrop.DnD_Container:
+                x = self.top.master.master.master.winfo_x()
+                y = self.top.master.master.master.winfo_y()
+                x_clic, y_clic = source.where(self.canvas, event)
+            else:
+                x = self.root.winfo_x()
+                y = self.root.winfo_y()
+                x_clic = event.x
+                y_clic = event.y
+            self.param_frame.geometry("%dx%d+%d+%d" % (200, 200, x + x_clic, y + y_clic))
+            self.param_frame.title(source.tags[0] + " parameters")
+
     def dnd_commit(self, source, event):
         if self.canvas != self.top.master.master.master.third_tab.layers_canvas:
             self.dnd_leave(source, event)
             x, y = source.where(self.canvas, event)
-            if self.canvas != self.top.master.master.master.third_tab.trash_canvas:
+            if self.canvas == self.top.master.master.master.third_tab.model_canvas:
                 x, y = self.check_n_offset(self.canvas, source, x, y)
+                if source.canvas == self.top.master.master.master.third_tab.layers_canvas:
+                    self.set_layer_params(event, source)
             source.attach(self.canvas, x, y)
         else:
             source.putback()
