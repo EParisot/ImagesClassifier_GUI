@@ -54,7 +54,7 @@ class ThirdTab(object):
 
         self.model_canvas = Canvas(self.model_frame)
         self.model_canvas.bind("<Enter>", self.modified)
-        self.model_canvas_dnd = dnd.DnD_Container(self.model_frame, self.model_canvas, tk)
+        self.model_canvas_dnd = dnd.DnD_Container(self.model_frame, self.model_canvas)
         self.model_canvas.config(borderwidth=2, relief="sunken", height=400, width=900)
         self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
         self.model_canvas.grid_propagate(0)
@@ -87,7 +87,7 @@ class ThirdTab(object):
         clear_but = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
 
         self.layers_canvas = Canvas(self.model_frame)
-        self.layers_canvas_dnd = dnd.DnD_Container(self.model_frame, self.layers_canvas, tk)
+        self.layers_canvas_dnd = dnd.DnD_Container(self.model_frame, self.layers_canvas)
         self.layers_canvas.config(borderwidth=2, relief="sunken", height=235, width=600)
         self.layers_canvas.grid(row=1, column=1, padx=20, pady=10)
         self.layers_canvas.grid_propagate(0)
@@ -95,38 +95,38 @@ class ThirdTab(object):
         self.trash_canvas = Canvas(self.model_frame)
         self.trash_canvas.config(borderwidth=2, relief="groove", height=200, width=200)
         self.trash_canvas.create_image(108, 105, image=self.trash_pic)
-        self.trash_dnd = dnd.DnD_Container(self.model_frame, self.trash_canvas, tk)
+        self.trash_dnd = dnd.DnD_Container(self.model_frame, self.trash_canvas)
         self.trash_canvas.grid(row=1, column=2, padx=20, pady=20, stick='w')
         self.trash_canvas.grid_propagate(0)
 
-        self.in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"), tk)
+        self.in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
         self.in_layer.attach(self.layers_canvas)
 
-        self.conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, ("Conv2d", "layer"), tk)
+        self.conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, ("Conv2d", "layer"))
         self.conv2d_layer.attach(self.layers_canvas, x=70)
 
-        self.max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"), tk)
+        self.max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"))
         self.max_p_layer.attach(self.layers_canvas, x=130)
 
-        self.flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, ("Flatten", "layer"), tk)
+        self.flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, ("Flatten", "layer"))
         self.flatten_layer.attach(self.layers_canvas, x=190)
 
-        self.dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"), tk)
+        self.dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"))
         self.dense_layer.attach(self.layers_canvas, x=250)
 
-        self.out_layer = dnd.Icon(self.app, self.out_layer_pic, ("Out", "layer"), tk)
+        self.out_layer = dnd.Icon(self.app, self.out_layer_pic, ("Out", "layer"))
         self.out_layer.attach(self.layers_canvas, x=310)
 
-        self.relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"), tk)
+        self.relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"))
         self.relu_activation.attach(self.layers_canvas, x=370)
 
-        self.sig_activation = dnd.Icon(self.app, self.sig_activation_pic, ("Sigmoid", "activation"), tk)
+        self.sig_activation = dnd.Icon(self.app, self.sig_activation_pic, ("Sigmoid", "activation"))
         self.sig_activation.attach(self.layers_canvas, x=430)
 
-        self.max_activation = dnd.Icon(self.app, self.max_activation_pic, ("Softmax", "activation"), tk)
+        self.max_activation = dnd.Icon(self.app, self.max_activation_pic, ("Softmax", "activation"))
         self.max_activation.attach(self.layers_canvas, x=490)
 
-        self.dropout = dnd.Icon(self.app, self.dropout_pic, ("Dropout", "activation"), tk)
+        self.dropout = dnd.Icon(self.app, self.dropout_pic, ("Dropout", "activation"))
         self.dropout.attach(self.layers_canvas, x=550)
 
     def clear(self, event):
