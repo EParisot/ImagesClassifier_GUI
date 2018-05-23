@@ -30,7 +30,9 @@ KEY_OPTION = 'comma' # open option menu
 KEY_QUIT = 'Escape' # quit windows
 KEY_CTRL_L = 'Control_L'
     ##### label shortcut
-NEXT_PHOTO = 'd'
-LAST_PHOTO = 'a'
+KEY_NEXT_PHOTO = 'd'
+KEY_LAST_PHOTO = 'a'
+KEY_DEL_PHOTO = 'BackSpace'
+KEY_LABEL_CHARS = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
     #####
 #####
