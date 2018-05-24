@@ -1,11 +1,22 @@
 # -*- coding: utf-8 -*-
 
 from srcs.color import *
+import platform
+import os
 
 """
 This file contains all constant
 """
 
+if platform.system() == 'Windows':
+    SYSTEM = 'Win'
+elif platform.system() == 'Linux':
+    if os.uname()[1] == 'raspberrypi':
+        SYSTEM = 'Rpi'
+    else:
+        SYSTEM = 'Linux'
+elif platform.system() == 'Darwin':
+    SYSTEM = 'MAC'
 FILE_CONFIG = 'config.cfg'
 
 SUCCESS = 0

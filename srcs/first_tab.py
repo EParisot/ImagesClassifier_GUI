@@ -13,15 +13,22 @@ import os
 import configparser
 from time import time, localtime, strftime, sleep
 
-import imutils
 from PIL import Image, ImageTk
 import configparser
-from imutils.video import VideoStream
-import cv2
+
+import imutils
+
+if SYSTEM != 'Rpi':
+    from imutils.video import VideoStream
+    import cv2
+else:
+    from picamera import PiCamera
+    from picamera.array import PiRGBArray
+
 import numpy as np
 import threading
 
-import Tk_Tooltips
+import srcs.Tk_Tooltips as ttp
 
 class FirstTab():
 
@@ -46,6 +53,14 @@ class FirstTab():
         self.snap_pic = ImageTk.PhotoImage(Image.open('assets/snap.png'))
         self.del_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
+        if SYSTEM == 'Rpi':
+            self.camera = PiCamera()
+            self.camera.resolution = (810, 500)
+            self.camera.framerate = 60
+            self.camera.hflip = True
+            self.camera.vflip = True
+            self.rawCapture = PiRGBArray(self.camera, size=(810, 500))
+        
         self.video_frame = Frame(self.snap_frame)
         self.video_frame.config(borderwidth=2, relief="sunken", height=500, width=810)
         self.video_frame.grid(row=0, column=0)
@@ -72,17 +87,17 @@ class FirstTab():
         play_but = Button(command_frame)
         play_but.config(image=self.cam_pic, command=cam_handler)
         play_but.grid(row=0, column=0, padx=10)
-        play_ttp = Tk_Tooltips.ToolTip(play_but, 'Start Camera', msgFunc=None, delay=1, follow=True)
+        play_ttp = ttp.ToolTip(play_but, 'Start Camera', msgFunc=None, delay=1, follow=True)
 
         stop_but = Button(command_frame)
         stop_but.config(image=self.stop_pic, command=stop_handler)
         stop_but.grid(row=0, column=1, padx=10)
-        stop_ttp = Tk_Tooltips.ToolTip(stop_but, 'Stop Camera', msgFunc=None, delay=1, follow=True)
+        stop_ttp = ttp.ToolTip(stop_but, 'Stop Camera', msgFunc=None, delay=1, follow=True)
 
         snap_but = Button(command_frame)
         snap_but.config(image=self.snap_pic, command=snap_handler)
         snap_but.grid(row=0, column=2, padx=10)
-        snap_ttp = Tk_Tooltips.ToolTip(snap_but, 'Snapshot', msgFunc=None, delay=1, follow=True)
+        snap_ttp = ttp.ToolTip(snap_but, 'Snapshot', msgFunc=None, delay=1, follow=True)
 
         self.prev_frame = Label(command_frame, image=self.none_pic)
         self.prev_frame.config(borderwidth=2, relief="sunken", height=120, width=160)
@@ -91,7 +106,7 @@ class FirstTab():
         del_but = Button(command_frame)
         del_but.config(image=self.del_pic, command=del_handler)
         del_but.grid(row=0, column=4, sticky="se")
-        del_but = Tk_Tooltips.ToolTip(del_but, 'Remove last snapshot', msgFunc=None, delay=1, follow=True)
+        del_but = ttp.ToolTip(del_but, 'Remove last snapshot', msgFunc=None, delay=1, follow=True)
  
         count_frame = Frame(command_frame)
         count_frame.grid(row=0, column=5, sticky='w')
@@ -108,15 +123,41 @@ class FirstTab():
         snap_count.grid(row=1, column=0, padx=10)
 
     def videoLoop(self):
-        while not self.stopEvent.is_set():
-            if self.stopEvent.is_set():
-                break
-            #####SYSTEM DEPENDENT
-            ret, self.video = self.vs.read()
-            if ret is True:
-                self.video = imutils.resize(self.video, width=800)
-                image = cv2.cvtColor(self.video, cv2.COLOR_BGR2RGB)
-                image = Image.fromarray(image)
+        if SYSTEM != 'Rpi':
+            while not self.stopEvent.is_set():
+                if self.stopEvent.is_set():
+                    break
+                #####SYSTEM DEPENDENT
+                ret, self.video = self.vs.read()
+                if ret is True:
+                    self.video = imutils.resize(self.video, width=800)
+                    image = cv2.cvtColor(self.video, cv2.COLOR_BGR2RGB)
+                    image = Image.fromarray(image)
+                    try:
+                        image = ImageTk.PhotoImage(image)
+                    except RuntimeError:
+                        break
+                    if self.panel is None:
+                        self.panel = Label(self.video_frame, image=image)
+                        self.panel.image = image
+                        self.panel.grid()
+                    else:
+                        self.panel.configure(image=image)
+                        self.panel.image = image
+                else:
+                    self.stop(self, self.path)
+                    break
+            self.panel.image = None
+            self.vs.release()
+            self.frame = None
+            
+        else:
+            for frame in self.camera.capture_continuous(self.rawCapture, format="rgb", use_video_port=True):
+                if self.stopEvent.is_set():
+                    self.rawCapture.truncate(0)
+                    break
+                self.image = frame.array
+                image = Image.fromarray(self.image)
                 try:
                     image = ImageTk.PhotoImage(image)
                 except RuntimeError:
@@ -128,12 +169,9 @@ class FirstTab():
                 else:
                     self.panel.configure(image=image)
                     self.panel.image = image
-            else:
-                self.stop(self, self.path)
-                break
-        self.panel.image = None
-        self.vs.release()
-        self.frame = None
+                self.rawCapture.truncate(0)
+            self.panel.image = None
+            self.frame = None
 
     def open_cam(event, self):
         if self.thread.is_alive():
@@ -141,7 +179,8 @@ class FirstTab():
         else:
             self.thread = threading.Thread(target=self.videoLoop, args=())
             self.stopEvent = threading.Event()
-            self.vs = cv2.VideoCapture(0)
+            if SYSTEM != 'Rpi':
+                self.vs = cv2.VideoCapture(0)
             sleep(0.2)
             self.thread.start()
 
@@ -153,10 +192,14 @@ class FirstTab():
     def snap(event, self):
         if self.thread.is_alive():
             self.picname = self.app.snap_path + "/" + str(time()) + ".jpg"
-            pic = self.video
-            cv2.imwrite(self.picname, pic)
+            if SYSTEM != 'Rpi':
+                pic = self.video
+                cv2.imwrite(self.picname, pic)
+                pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
+            else:
+                pic = self.image
+                self.camera.capture(self.picname)
             pic = imutils.resize(pic, width=160)
-            pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
             pic = Image.fromarray(pic)
             pic = ImageTk.PhotoImage(pic)
             self.prev_frame.config(image=pic)
