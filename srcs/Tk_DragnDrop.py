@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
-##Why is it needed ?
-import srcs.layers
-##It is...
-from srcs.layers import layers_list
-##Yes, this one too...
+import srcs
 
 import tkinter as tk
 from tkinter import ttk
@@ -181,8 +177,8 @@ class Icon:
         if target:
             if target.canvas == self.app.third_tab.trash_canvas:
                 self.label.destroy()
-                if self.last_id in layers_list:
-                    layers_list.pop(self.last_id)
+                if self.last_id in self.app.layers_list:
+                    self.app.layers_list.pop(self.last_id)
                 
 class DnD_Container:
 
@@ -613,43 +609,43 @@ class DnD_Container:
                     val_1.focus_set()
                     
                 # Load values if exists
-                if source.id in layers_list:
+                if source.id in self.app.layers_list:
                     srcs.Tk_DragnDrop.DnD_Container.load_layer(self, source.id)
 
     def load_layer(self, id):
 
-        if layers_list[id]['tag'] == "In":
-            self.dim_1.set(layers_list[id]['dim_1'])
-            self.dim_2.set(layers_list[id]['dim_2'])
-            self.dim_3.set(layers_list[id]['dim_3'])
+        if self.app.layers_list[id]['tag'] == "In":
+            self.dim_1.set(self.app.layers_list[id]['dim_1'])
+            self.dim_2.set(self.app.layers_list[id]['dim_2'])
+            self.dim_3.set(self.app.layers_list[id]['dim_3'])
             
-        elif layers_list[id]['tag'] == "Conv2d":
-            self.filters.set(layers_list[id]['filters'])
-            self.kernel_size_x.set(layers_list[id]['kernel_size_x'])
-            self.kernel_size_y.set(layers_list[id]['kernel_size_y'])
-            self.stride_x.set(layers_list[id]['stride_x'])
-            self.stride_y.set(layers_list[id]['stride_y'])
-            self.padding.set(layers_list[id]['padding'])
+        elif self.app.layers_list[id]['tag'] == "Conv2d":
+            self.filters.set(self.app.layers_list[id]['filters'])
+            self.kernel_size_x.set(self.app.layers_list[id]['kernel_size_x'])
+            self.kernel_size_y.set(self.app.layers_list[id]['kernel_size_y'])
+            self.stride_x.set(self.app.layers_list[id]['stride_x'])
+            self.stride_y.set(self.app.layers_list[id]['stride_y'])
+            self.padding.set(self.app.layers_list[id]['padding'])
 
-        elif layers_list[id]['tag'] == "Dense":
+        elif self.app.layers_list[id]['tag'] == "Dense":
             self.neurons.set(layers_list[id]['neurons'])
 
-        elif layers_list[id]['tag'] == "Max_Pooling":
-            self.pool_size_x.set(layers_list[id]['pool_size_x'])
-            self.pool_size_y.set(layers_list[id]['pool_size_y'])
-            self.stride_x.set(layers_list[id]['stride_x'])
-            self.stride_y.set(layers_list[id]['stride_y'])
+        elif self.app.layers_list[id]['tag'] == "Max_Pooling":
+            self.pool_size_x.set(self.app.layers_list[id]['pool_size_x'])
+            self.pool_size_y.set(self.app.layers_list[id]['pool_size_y'])
+            self.stride_x.set(self.app.layers_list[id]['stride_x'])
+            self.stride_y.set(self.app.layers_list[id]['stride_y'])
 
-        elif layers_list[id]['tag'] == "Out":
-            self.out_type.set(layers_list[id]['out_type'])
-            self.out_nb.set(layers_list[id]['out_nb'])
+        elif self.app.layers_list[id]['tag'] == "Out":
+            self.out_type.set(self.app.layers_list[id]['out_type'])
+            self.out_nb.set(self.app.layers_list[id]['out_nb'])
 
-        elif layers_list[id]['tag'] == "Dropout":
-            self.ratio.set(layers_list[id]['ratio'])
+        elif self.app.layers_list[id]['tag'] == "Dropout":
+            self.ratio.set(self.app.layers_list[id]['ratio'])
 
     def save_layer(self, id, tag, **kwargs):
         
-        if id in layers_list:
+        if id in self.app.layers_list:
             res = askquestion("Modify Layer", "Layer already exists and will be overwriten...", icon='warning')
             if res == "no":
                 self.test_val.master.config(bg='SystemButtonFace')
@@ -663,7 +659,7 @@ class DnD_Container:
         layer_dict['tag'] = tag
         for key in kwargs:
             layer_dict[key] = kwargs[key].get()
-        layers_list[id] = layer_dict
+        self.app.layers_list[id] = layer_dict
         self.test_val.master.config(bg='SystemButtonFace')
         for widget in self.test_val.master.winfo_children():
             widget.config(bg='SystemButtonFace')
@@ -673,7 +669,7 @@ class DnD_Container:
 
     def on_close(self, id):
 
-        if id not in layers_list:
+        if id not in self.app.layers_list:
             ret = askquestion("Layer not saved", "Layer is not saved in model, quit anyway ? \n(you can save it later by double-clicking it)", icon='warning')
             if ret == "no":
                 return

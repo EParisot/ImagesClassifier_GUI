@@ -15,6 +15,7 @@ from time import time, localtime, strftime, sleep
 
 from PIL import Image, ImageTk
 import configparser
+from pathlib import Path
 
 import imutils
 
@@ -27,8 +28,6 @@ else:
 
 import numpy as np
 import threading
-
-from pathlib import Path
 
 import srcs.Tk_Tooltips as ttp
 
@@ -209,7 +208,7 @@ class FirstTab():
                 self.prev_frame.image = pic
                 self.count.set(self.count.get() + 1)
             else:
-                showwarning("No destination", "Please select a destination dir in option for your sanpshots...")
+                showwarning("No destination", "Please select a destination dir in Options")
         else:
             showwarning("No video running", "Please start the video before you take a snap")
 

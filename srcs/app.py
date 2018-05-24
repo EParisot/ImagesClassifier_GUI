@@ -20,6 +20,8 @@ class App(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
 
+        self.layers_list = {}
+
         self.bind("<KeyPress>", self.onKeyPress)
         self.bind("<KeyRelease>", self.onKeyRelease)
 

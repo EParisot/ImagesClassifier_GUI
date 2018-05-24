@@ -20,8 +20,6 @@ import srcs.Tk_DragnDrop as dnd
 
 import json
 
-from srcs.layers import layers_list
-
 class ThirdTab(object):
 
     def __init__(self, app):
@@ -138,28 +136,78 @@ class ThirdTab(object):
             res = askquestion("Clear Model", "Modifications not saved, \nare you sure ?", icon='warning')
             if res == 'yes':
                 self.model_canvas.delete("all")
-                layers_list = {}
+                self.app.layers_list = {}
         else:
             self.model_canvas.delete("all")
 
-    def parse(self, filename):
-        pass # TODO read file
-
     def load(self, event):
         filename =  askopenfilename(title = "Select Model",filetypes = (("json files","*.json"),("all files","*.*")))
-        if filename is not None:
-            self.parse(filename)
+        if filename:
+            with open(filename, 'r') as infile:
+                if self.app.layers_list:
+                    res = askquestion("Load Model", "This action will overwrite existing model \n Load anyway ?", icon='warning')
+                    if res == 'no':
+                        return
+                data = json.load(infile)
+                self.model_canvas.delete("all")
+                self.parse(data)
+                self.app.layers_list = data
+
+    def parse(self, data): # TODO LOAD DATAS
+        for item in data:
+
+            if data[item]['tag'] == "In":
+                self.new_in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
+                self.new_in_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                
+            elif data[item]['tag'] == "Conv2d":
+                self.new_conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, ("Conv2d", "layer"))
+                self.new_conv2d_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                
+            elif data[item]['tag'] == "Max_Pooling":
+                self.new_max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"))
+                self.new_max_p_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                
+            elif data[item]['tag'] == "Flatten":
+                self.new_flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, ("Flatten", "layer"))
+                self.new_flatten_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                
+            elif data[item]['tag'] == "Dense":
+                self.new_dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"))
+                self.new_dense_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+
+            elif data[item]['tag'] == "Out":  
+                self.new_out_layer = dnd.Icon(self.app, self.out_layer_pic, ("Out", "layer"))
+                self.new_out_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+
+            elif data[item]['tag'] == "Relu":
+                self.new_relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"))
+                self.new_relu_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                
+            elif data[item]['tag'] == "Sigmoid":
+                self.new_sig_activation = dnd.Icon(self.app, self.sig_activation_pic, ("Sigmoid", "activation"))
+                self.new_sig_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+
+            elif data[item]['tag'] == "Softmax":
+                self.new_max_activation = dnd.Icon(self.app, self.max_activation_pic, ("Softmax", "activation"))
+                self.new_max_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                
+            elif data[item]['tag'] == "Dropout":
+                self.new_dropout = dnd.Icon(self.app, self.dropout_pic, ("Dropout", "activation"))
+                self.new_dropout.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+
 
     def write_coords(self):
+        
         for item_id in self.model_canvas.find_all():
-            if item_id in layers_list:
-                layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
-                layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
+            if item_id in self.self.app.layers_list:
+                self.self.app.layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
+                self.self.app.layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
             else:
-                layers_list[item_id] = {}
-                layers_list[item_id]['tag'] = self.model_canvas.gettags(item_id)[0]
-                layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
-                layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
+                self.self.app.layers_list[item_id] = {}
+                self.self.app.layers_list[item_id]['tag'] = self.model_canvas.gettags(item_id)[0]
+                self.self.app.layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
+                self.self.app.layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
 
     
     def save(self, event):
@@ -168,7 +216,7 @@ class ThirdTab(object):
             self.saved = True
             self.write_coords()
             with open(filename, 'w') as outfile:
-                json.dump(layers_list, outfile)
+                json.dump(self.self.app.layers_list, outfile)
 
     def modified(self, event):
         self.saved = False
