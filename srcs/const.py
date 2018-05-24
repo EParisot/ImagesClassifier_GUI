@@ -45,6 +45,8 @@ HEIGHT_IMG_INFO = 35
 ##### model
 MODEL_W = 900
 MODEL_H = 400
+LAYER_INFO_W = 250
+LAYER_INFO_H = 300
 #####
 
 ##### shortcut

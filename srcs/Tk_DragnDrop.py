@@ -293,11 +293,11 @@ class DnD_Container:
                     x_clic = event.x
                     y_clic = event.y
                 self.param_frame = tk.Toplevel()
-                self.param_frame.geometry("%dx%d+%d+%d" % (250, 250, x + x_clic, y + y_clic))
+                self.param_frame.geometry("%dx%d+%d+%d" % (LAYER_INFO_W, LAYER_INFO_H, x + x_clic, y + y_clic))
                 self.param_frame.title(source.tags[0] + " parameters")
                 self.param_frame.transient(self.app)
                 self.param_frame.grab_set()
-                on_close_handler = lambda: srcs.Tk_DragnDrop.DnD_Container.on_close(self)
+                on_close_handler = lambda: srcs.Tk_DragnDrop.DnD_Container.on_close(self, source.id)
                 self.param_frame.protocol("WM_DELETE_WINDOW", on_close_handler)
                 self.test_val.master.config(bg='lightgrey')
                 for widget in self.test_val.master.winfo_children():
@@ -369,6 +369,7 @@ class DnD_Container:
                     labels.grid_rowconfigure(2, weight=1)
                     labels.grid_rowconfigure(3, weight=1)
                     labels.grid_rowconfigure(4, weight=1)
+                    labels.grid_rowconfigure(5, weight=1)
                     labels.grid_columnconfigure(0, weight=1)
                     labels.grid_columnconfigure(1, weight=1)
                     labels.grid_columnconfigure(2, weight=1)
@@ -414,15 +415,24 @@ class DnD_Container:
                     val_3_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
                     val_3_y.grid(row=3, column=2, sticky='nsw', padx=5, pady=10)
 
+                    label_4 = tk.Label(labels)
+                    label_4.config(text='Padding:', font=("Helvetica", 14))
+                    label_4.grid(row=4, column=0, sticky='nsw', pady=10)
+
+                    self.padding = tk.IntVar()
+
+                    val_4 = tk.Checkbutton(labels, variable=self.padding)
+                    val_4.grid(row=4, column=2, sticky='nsw', padx=5, pady=5)
 
                     save_conv2d = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
-                                                         filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y, stride_x=self.stride_x, stride_y=self.stride_y)
+                                                                     filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y,
+                                                                     stride_x=self.stride_x, stride_y=self.stride_y, padding=self.padding)
                     
                     save_but = tk.Button(labels)
                     save_but.config(text='Save', font=("Helvetica", 16))
                     save_but.bind("<ButtonPress-1>", save_conv2d)
                     save_but.bind("<Return>", save_conv2d)
-                    save_but.grid(row=4, column=1, sticky='nsew', pady=10)
+                    save_but.grid(row=5, column=1, sticky='nsew', pady=10)
 
                     val_1.focus_set()
                 
@@ -601,18 +611,41 @@ class DnD_Container:
                     save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
 
                     val_1.focus_set()
+                    
+                # Load values if exists
+                if source.id in layers_list:
+                    srcs.Tk_DragnDrop.DnD_Container.load_layer(self, source.id)
 
-    def on_close(self):
-        
-        ret = askquestion("Layer not saved", "Layer is not saved in model, quit anyway ? \n(you can save it later by double-clicking it)", icon='warning')
-        if ret == "yes":
-            self.test_val.master.config(bg='SystemButtonFace')
-            for widget in self.test_val.master.winfo_children():
-                widget.config(bg='SystemButtonFace')
-                for elem in widget.winfo_children():
-                    elem.config(bg='SystemButtonFace')
-            self.param_frame.destroy()
+    def load_layer(self, id):
 
+        if layers_list[id]['tag'] == "In":
+            self.dim_1.set(layers_list[id]['dim_1'])
+            self.dim_2.set(layers_list[id]['dim_2'])
+            self.dim_3.set(layers_list[id]['dim_3'])
+            
+        elif layers_list[id]['tag'] == "Conv2d":
+            self.filters.set(layers_list[id]['filters'])
+            self.kernel_size_x.set(layers_list[id]['kernel_size_x'])
+            self.kernel_size_y.set(layers_list[id]['kernel_size_y'])
+            self.stride_x.set(layers_list[id]['stride_x'])
+            self.stride_y.set(layers_list[id]['stride_y'])
+            self.padding.set(layers_list[id]['padding'])
+
+        elif layers_list[id]['tag'] == "Dense":
+            self.neurons.set(layers_list[id]['neurons'])
+
+        elif layers_list[id]['tag'] == "Max_Pooling":
+            self.pool_size_x.set(layers_list[id]['pool_size_x'])
+            self.pool_size_y.set(layers_list[id]['pool_size_y'])
+            self.stride_x.set(layers_list[id]['stride_x'])
+            self.stride_y.set(layers_list[id]['stride_y'])
+
+        elif layers_list[id]['tag'] == "Out":
+            self.out_type.set(layers_list[id]['out_type'])
+            self.out_nb.set(layers_list[id]['out_nb'])
+
+        elif layers_list[id]['tag'] == "Dropout":
+            self.ratio.set(layers_list[id]['ratio'])
 
     def save_layer(self, id, tag, **kwargs):
         
@@ -631,6 +664,19 @@ class DnD_Container:
         for key in kwargs:
             layer_dict[key] = kwargs[key].get()
         layers_list[id] = layer_dict
+        self.test_val.master.config(bg='SystemButtonFace')
+        for widget in self.test_val.master.winfo_children():
+            widget.config(bg='SystemButtonFace')
+            for elem in widget.winfo_children():
+                elem.config(bg='SystemButtonFace')
+        self.param_frame.destroy()
+
+    def on_close(self, id):
+
+        if id not in layers_list:
+            ret = askquestion("Layer not saved", "Layer is not saved in model, quit anyway ? \n(you can save it later by double-clicking it)", icon='warning')
+            if ret == "no":
+                return
         self.test_val.master.config(bg='SystemButtonFace')
         for widget in self.test_val.master.winfo_children():
             widget.config(bg='SystemButtonFace')
