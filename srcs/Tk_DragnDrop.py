@@ -177,7 +177,6 @@ class Icon:
         if target:
             if target.canvas == self.root.third_tab.trash_canvas:
                 self.label.destroy()
-                self.root.third_tab.model_canvas_dnd.param_frame.destroy()
                 if self.last_id in layers_list:
                     layers_list.pop(self.last_id)
                 
@@ -556,7 +555,7 @@ class DnD_Container:
                 self.param_frame.destroy()
                 test_val.config(bg='grey')
                 return
-        layers_list[id] = {} #TODO: Save the layer
+        layers_list[id] = {} #TODO: Save the layer's datas
         if len(kwargs) > 0:
             self.param_frame.destroy()
         self.test_val.master.config(bg='SystemButtonFace')
