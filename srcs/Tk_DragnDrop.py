@@ -177,6 +177,7 @@ class Icon:
         if target:
             if target.canvas == self.root.third_tab.trash_canvas:
                 self.label.destroy()
+                self.root.third_tab.model_canvas_dnd.param_frame.destroy()
                 if self.last_id in layers_list:
                     layers_list.pop(self.last_id)
                 
@@ -260,10 +261,10 @@ class DnD_Container:
 
     def set_layer_params(self, event, source):
         if type(self) == srcs.Tk_DragnDrop.DnD_Container:
-            test_val = self.root.master.master.master.third_tab.model_canvas
+            self.test_val = self.root.master.master.master.third_tab.model_canvas
         else:
-            test_val = self.canvas
-        if test_val == source.root.third_tab.model_canvas:
+            self.test_val = self.canvas
+        if self.test_val == source.root.third_tab.model_canvas:
             if ("layer" in source.tags and "Flatten" not in source.tags) or "Dropout" in source.tags:
                 if type(self) == srcs.Tk_DragnDrop.DnD_Container:
                     x = self.root.master.master.master.winfo_x()
@@ -275,10 +276,13 @@ class DnD_Container:
                     x_clic = event.x
                     y_clic = event.y
                 self.param_frame = tk.Toplevel()
-                
                 self.param_frame.geometry("%dx%d+%d+%d" % (250, 250, x + x_clic, y + y_clic))
                 self.param_frame.title(source.tags[0] + " parameters")
                 self.param_frame.transient(self.root)
+                self.param_frame.grab_set()
+                self.test_val.master.config(bg='lightgrey')
+                for widget in self.test_val.master.winfo_children():
+                    widget.config(bg='lightgrey')
 
                 if source.tags[0] == "In":
                     
@@ -550,7 +554,11 @@ class DnD_Container:
             res = askquestion("Modify Layer", "Layer already exists and will be overwriten...", icon='warning')
             if res == "no":
                 self.param_frame.destroy()
+                test_val.config(bg='grey')
                 return
         layers_list[id] = {} #TODO: Save the layer
         if len(kwargs) > 0:
             self.param_frame.destroy()
+        self.test_val.master.config(bg='SystemButtonFace')
+        for widget in self.test_val.master.winfo_children():
+            widget.config(bg='SystemButtonFace')
