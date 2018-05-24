@@ -57,14 +57,14 @@ class FirstTab():
 
         if SYSTEM == 'Rpi':
             self.camera = PiCamera()
-            self.camera.resolution = (810, 500)
-            self.camera.framerate = 60
+            self.camera.resolution = (SNAP_W, SNAP_H)
+            self.camera.framerate = SNAP_FPS
             self.camera.hflip = True
             self.camera.vflip = True
-            self.rawCapture = PiRGBArray(self.camera, size=(810, 500))
+            self.rawCapture = PiRGBArray(self.camera, size=(SNAP_W, SNAP_H))
         
         self.video_frame = Frame(self.snap_frame)
-        self.video_frame.config(borderwidth=2, relief="sunken", height=500, width=810)
+        self.video_frame.config(borderwidth=2, relief="sunken", height=SNAP_H, width=SNAP_W)
         self.video_frame.grid(row=0, column=0)
         self.video_frame.grid_propagate(0)
 
@@ -129,7 +129,6 @@ class FirstTab():
             while not self.stopEvent.is_set():
                 if self.stopEvent.is_set():
                     break
-                #####SYSTEM DEPENDENT
                 ret, self.video = self.vs.read()
                 if ret is True:
                     self.video = imutils.resize(self.video, width=800)

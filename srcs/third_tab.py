@@ -59,7 +59,7 @@ class ThirdTab(object):
         self.model_canvas = Canvas(self.model_frame)
         self.model_canvas.bind("<Enter>", self.modified)
         self.model_canvas_dnd = dnd.DnD_Container(self.app, self.model_frame, self.model_canvas)
-        self.model_canvas.config(borderwidth=2, relief="sunken", height=400, width=900)
+        self.model_canvas.config(borderwidth=2, relief="sunken", height=MODEL_H, width=MODEL_W)
         self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
         self.model_canvas.grid_propagate(0)
 

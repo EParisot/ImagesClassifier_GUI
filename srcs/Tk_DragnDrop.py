@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
+##Why is it needed ?
 import srcs.layers
+##It is...
+from srcs.layers import layers_list
+##Yes, this one too...
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import *
-
-from srcs.layers import layers_list 
+from srcs.const import *
 
 # The factory function
 
@@ -228,7 +232,7 @@ class DnD_Container:
         source_bbox = source.canvas.bbox(source.id)
         source_w = source_bbox[2] - source_bbox[0]
         source_h = source_bbox[3] - source_bbox[1]
-            
+        # Check overlap and "recursively" execute it
         if len([z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]) > 0:
             items = [z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]
             item_under = items[0]
@@ -245,7 +249,7 @@ class DnD_Container:
                     item_bbox = canvas.bbox(item_under)
                     item_w = item_bbox[2] - item_bbox[0]
                     item_h = item_bbox[3] - item_bbox[1]
-                    if x_under + item_w < 10 or x_under + item_w + item_w > 900 - 10:
+                    if x_under + item_w < 10 or x_under + item_w + item_w > MODEL_W - 10:
                         break
                     canvas.move(item_under, item_w, 0)
                     x_bis = x_under + item_w
@@ -258,19 +262,19 @@ class DnD_Container:
                     item_bbox = canvas.bbox(item_under)
                     item_w = item_bbox[2] - item_bbox[0]
                     item_h = item_bbox[3] - item_bbox[1]
-                    if x_under - item_w < 10 or x_under > 900 - 10:
+                    if x_under - item_w < 10 or x_under > MODEL_W - 10:
                         break
                     canvas.move(item_under, -item_w, 0)
                     x_bis = x_under - item_w
-                    
+        # check if initial moove is correct :           
         if x < 0:
             x = 5
-        elif (x + source_w) > 900:
-            x = 900 - source_w + 4
+        elif (x + source_w) > MODEL_W:
+            x = MODEL_W - source_w + 4
         if y < 0:
             y = 5
-        elif (y + source_h) > 400:
-            y = 400 - source_h + 4
+        elif (y + source_h) > MODEL_H:
+            y = MODEL_H - source_h + 4
             
         return (x, y)
 
