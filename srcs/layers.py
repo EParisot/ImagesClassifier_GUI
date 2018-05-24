@@ -16,7 +16,6 @@ from PIL import Image, ImageTk
 
 import srcs.Tk_Tooltips as ttp
 
-
 global layers_list
 layers_list = {}
 
@@ -32,9 +31,9 @@ class Layers(object):
 class In_layer(Layers):
 
     def __init__(self, width, heigth, pix_type):
-        self.width = width
-        self.heigth = heigth
-        self.pix_type = pix_type
+        self.dim1 = dim1
+        self.dim2 = dim2
+        self.dim3 = dim3
 
 class Conv2D_layer(Layers):
 

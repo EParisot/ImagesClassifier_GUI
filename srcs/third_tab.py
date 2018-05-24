@@ -56,7 +56,7 @@ class ThirdTab(object):
 
         self.model_canvas = Canvas(self.model_frame)
         self.model_canvas.bind("<Enter>", self.modified)
-        self.model_canvas_dnd = dnd.DnD_Container(self.model_frame, self.model_canvas)
+        self.model_canvas_dnd = dnd.DnD_Container(self.app, self.model_frame, self.model_canvas)
         self.model_canvas.config(borderwidth=2, relief="sunken", height=400, width=900)
         self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
         self.model_canvas.grid_propagate(0)
@@ -89,7 +89,7 @@ class ThirdTab(object):
         clear_but = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
 
         self.layers_canvas = Canvas(self.model_frame)
-        self.layers_canvas_dnd = dnd.DnD_Container(self.model_frame, self.layers_canvas)
+        self.layers_canvas_dnd = dnd.DnD_Container(self.app, self.model_frame, self.layers_canvas)
         self.layers_canvas.config(borderwidth=2, relief="sunken", height=235, width=600)
         self.layers_canvas.grid(row=1, column=1, padx=20, pady=10)
         self.layers_canvas.grid_propagate(0)
@@ -97,7 +97,7 @@ class ThirdTab(object):
         self.trash_canvas = Canvas(self.model_frame)
         self.trash_canvas.config(borderwidth=2, relief="groove", height=200, width=200)
         self.trash_canvas.create_image(108, 105, image=self.trash_pic)
-        self.trash_dnd = dnd.DnD_Container(self.model_frame, self.trash_canvas)
+        self.trash_dnd = dnd.DnD_Container(self.app, self.model_frame, self.trash_canvas)
         self.trash_canvas.grid(row=1, column=2, padx=20, pady=20, stick='w')
         self.trash_canvas.grid_propagate(0)
 

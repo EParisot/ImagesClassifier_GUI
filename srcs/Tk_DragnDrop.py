@@ -106,10 +106,10 @@ class DndHandler:
 
 class Icon:
 
-    def __init__(self, root, img, tags):
+    def __init__(self, app, img, tags):
         self.img = img
         self.tags = tags
-        self.root = root
+        self.app = app
         self.canvas = self.label = self.id = None
 
 
@@ -137,7 +137,7 @@ class Icon:
         canvas = self.canvas
         if not canvas:
             return
-        if self.canvas != self.root.third_tab.layers_canvas:
+        if self.canvas != self.app.third_tab.layers_canvas:
             id = self.id
             self.last_id = id
             label = self.label
@@ -145,7 +145,7 @@ class Icon:
             canvas.delete(id)
             label.destroy()
         else:
-            label = Icon(self.root, self.img, self.tags)
+            label = Icon(self.app, self.img, self.tags)
             label.attach(self.canvas, x=self.x_orig, y=self.y_orig)
 
     def press(self, event):
@@ -175,14 +175,15 @@ class Icon:
 
     def dnd_end(self, target, event):
         if target:
-            if target.canvas == self.root.third_tab.trash_canvas:
+            if target.canvas == self.app.third_tab.trash_canvas:
                 self.label.destroy()
                 if self.last_id in layers_list:
                     layers_list.pop(self.last_id)
                 
 class DnD_Container:
 
-    def __init__(self, root, canvas):
+    def __init__(self, app, root, canvas):
+        self.app = app
         self.root = root
         self.canvas = canvas
         self.canvas.dnd_accept = self.dnd_accept
@@ -191,7 +192,7 @@ class DnD_Container:
         return self
 
     def dnd_enter(self, source, event):
-        if self.canvas != self.root.master.master.master.third_tab.layers_canvas:
+        if self.canvas != self.app.third_tab.layers_canvas:
             self.canvas.focus_set() # Show highlight border
             x, y = source.where(self.canvas, event)
             x1, y1, x2, y2 = source.canvas.bbox(source.id)
@@ -200,24 +201,24 @@ class DnD_Container:
             self.dnd_motion(source, event)
 
     def dnd_motion(self, source, event):
-        if self.canvas != self.root.master.master.master.third_tab.layers_canvas:
+        if self.canvas != self.app.third_tab.layers_canvas:
             x, y = source.where(self.canvas, event)
             x1, y1, x2, y2 = self.canvas.bbox(self.dndid)
             self.canvas.move(self.dndid, x-x1, y-y1)
 
     def dnd_leave(self, source, event):
-        if self.canvas != self.root.master.master.master.third_tab.layers_canvas:
+        if self.canvas != self.app.third_tab.layers_canvas:
             self.root.focus_set() # Hide highlight border
             self.canvas.delete(self.dndid)
             self.dndid = None
 
     def dnd_commit(self, source, event):
-        if self.canvas != self.root.master.master.master.third_tab.layers_canvas:
+        if self.canvas != self.app.third_tab.layers_canvas:
             self.dnd_leave(source, event)
             x, y = source.where(self.canvas, event)
-            if self.canvas == self.root.master.master.master.third_tab.model_canvas:
+            if self.canvas == self.app.third_tab.model_canvas:
                 x, y = self.check_n_offset(self.canvas, source, x, y)
-                if source.canvas == self.root.master.master.master.third_tab.layers_canvas:
+                if source.canvas == self.app.third_tab.layers_canvas:
                     self.set_layer_params(event, source)
             source.attach(self.canvas, x, y)
         else:
@@ -260,29 +261,28 @@ class DnD_Container:
 
     def set_layer_params(self, event, source):
         if type(self) == srcs.Tk_DragnDrop.DnD_Container:
-            self.test_val = self.root.master.master.master.third_tab.model_canvas
+            self.test_val = self.app.third_tab.model_canvas
         else:
             self.test_val = self.canvas
-        if self.test_val == source.root.third_tab.model_canvas:
+        if self.test_val == source.app.third_tab.model_canvas:
             if ("layer" in source.tags and "Flatten" not in source.tags) or "Dropout" in source.tags:
+                x = self.app.winfo_x()
+                y = self.app.winfo_y()
                 if type(self) == srcs.Tk_DragnDrop.DnD_Container:
-                    x = self.root.master.master.master.winfo_x()
-                    y = self.root.master.master.master.winfo_y()
                     x_clic, y_clic = source.where(self.canvas, event)
                 else:
-                    x = self.root.winfo_x()
-                    y = self.root.winfo_y()
                     x_clic = event.x
                     y_clic = event.y
                 self.param_frame = tk.Toplevel()
                 self.param_frame.geometry("%dx%d+%d+%d" % (250, 250, x + x_clic, y + y_clic))
                 self.param_frame.title(source.tags[0] + " parameters")
-                self.param_frame.transient(self.root)
+                self.param_frame.transient(self.app)
                 self.param_frame.grab_set()
                 self.test_val.master.config(bg='lightgrey')
                 for widget in self.test_val.master.winfo_children():
                     widget.config(bg='lightgrey')
-
+                    for elem in widget.winfo_children():
+                        elem.config(bg='lightgrey')
                 if source.tags[0] == "In":
                     
                     labels = tk.Label(self.param_frame)
@@ -301,39 +301,35 @@ class DnD_Container:
                     label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=5, pady=10)
                     
                     label_1 = tk.Label(labels)
-                    label_1.config(text='Width:', font=("Helvetica", 14))
+                    label_1.config(text='Dim 1:', font=("Helvetica", 14))
                     label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
                     
-                    self.width = tk.StringVar()
+                    self.dim1 = tk.StringVar()
                     
-                    val_1 = tk.Entry(labels, width=10, textvariable=self.width)
+                    val_1 = tk.Entry(labels, width=10, textvariable=self.dim1)
                     val_1.grid(row=1, column=2, sticky='nsw', padx=5, pady=10)
 
                     label_2 = tk.Label(labels)
-                    label_2.config(text='Heigth:', font=("Helvetica", 14))
+                    label_2.config(text='Dim 2:', font=("Helvetica", 14))
                     label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
                     
-                    self.heigth = tk.StringVar()
+                    self.dim2 = tk.StringVar()
                     
-                    val_2 = tk.Entry(labels, width=10, textvariable=self.heigth)
+                    val_2 = tk.Entry(labels, width=10, textvariable=self.dim2)
                     val_2.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
 
                     label_3 = tk.Label(labels)
-                    label_3.config(text='Colors:', font=("Helvetica", 14))
+                    label_3.config(text='Dim 3:', font=("Helvetica", 14))
                     label_3.grid(row=3, column=0, sticky='nsw', padx=5, pady=10)
                     
-                    self.pix_type = tk.IntVar()
-                    self.pix_type.set(1)
+                    self.dim3 = tk.StringVar()
                     
-                    val_3 = tk.Radiobutton(labels)
-                    val_3.config(text="Yes", variable=self.pix_type, value=1)
-                    val_3.grid(row=3, column=1, sticky='nse', padx=5, pady=10)
-                    val_3bis = tk.Radiobutton(labels)
-                    val_3bis.config(text="No", variable=self.pix_type, value=2)
-                    val_3bis.grid(row=3, column=2, sticky='nse', padx=5, pady=10)
+                    val_3 = tk.Entry(labels, width=10, textvariable=self.dim3)
+                    val_3.grid(row=3, column=2, sticky='nsw', padx=5, pady=10)
+    
 
                     save_in = lambda: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
-                                                         width=self.width, heigth=self.heigth, pix_type=self.pix_type)
+                                                         dim1=self.dim1, dim2=self.dim2, dim3=self.dim3)
 
                     save_but = tk.Button(labels)
                     save_but.config(text='Save', font=("Helvetica", 16), command=save_in)
@@ -536,7 +532,6 @@ class DnD_Container:
                     label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
 
                     self.ratio = tk.StringVar()
-                    self.ratio.set("0.2")
                     
                     val_1 = tk.Entry(labels, width=10, textvariable=self.ratio)
                     val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
@@ -561,3 +556,5 @@ class DnD_Container:
         self.test_val.master.config(bg='SystemButtonFace')
         for widget in self.test_val.master.winfo_children():
             widget.config(bg='SystemButtonFace')
+            for elem in widget.winfo_children():
+                elem.config(bg='SystemButtonFace')
