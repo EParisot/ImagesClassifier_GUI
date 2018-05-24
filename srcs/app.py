@@ -39,7 +39,10 @@ class App(tk.Tk):
         self.cfg = configparser.ConfigParser()
         self.cfg.read(FILE_CONFIG)
         self.lang = self.cfg.get('general', 'language')
-        self.snap_path = self.cfg.get('paths', 'snap_path')
+        self.snap_path = StringVar()
+        self.out_path = StringVar()
+        self.snap_path.set(self.cfg.get('paths', 'snap_path'))
+        self.out_path.set(self.cfg.get('paths', 'out_path'))
 
         self.options_but = Button(self, text="Options", font=("Helvetica", 16), command=self.open_options)
         self.options_but.grid(row=0, column=0, sticky="nw")
@@ -221,6 +224,8 @@ class App(tk.Tk):
         self.OUT_path = self.path2_result.get()
         self.cfg.set('paths', 'out_path', self.OUT_path)
         self.cfg.set('paths', 'snap_path', self.IN_path)
+        self.snap_path.set(self.IN_path)
+        self.out_path.set(self.OUT_path)
         self.second_tab.load()
 
         with open(FILE_CONFIG, 'w') as f:

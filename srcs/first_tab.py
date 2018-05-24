@@ -28,6 +28,8 @@ else:
 import numpy as np
 import threading
 
+from pathlib import Path
+
 import srcs.Tk_Tooltips as ttp
 
 class FirstTab():
@@ -191,20 +193,24 @@ class FirstTab():
 
     def snap(event, self):
         if self.thread.is_alive():
-            self.picname = self.app.snap_path + "/" + str(time()) + ".jpg"
-            if SYSTEM != 'Rpi':
-                pic = self.video
-                cv2.imwrite(self.picname, pic)
-                pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
+            p = Path(self.app.snap_path.get())
+            if p.exists():
+                self.picname = self.app.snap_path.get() + "/" + str(time()) + ".jpg"
+                if SYSTEM != 'Rpi':
+                    pic = self.video
+                    cv2.imwrite(self.picname, pic)
+                    pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
+                else:
+                    pic = self.image
+                    self.camera.capture(self.picname)
+                pic = imutils.resize(pic, width=160)
+                pic = Image.fromarray(pic)
+                pic = ImageTk.PhotoImage(pic)
+                self.prev_frame.config(image=pic)
+                self.prev_frame.image = pic
+                self.count.set(self.count.get() + 1)
             else:
-                pic = self.image
-                self.camera.capture(self.picname)
-            pic = imutils.resize(pic, width=160)
-            pic = Image.fromarray(pic)
-            pic = ImageTk.PhotoImage(pic)
-            self.prev_frame.config(image=pic)
-            self.prev_frame.image = pic
-            self.count.set(self.count.get() + 1)
+                showwarning("No destination", "Please select a destination dir in option for your sanpshots...")
         else:
             showwarning("No video running", "Please start the video before you take a snap")
 
