@@ -139,6 +139,7 @@ class Icon:
             return
         if self.canvas != self.root.third_tab.layers_canvas:
             id = self.id
+            self.last_id = id
             label = self.label
             self.canvas = self.label = self.id = None
             canvas.delete(id)
@@ -176,6 +177,8 @@ class Icon:
         if target:
             if target.canvas == self.root.third_tab.trash_canvas:
                 self.label.destroy()
+                if self.last_id in layers_list:
+                    layers_list.pop(self.last_id)
                 
 class DnD_Container:
 
@@ -260,287 +263,288 @@ class DnD_Container:
             test_val = self.root.master.master.master.third_tab.model_canvas
         else:
             test_val = self.canvas
-        if test_val == source.root.third_tab.model_canvas and ("layer" in source.tags and "Flatten" not in source.tags) or "Dropout" in source.tags:
-            if type(self) == srcs.Tk_DragnDrop.DnD_Container:
-                x = self.root.master.master.master.winfo_x()
-                y = self.root.master.master.master.winfo_y()
-                x_clic, y_clic = source.where(self.canvas, event)
-            else:
-                x = self.root.winfo_x()
-                y = self.root.winfo_y()
-                x_clic = event.x
-                y_clic = event.y
-            self.param_frame = tk.Toplevel()
-            
-            self.param_frame.geometry("%dx%d+%d+%d" % (250, 250, x + x_clic, y + y_clic))
-            self.param_frame.title(source.tags[0] + " parameters")
-            self.param_frame.transient(self.root)
+        if test_val == source.root.third_tab.model_canvas:
+            if ("layer" in source.tags and "Flatten" not in source.tags) or "Dropout" in source.tags:
+                if type(self) == srcs.Tk_DragnDrop.DnD_Container:
+                    x = self.root.master.master.master.winfo_x()
+                    y = self.root.master.master.master.winfo_y()
+                    x_clic, y_clic = source.where(self.canvas, event)
+                else:
+                    x = self.root.winfo_x()
+                    y = self.root.winfo_y()
+                    x_clic = event.x
+                    y_clic = event.y
+                self.param_frame = tk.Toplevel()
+                
+                self.param_frame.geometry("%dx%d+%d+%d" % (250, 250, x + x_clic, y + y_clic))
+                self.param_frame.title(source.tags[0] + " parameters")
+                self.param_frame.transient(self.root)
 
-            if source.tags[0] == "In":
-                
-                labels = tk.Label(self.param_frame)
-                labels.grid(row=0, column=0, sticky='nsw')
-                labels.grid_rowconfigure(0, weight=1)
-                labels.grid_rowconfigure(1, weight=1)
-                labels.grid_rowconfigure(2, weight=1)
-                labels.grid_rowconfigure(3, weight=1)
-                labels.grid_rowconfigure(4, weight=1)
-                labels.grid_columnconfigure(0, weight=1)
-                labels.grid_columnconfigure(1, weight=1)
-                labels.grid_columnconfigure(2, weight=1)
+                if source.tags[0] == "In":
+                    
+                    labels = tk.Label(self.param_frame)
+                    labels.grid(row=0, column=0, sticky='nsw')
+                    labels.grid_rowconfigure(0, weight=1)
+                    labels.grid_rowconfigure(1, weight=1)
+                    labels.grid_rowconfigure(2, weight=1)
+                    labels.grid_rowconfigure(3, weight=1)
+                    labels.grid_rowconfigure(4, weight=1)
+                    labels.grid_columnconfigure(0, weight=1)
+                    labels.grid_columnconfigure(1, weight=1)
+                    labels.grid_columnconfigure(2, weight=1)
 
-                label_0 = tk.Label(labels)
-                label_0.config(text='In Layer:', font=("Helvetica", 18))
-                label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=5, pady=10)
-                
-                label_1 = tk.Label(labels)
-                label_1.config(text='Width:', font=("Helvetica", 14))
-                label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
-                
-                self.width = tk.StringVar()
-                
-                val_1 = tk.Entry(labels, width=10, textvariable=self.width)
-                val_1.grid(row=1, column=2, sticky='nsw', padx=5, pady=10)
+                    label_0 = tk.Label(labels)
+                    label_0.config(text='In Layer:', font=("Helvetica", 18))
+                    label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=5, pady=10)
+                    
+                    label_1 = tk.Label(labels)
+                    label_1.config(text='Width:', font=("Helvetica", 14))
+                    label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
+                    
+                    self.width = tk.StringVar()
+                    
+                    val_1 = tk.Entry(labels, width=10, textvariable=self.width)
+                    val_1.grid(row=1, column=2, sticky='nsw', padx=5, pady=10)
 
-                label_2 = tk.Label(labels)
-                label_2.config(text='Heigth:', font=("Helvetica", 14))
-                label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
-                
-                self.heigth = tk.StringVar()
-                
-                val_2 = tk.Entry(labels, width=10, textvariable=self.heigth)
-                val_2.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
+                    label_2 = tk.Label(labels)
+                    label_2.config(text='Heigth:', font=("Helvetica", 14))
+                    label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
+                    
+                    self.heigth = tk.StringVar()
+                    
+                    val_2 = tk.Entry(labels, width=10, textvariable=self.heigth)
+                    val_2.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
 
-                label_3 = tk.Label(labels)
-                label_3.config(text='Colors:', font=("Helvetica", 14))
-                label_3.grid(row=3, column=0, sticky='nsw', padx=5, pady=10)
-                
-                self.pix_type = tk.IntVar()
-                self.pix_type.set(1)
-                
-                val_3 = tk.Radiobutton(labels)
-                val_3.config(text="Yes", variable=self.pix_type, value=1)
-                val_3.grid(row=3, column=1, sticky='nse', padx=5, pady=10)
-                val_3bis = tk.Radiobutton(labels)
-                val_3bis.config(text="No", variable=self.pix_type, value=2)
-                val_3bis.grid(row=3, column=2, sticky='nse', padx=5, pady=10)
+                    label_3 = tk.Label(labels)
+                    label_3.config(text='Colors:', font=("Helvetica", 14))
+                    label_3.grid(row=3, column=0, sticky='nsw', padx=5, pady=10)
+                    
+                    self.pix_type = tk.IntVar()
+                    self.pix_type.set(1)
+                    
+                    val_3 = tk.Radiobutton(labels)
+                    val_3.config(text="Yes", variable=self.pix_type, value=1)
+                    val_3.grid(row=3, column=1, sticky='nse', padx=5, pady=10)
+                    val_3bis = tk.Radiobutton(labels)
+                    val_3bis.config(text="No", variable=self.pix_type, value=2)
+                    val_3bis.grid(row=3, column=2, sticky='nse', padx=5, pady=10)
 
-                save_in = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0],
-                                                     width=self.width, heigth=self.heigth, pix_type=self.pix_type)
+                    save_in = lambda: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
+                                                         width=self.width, heigth=self.heigth, pix_type=self.pix_type)
 
-                save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16), command=save_in)
-                save_but.grid(row=4, column=1, sticky='nsew', padx=5, pady=10)
-                
-            elif source.tags[0] == "Conv2d":
-                
-                labels = tk.Label(self.param_frame)
-                labels.grid(row=0, column=0, sticky='nsw')
-                labels.grid_rowconfigure(0, weight=1)
-                labels.grid_rowconfigure(1, weight=1)
-                labels.grid_rowconfigure(2, weight=1)
-                labels.grid_rowconfigure(3, weight=1)
-                labels.grid_columnconfigure(0, weight=1)
-                labels.grid_columnconfigure(1, weight=1)
-                labels.grid_columnconfigure(2, weight=1)
+                    save_but = tk.Button(labels)
+                    save_but.config(text='Save', font=("Helvetica", 16), command=save_in)
+                    save_but.grid(row=4, column=1, sticky='nsew', padx=5, pady=10)
+                    
+                elif source.tags[0] == "Conv2d":
+                    
+                    labels = tk.Label(self.param_frame)
+                    labels.grid(row=0, column=0, sticky='nsw')
+                    labels.grid_rowconfigure(0, weight=1)
+                    labels.grid_rowconfigure(1, weight=1)
+                    labels.grid_rowconfigure(2, weight=1)
+                    labels.grid_rowconfigure(3, weight=1)
+                    labels.grid_columnconfigure(0, weight=1)
+                    labels.grid_columnconfigure(1, weight=1)
+                    labels.grid_columnconfigure(2, weight=1)
 
-                label_0 = tk.Label(labels)
-                label_0.config(text='Conv2D Layer:', font=("Helvetica", 18))
-                label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
+                    label_0 = tk.Label(labels)
+                    label_0.config(text='Conv2D Layer:', font=("Helvetica", 18))
+                    label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
 
-                label_1 = tk.Label(labels)
-                label_1.config(text='Filters:', font=("Helvetica", 14))
-                label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
+                    label_1 = tk.Label(labels)
+                    label_1.config(text='Filters:', font=("Helvetica", 14))
+                    label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
 
-                self.filters = tk.StringVar()
-                
-                val_1 = tk.Entry(labels, width=10, textvariable=self.filters)
-                val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
-                
-                label_2 = tk.Label(labels)
-                label_2.config(text='Kernel size:', font=("Helvetica", 14))
-                label_2.grid(row=2, column=0, sticky='nsw', pady=10)
-                
-                self.kernel_size_x = tk.StringVar()
-                
-                val_2_x = tk.Entry(labels, width=10, textvariable=self.kernel_size_x)
-                val_2_x.grid(row=2, column=1, sticky='nsw', pady=10)
+                    self.filters = tk.StringVar()
+                    
+                    val_1 = tk.Entry(labels, width=10, textvariable=self.filters)
+                    val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
+                    
+                    label_2 = tk.Label(labels)
+                    label_2.config(text='Kernel size:', font=("Helvetica", 14))
+                    label_2.grid(row=2, column=0, sticky='nsw', pady=10)
+                    
+                    self.kernel_size_x = tk.StringVar()
+                    
+                    val_2_x = tk.Entry(labels, width=10, textvariable=self.kernel_size_x)
+                    val_2_x.grid(row=2, column=1, sticky='nsw', pady=10)
 
-                self.kernel_size_y = tk.StringVar()
-                
-                val_2_y = tk.Entry(labels, width=10, textvariable=self.kernel_size_y)
-                val_2_y.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
-
-
-                save_conv2d = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0],
-                                                     filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y)
-                
-                save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16), command=save_conv2d)
-                save_but.grid(row=3, column=1, sticky='nsew', pady=10)
-            
-            elif source.tags[0] == "Dense":
-                
-                labels = tk.Label(self.param_frame)
-                labels.grid(row=0, column=0, sticky='nsw')
-                labels.grid_rowconfigure(0, weight=1)
-                labels.grid_rowconfigure(1, weight=1)
-                labels.grid_rowconfigure(2, weight=1)
-                labels.grid_columnconfigure(0, weight=1)
-                labels.grid_columnconfigure(1, weight=1)
-                labels.grid_columnconfigure(2, weight=1)
-
-                label_0 = tk.Label(labels)
-                label_0.config(text='Conv2D Layer:', font=("Helvetica", 18))
-                label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
-                
-                label_1 = tk.Label(labels)
-                label_1.config(text='Neurons:', font=("Helvetica", 14))
-                label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
-
-                self.neurons = tk.StringVar()
-                
-                val_1 = tk.Entry(labels, width=10, textvariable=self.neurons)
-                val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
+                    self.kernel_size_y = tk.StringVar()
+                    
+                    val_2_y = tk.Entry(labels, width=10, textvariable=self.kernel_size_y)
+                    val_2_y.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
 
 
-                save_dense = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0], neurons=self.neurons)
+                    save_conv2d = lambda: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
+                                                         filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y)
+                    
+                    save_but = tk.Button(labels)
+                    save_but.config(text='Save', font=("Helvetica", 16), command=save_conv2d)
+                    save_but.grid(row=3, column=1, sticky='nsew', pady=10)
                 
-                save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16), command=save_dense)
-                save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
-                
-            elif source.tags[0] == "Max_pooling":
-                
-                labels = tk.Label(self.param_frame)
-                labels.grid(row=0, column=0, sticky='nsw')
-                labels.grid_rowconfigure(0, weight=1)
-                labels.grid_rowconfigure(1, weight=1)
-                labels.grid_rowconfigure(2, weight=1)
-                labels.grid_rowconfigure(3, weight=1)
-                labels.grid_columnconfigure(0, weight=1)
-                labels.grid_columnconfigure(1, weight=1)
-                labels.grid_columnconfigure(2, weight=1)
+                elif source.tags[0] == "Dense":
+                    
+                    labels = tk.Label(self.param_frame)
+                    labels.grid(row=0, column=0, sticky='nsw')
+                    labels.grid_rowconfigure(0, weight=1)
+                    labels.grid_rowconfigure(1, weight=1)
+                    labels.grid_rowconfigure(2, weight=1)
+                    labels.grid_columnconfigure(0, weight=1)
+                    labels.grid_columnconfigure(1, weight=1)
+                    labels.grid_columnconfigure(2, weight=1)
 
-                label_0 = tk.Label(labels)
-                label_0.config(text='MaxPooling Layer:', font=("Helvetica", 18))
-                label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
-                
-                label_1 = tk.Label(labels)
-                label_1.config(text='Pool size:', font=("Helvetica", 14))
-                label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
-                
-                self.pool_size_x = tk.StringVar()
-                
-                val_1_x = tk.Entry(labels, width=10, textvariable=self.pool_size_x)
-                val_1_x.grid(row=1, column=2, sticky='nsw', pady=10)
+                    label_0 = tk.Label(labels)
+                    label_0.config(text='Conv2D Layer:', font=("Helvetica", 18))
+                    label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
+                    
+                    label_1 = tk.Label(labels)
+                    label_1.config(text='Neurons:', font=("Helvetica", 14))
+                    label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
 
-                self.pool_size_y = tk.StringVar()
-                
-                val_1_y = tk.Entry(labels, width=10, textvariable=self.pool_size_y)
-                val_1_y.grid(row=1, column=1, sticky='nsw', padx=5, pady=10)
+                    self.neurons = tk.StringVar()
+                    
+                    val_1 = tk.Entry(labels, width=10, textvariable=self.neurons)
+                    val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
 
-                label_2 = tk.Label(labels)
-                label_2.config(text='Stride:', font=("Helvetica", 14))
-                label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
-                
-                self.stride_x = tk.StringVar()
-                
-                val_2_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
-                val_2_x.grid(row=2, column=1, sticky='nsw', padx=5, pady=10)
 
-                self.stride_y = tk.StringVar()
+                    save_dense = lambda: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0], neurons=self.neurons)
+                    
+                    save_but = tk.Button(labels)
+                    save_but.config(text='Save', font=("Helvetica", 16), command=save_dense)
+                    save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
+                    
+                elif source.tags[0] == "Max_pooling":
+                    
+                    labels = tk.Label(self.param_frame)
+                    labels.grid(row=0, column=0, sticky='nsw')
+                    labels.grid_rowconfigure(0, weight=1)
+                    labels.grid_rowconfigure(1, weight=1)
+                    labels.grid_rowconfigure(2, weight=1)
+                    labels.grid_rowconfigure(3, weight=1)
+                    labels.grid_columnconfigure(0, weight=1)
+                    labels.grid_columnconfigure(1, weight=1)
+                    labels.grid_columnconfigure(2, weight=1)
+
+                    label_0 = tk.Label(labels)
+                    label_0.config(text='MaxPooling Layer:', font=("Helvetica", 18))
+                    label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
+                    
+                    label_1 = tk.Label(labels)
+                    label_1.config(text='Pool size:', font=("Helvetica", 14))
+                    label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
+                    
+                    self.pool_size_x = tk.StringVar()
+                    
+                    val_1_x = tk.Entry(labels, width=10, textvariable=self.pool_size_x)
+                    val_1_x.grid(row=1, column=2, sticky='nsw', pady=10)
+
+                    self.pool_size_y = tk.StringVar()
+                    
+                    val_1_y = tk.Entry(labels, width=10, textvariable=self.pool_size_y)
+                    val_1_y.grid(row=1, column=1, sticky='nsw', padx=5, pady=10)
+
+                    label_2 = tk.Label(labels)
+                    label_2.config(text='Stride:', font=("Helvetica", 14))
+                    label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
+                    
+                    self.stride_x = tk.StringVar()
+                    
+                    val_2_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
+                    val_2_x.grid(row=2, column=1, sticky='nsw', padx=5, pady=10)
+
+                    self.stride_y = tk.StringVar()
+                    
+                    val_2_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
+                    val_2_y.grid(row=2, column=2, sticky='nsw', pady=10)
+
+                    save_max_p = lambda: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
+                                                         pool_size_x=self.pool_size_x, pool_size_y=self.pool_size_y,
+                                                         stride_x=self.stride_x, stride_y=self.stride_y)
+
+                    save_but = tk.Button(labels)
+                    save_but.config(text='Save', font=("Helvetica", 16), command=save_max_p)
+                    save_but.grid(row=3, column=1, sticky='nsew', padx=5, pady=10)
                 
-                val_2_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
-                val_2_y.grid(row=2, column=2, sticky='nsw', pady=10)
+                elif source.tags[0] == "Out":
+                    
+                    labels = tk.Label(self.param_frame)
+                    labels.grid(row=0, column=0, sticky='nsw')
+                    labels.grid_rowconfigure(0, weight=1)
+                    labels.grid_rowconfigure(1, weight=1)
+                    labels.grid_rowconfigure(2, weight=1)
+                    labels.grid_rowconfigure(3, weight=1)
+                    labels.grid_rowconfigure(4, weight=1)
+                    labels.grid_columnconfigure(0, weight=1)
+                    labels.grid_columnconfigure(1, weight=1)
 
-                save_max_p = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0],
-                                                     pool_size_x=self.pool_size_x, pool_size_y=self.pool_size_y,
-                                                     stride_x=self.stride_x, stride_y=self.stride_y)
+                    label_0 = tk.Label(labels)
+                    label_0.config(text="Out Layer:", font=("Helvetica", 18))
+                    label_0.grid(row=0, column=0, sticky='new', columnspan=2, padx=10, pady=10)
+                    
+                    label_1 = tk.Label(labels)
+                    label_1.config(text="Output(s):", font=("Helvetica", 14))
+                    label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
+                    
+                    self.out_nb = tk.StringVar()
+                    self.values = ("1", "2", "3", "4")
+                    self.out_nb.set(self.values[0])
+                    
+                    val_1 = ttk.Combobox(labels, textvariable=self.out_nb, values=self.values, state="readonly", width=10)
+                    val_1.grid(row=1, column=1, sticky='nsw', padx=5, pady=10)
 
-                save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16), command=save_max_p)
-                save_but.grid(row=3, column=1, sticky='nsew', padx=5, pady=10)
-            
-            elif source.tags[0] == "Out":
-                
-                labels = tk.Label(self.param_frame)
-                labels.grid(row=0, column=0, sticky='nsw')
-                labels.grid_rowconfigure(0, weight=1)
-                labels.grid_rowconfigure(1, weight=1)
-                labels.grid_rowconfigure(2, weight=1)
-                labels.grid_rowconfigure(3, weight=1)
-                labels.grid_rowconfigure(4, weight=1)
-                labels.grid_columnconfigure(0, weight=1)
-                labels.grid_columnconfigure(1, weight=1)
+                    label_1 = tk.Label(labels)
+                    label_1.config(text='Type:', font=("Helvetica", 14))
+                    label_1.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
+                    
+                    self.out_type = tk.IntVar()
+                    self.out_type.set(1)
+                    
+                    val_1 = tk.Radiobutton(labels)
+                    val_1.config(text="Categories", variable=self.out_type, value=1)
+                    val_1.grid(row=2, column=1, sticky='nsw', padx=5, pady=10)
+                    val_1bis = tk.Radiobutton(labels)
+                    val_1bis.config(text="Values", variable=self.out_type, value=2)
+                    val_1bis.grid(row=3, column=1, sticky='nsw', padx=5, pady=10)
 
-                label_0 = tk.Label(labels)
-                label_0.config(text="Out Layer:", font=("Helvetica", 18))
-                label_0.grid(row=0, column=0, sticky='new', columnspan=2, padx=10, pady=10)
-                
-                label_1 = tk.Label(labels)
-                label_1.config(text="Output(s):", font=("Helvetica", 14))
-                label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
-                
-                self.out_nb = tk.StringVar()
-                self.values = ("1", "2", "3", "4")
-                self.out_nb.set(self.values[0])
-                
-                val_1 = ttk.Combobox(labels, textvariable=self.out_nb, values=self.values, state="readonly", width=10)
-                val_1.grid(row=1, column=1, sticky='nsw', padx=5, pady=10)
+                    save_out = lambda: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0], out_type=self.out_type, out_nb=self.out_nb)
 
-                label_1 = tk.Label(labels)
-                label_1.config(text='Type:', font=("Helvetica", 14))
-                label_1.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
-                
-                self.out_type = tk.IntVar()
-                self.out_type.set(1)
-                
-                val_1 = tk.Radiobutton(labels)
-                val_1.config(text="Categories", variable=self.out_type, value=1)
-                val_1.grid(row=2, column=1, sticky='nsw', padx=5, pady=10)
-                val_1bis = tk.Radiobutton(labels)
-                val_1bis.config(text="Values", variable=self.out_type, value=2)
-                val_1bis.grid(row=3, column=1, sticky='nsw', padx=5, pady=10)
+                    save_but = tk.Button(labels)
+                    save_but.config(text='Save', font=("Helvetica", 16), command=save_out)
+                    save_but.grid(row=4, column=0, columnspan=2, padx=5, pady=10)
+              
+                elif source.tags[0] == "Dropout":
+                    
+                    labels = tk.Label(self.param_frame)
+                    labels.grid(row=0, column=0, sticky='nsw')
+                    labels.grid_rowconfigure(0, weight=1)
+                    labels.grid_rowconfigure(1, weight=1)
+                    labels.grid_rowconfigure(2, weight=1)
+                    labels.grid_columnconfigure(0, weight=1)
+                    labels.grid_columnconfigure(1, weight=1)
+                    labels.grid_columnconfigure(2, weight=1)
 
-                save_out = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0], out_type=self.out_type, out_nb=self.out_nb)
+                    label_0 = tk.Label(labels)
+                    label_0.config(text='Dropout Layer:', font=("Helvetica", 18))
+                    label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
+                    
+                    label_1 = tk.Label(labels)
+                    label_1.config(text='Ratio:', font=("Helvetica", 14))
+                    label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
 
-                save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16), command=save_out)
-                save_but.grid(row=4, column=0, columnspan=2, padx=5, pady=10)
-          
-            elif source.tags[0] == "Dropout":
-                
-                labels = tk.Label(self.param_frame)
-                labels.grid(row=0, column=0, sticky='nsw')
-                labels.grid_rowconfigure(0, weight=1)
-                labels.grid_rowconfigure(1, weight=1)
-                labels.grid_rowconfigure(2, weight=1)
-                labels.grid_columnconfigure(0, weight=1)
-                labels.grid_columnconfigure(1, weight=1)
-                labels.grid_columnconfigure(2, weight=1)
+                    self.ratio = tk.StringVar()
+                    self.ratio.set("0.2")
+                    
+                    val_1 = tk.Entry(labels, width=10, textvariable=self.ratio)
+                    val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
 
-                label_0 = tk.Label(labels)
-                label_0.config(text='Dropout Layer:', font=("Helvetica", 18))
-                label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
-                
-                label_1 = tk.Label(labels)
-                label_1.config(text='Ratio:', font=("Helvetica", 14))
-                label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
+                    save_dropout = lambda: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0], ratio=self.ratio)
 
-                self.ratio = tk.StringVar()
-                self.ratio.set("0.2")
-                
-                val_1 = tk.Entry(labels, width=10, textvariable=self.ratio)
-                val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
+                    save_but = tk.Button(labels)
+                    save_but.config(text='Save', font=("Helvetica", 16), command=save_dropout)
+                    save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
 
-                save_dropout = lambda: DnD_Container.save_layer(self=self, layers_list=layers_list, id=source.id, tag=source.tags[0], ratio=self.ratio)
-
-                save_but = tk.Button(labels)
-                save_but.config(text='Save', font=("Helvetica", 16), command=save_dropout)
-                save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
-
-    def save_layer(self, layers_list, id, tag, **kwargs):
+    def save_layer(self, id, tag, **kwargs):
         
         if id in layers_list:
             res = askquestion("Modify Layer", "Layer already exists and will be overwriten...", icon='warning')
@@ -548,4 +552,5 @@ class DnD_Container:
                 self.param_frame.destroy()
                 return
         layers_list[id] = {} #TODO: Save the layer
-        self.param_frame.destroy()
+        if len(kwargs) > 0:
+            self.param_frame.destroy()
