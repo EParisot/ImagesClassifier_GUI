@@ -18,6 +18,8 @@ from PIL import Image, ImageTk
 import srcs.Tk_Tooltips as ttp
 import srcs.Tk_DragnDrop as dnd
 
+import json
+
 from srcs.layers import layers_list
 
 class ThirdTab(object):
@@ -141,21 +143,32 @@ class ThirdTab(object):
             self.model_canvas.delete("all")
 
     def parse(self, filename):
-        pass
+        pass # TODO read file
 
     def load(self, event):
         filename =  askopenfilename(title = "Select Model",filetypes = (("json files","*.json"),("all files","*.*")))
         if filename is not None:
             self.parse(filename)
 
-    def write(self, filename):
-        pass
+    def write_coords(self):
+        for item_id in self.model_canvas.find_all():
+            if item_id in layers_list:
+                layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
+                layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
+            else:
+                layers_list[item_id] = {}
+                layers_list[item_id]['tag'] = self.model_canvas.gettags(item_id)[0]
+                layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
+                layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
+
     
     def save(self, event):
         filename = asksaveasfilename(title = "Save Model",filetypes = (("json files","*.json"),("all files","*.*")))
         if filename is not None:
             self.saved = True
-            self.write(filename)
+            self.write_coords()
+            with open(filename, 'w') as outfile:
+                json.dump(layers_list, outfile)
 
     def modified(self, event):
         self.saved = False
