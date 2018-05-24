@@ -228,15 +228,6 @@ class DnD_Container:
         source_bbox = source.canvas.bbox(source.id)
         source_w = source_bbox[2] - source_bbox[0]
         source_h = source_bbox[3] - source_bbox[1]
-        
-        if x < 0:
-            x = 5
-        elif (x + source_w) > 900:
-            x = 900 - source_w + 4
-        if y < 0:
-            y = 5
-        elif (y + source_h) > 400:
-            y = 400 - source_h + 4
             
         if len([z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]) > 0:
             items = [z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]
@@ -254,6 +245,8 @@ class DnD_Container:
                     item_bbox = canvas.bbox(item_under)
                     item_w = item_bbox[2] - item_bbox[0]
                     item_h = item_bbox[3] - item_bbox[1]
+                    if x_under + item_w < 10 or x_under + item_w + item_w > 900 - 10:
+                        break
                     canvas.move(item_under, item_w, 0)
                     x_bis = x_under + item_w
             elif x < x_under:
@@ -265,35 +258,20 @@ class DnD_Container:
                     item_bbox = canvas.bbox(item_under)
                     item_w = item_bbox[2] - item_bbox[0]
                     item_h = item_bbox[3] - item_bbox[1]
+                    if x_under - item_w < 10 or x_under > 900 - 10:
+                        break
                     canvas.move(item_under, -item_w, 0)
                     x_bis = x_under - item_w
-
-##            if x_bis < 5:
-##                print("test1")
-##                x_bis = 5
-##                while len([z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]) > 0:
-##                    print("test")
-##                    items = [z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]
-##                    item_under = items[0]
-##                    x_under, y_under = canvas.coords(item_under)
-##                    item_bbox = canvas.bbox(item_under)
-##                    item_w = item_bbox[2] - item_bbox[0]
-##                    item_h = item_bbox[3] - item_bbox[1]
-##                    canvas.move(item_under, item_w, 0)
-##                    x_bis = x_under + item_w
-##            elif x_bis > 900 - source_w + 4:
-##                print("test2")
-##                x_bis = 900 - source_w + 4
-##                while len([z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]) > 0:
-##                    items = [z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]
-##                    item_under = items[0]
-##                    x_under, y_under = canvas.coords(item_under)
-##                    item_bbox = canvas.bbox(item_under)
-##                    item_w = item_bbox[2] - item_bbox[0]
-##                    item_h = item_bbox[3] - item_bbox[1]
-##                    canvas.move(item_under, -item_w, 0)
-##                    x_bis = x_under - item_w
-
+                    
+        if x < 0:
+            x = 5
+        elif (x + source_w) > 900:
+            x = 900 - source_w + 4
+        if y < 0:
+            y = 5
+        elif (y + source_h) > 400:
+            y = 400 - source_h + 4
+            
         return (x, y)
 
     def set_layer_params(self, event, source):
