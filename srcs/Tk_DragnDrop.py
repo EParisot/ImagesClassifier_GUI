@@ -228,6 +228,16 @@ class DnD_Container:
         source_bbox = source.canvas.bbox(source.id)
         source_w = source_bbox[2] - source_bbox[0]
         source_h = source_bbox[3] - source_bbox[1]
+        
+        if x < 0:
+            x = 5
+        elif (x + source_w) > 900:
+            x = 900 - source_w + 4
+        if y < 0:
+            y = 5
+        elif (y + source_h) > 400:
+            y = 400 - source_h + 4
+            
         if len([z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]) > 0:
             items = [z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]
             item_under = items[0]
@@ -257,6 +267,33 @@ class DnD_Container:
                     item_h = item_bbox[3] - item_bbox[1]
                     canvas.move(item_under, -item_w, 0)
                     x_bis = x_under - item_w
+
+##            if x_bis < 5:
+##                print("test1")
+##                x_bis = 5
+##                while len([z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]) > 0:
+##                    print("test")
+##                    items = [z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]
+##                    item_under = items[0]
+##                    x_under, y_under = canvas.coords(item_under)
+##                    item_bbox = canvas.bbox(item_under)
+##                    item_w = item_bbox[2] - item_bbox[0]
+##                    item_h = item_bbox[3] - item_bbox[1]
+##                    canvas.move(item_under, item_w, 0)
+##                    x_bis = x_under + item_w
+##            elif x_bis > 900 - source_w + 4:
+##                print("test2")
+##                x_bis = 900 - source_w + 4
+##                while len([z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]) > 0:
+##                    items = [z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]
+##                    item_under = items[0]
+##                    x_under, y_under = canvas.coords(item_under)
+##                    item_bbox = canvas.bbox(item_under)
+##                    item_w = item_bbox[2] - item_bbox[0]
+##                    item_h = item_bbox[3] - item_bbox[1]
+##                    canvas.move(item_under, -item_w, 0)
+##                    x_bis = x_under - item_w
+
         return (x, y)
 
     def set_layer_params(self, event, source):
@@ -349,6 +386,7 @@ class DnD_Container:
                     labels.grid_rowconfigure(1, weight=1)
                     labels.grid_rowconfigure(2, weight=1)
                     labels.grid_rowconfigure(3, weight=1)
+                    labels.grid_rowconfigure(4, weight=1)
                     labels.grid_columnconfigure(0, weight=1)
                     labels.grid_columnconfigure(1, weight=1)
                     labels.grid_columnconfigure(2, weight=1)
@@ -380,15 +418,29 @@ class DnD_Container:
                     val_2_y = tk.Entry(labels, width=10, textvariable=self.kernel_size_y)
                     val_2_y.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
 
+                    label_3 = tk.Label(labels)
+                    label_3.config(text='Stride:', font=("Helvetica", 14))
+                    label_3.grid(row=3, column=0, sticky='nsw', pady=10)
+                    
+                    self.stride_x = tk.StringVar()
+                    
+                    val_3_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
+                    val_3_x.grid(row=3, column=1, sticky='nsw', pady=10)
+
+                    self.stride_y = tk.StringVar()
+                    
+                    val_3_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
+                    val_3_y.grid(row=3, column=2, sticky='nsw', padx=5, pady=10)
+
 
                     save_conv2d = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
-                                                         filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y)
+                                                         filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y, stride_x=self.stride_x, stride_y=self.stride_y)
                     
                     save_but = tk.Button(labels)
                     save_but.config(text='Save', font=("Helvetica", 16))
                     save_but.bind("<ButtonPress-1>", save_conv2d)
                     save_but.bind("<Return>", save_conv2d)
-                    save_but.grid(row=3, column=1, sticky='nsew', pady=10)
+                    save_but.grid(row=4, column=1, sticky='nsew', pady=10)
 
                     val_1.focus_set()
                 
@@ -569,6 +621,7 @@ class DnD_Container:
                     val_1.focus_set()
 
     def on_close(self):
+        
         ret = askquestion("Layer not saved", "Layer is not saved in model, quit anyway ? \n(you can save it later by double-clicking it)", icon='warning')
         if ret == "yes":
             self.test_val.master.config(bg='SystemButtonFace')
@@ -584,8 +637,12 @@ class DnD_Container:
         if id in layers_list:
             res = askquestion("Modify Layer", "Layer already exists and will be overwriten...", icon='warning')
             if res == "no":
+                self.test_val.master.config(bg='SystemButtonFace')
+                for widget in self.test_val.master.winfo_children():
+                    widget.config(bg='SystemButtonFace')
+                    for elem in widget.winfo_children():
+                        elem.config(bg='SystemButtonFace')
                 self.param_frame.destroy()
-                test_val.config(bg='grey')
                 return
         layer_dict = {}
         layer_dict['tag'] = tag
