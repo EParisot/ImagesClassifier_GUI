@@ -84,11 +84,15 @@ class App(tk.Tk):
 
         # if we are in label
         if self.tabs.tab(self.tabs.select(), "text") == LABEL_NAME:
-            if event.keysym == NEXT_PHOTO:
+            if event.keysym == KEY_NEXT_PHOTO:
                 self.second_tab.next_photo()
-            elif event.keysym == LAST_PHOTO:
+            elif event.keysym == KEY_LAST_PHOTO:
                 self.second_tab.last_photo()
-            
+            elif event.keysym == KEY_DEL_PHOTO:
+                self.second_tab.del_photo()
+            elif event.char in KEY_LABEL_CHARS:
+                self.second_tab.event_win(event)
+
     def onKeyRelease(self, event):
         if event.keysym == KEY_CTRL_L:
             self.l_ctrl_pressed = False;
@@ -217,6 +221,7 @@ class App(tk.Tk):
         self.OUT_path = self.path2_result.get()
         self.cfg.set('paths', 'out_path', self.OUT_path)
         self.cfg.set('paths', 'snap_path', self.IN_path)
+        self.second_tab.load()
 
         with open(FILE_CONFIG, 'w') as f:
             self.cfg.write(f)
