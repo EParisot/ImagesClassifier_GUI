@@ -25,7 +25,8 @@ class ThirdTab(object):
     def __init__(self, app):
         self.app = app
 
-        self.saved = False
+        self.saved = tk.BooleanVar()
+        self.saved.set(False)
         
         self.model_frame = Frame(app.third_tab)
         self.model_frame.grid(row=0, column=0, stick='n')
@@ -55,7 +56,7 @@ class ThirdTab(object):
         self.photo_label.grid(row=0, column=0, padx=20, pady=10, stick='e')
 
         self.model_canvas = Canvas(self.model_frame)
-        self.model_canvas.bind("<Enter>", self.modified)
+        self.model_canvas.bind("<ButtonPress>", self.modified)
         self.model_canvas_dnd = dnd.DnD_Container(self.app, self.model_frame, self.model_canvas)
         self.model_canvas.config(borderwidth=2, relief="sunken", height=MODEL_H, width=MODEL_W)
         self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
@@ -200,23 +201,23 @@ class ThirdTab(object):
     def write_coords(self):
         
         for item_id in self.model_canvas.find_all():
-            if item_id in self.self.app.layers_list:
-                self.self.app.layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
-                self.self.app.layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
+            if item_id in self.app.layers_list:
+                self.app.layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
+                self.app.layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
             else:
-                self.self.app.layers_list[item_id] = {}
-                self.self.app.layers_list[item_id]['tag'] = self.model_canvas.gettags(item_id)[0]
-                self.self.app.layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
-                self.self.app.layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
+                self.app.layers_list[item_id] = {}
+                self.app.layers_list[item_id]['tag'] = self.model_canvas.gettags(item_id)[0]
+                self.app.layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
+                self.app.layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
 
     
     def save(self, event):
         filename = asksaveasfilename(title = "Save Model",filetypes = (("json files","*.json"),("all files","*.*")))
-        if filename is not None:
-            self.saved = True
+        if filename:
+            self.saved.set(True)
             self.write_coords()
             with open(filename, 'w') as outfile:
-                json.dump(self.self.app.layers_list, outfile)
+                json.dump(self.app.layers_list, outfile)
 
     def modified(self, event):
-        self.saved = False
+        self.saved.set(False)

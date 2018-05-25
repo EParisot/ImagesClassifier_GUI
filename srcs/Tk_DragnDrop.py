@@ -221,6 +221,7 @@ class DnD_Container:
                 if source.canvas == self.app.third_tab.layers_canvas:
                     self.set_layer_params(event, source)
             source.attach(self.canvas, x, y)
+            self.app.third_tab.saved.set(False)
         else:
             source.putback()
 
@@ -288,6 +289,10 @@ class DnD_Container:
                 else:
                     x_clic = event.x
                     y_clic = event.y
+                if (x + x_clic) < 0:
+                    x_clic = 0
+                if (y + y_clic) < 0:
+                    y_clic = 0
                 self.param_frame = tk.Toplevel()
                 self.param_frame.geometry("%dx%d+%d+%d" % (LAYER_INFO_W, LAYER_INFO_H, x + x_clic, y + y_clic))
                 self.param_frame.title(source.tags[0] + " parameters")

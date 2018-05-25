@@ -38,8 +38,6 @@ if __name__ == '__main__':
 
     app = App()
 
-    #app.layers_list = {}
-
     app.first_tab = FirstTab(app)
     app.second_tab = SecondTab(app)
     app.third_tab = ThirdTab(app)
