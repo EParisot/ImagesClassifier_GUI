@@ -243,7 +243,7 @@ class ThirdTab(object):
             self.saved.set(True)
             self.write_coords()
             if os.path.exists(filename):
-                os.remove(filname)
+                os.remove(filename)
             with open(filename, 'w') as outfile:
                 json.dump(self.app.layers_list, outfile)
 
