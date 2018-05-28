@@ -238,10 +238,12 @@ class ThirdTab(object):
 
     
     def save(self, event):
-        filename = asksaveasfilename(title = "Save Model",filetypes = (("json files","*.json"),("all files","*.*")))
+        filename = asksaveasfilename(title = "Save Model", defaultextension=".json", filetypes = (("json files","*.json"),("all files","*.*")))
         if filename:
             self.saved.set(True)
             self.write_coords()
+            if os.path.exists(filename):
+                os.remove(filname)
             with open(filename, 'w') as outfile:
                 json.dump(self.app.layers_list, outfile)
 
