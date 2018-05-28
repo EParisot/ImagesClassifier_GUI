@@ -35,6 +35,7 @@ class ThirdTab(object):
         self.model_frame.grid_columnconfigure(2, weight=1)
         self.model_frame.grid_rowconfigure(0, weight=1)
         self.model_frame.grid_rowconfigure(1, weight=1)
+        self.model_frame.grid_rowconfigure(2, weight=1)
 
         self.input_pic = ImageTk.PhotoImage(Image.open('assets/photo.png'))
         self.trash_pic = ImageTk.PhotoImage(Image.open('assets/trash.png'))
@@ -105,17 +106,19 @@ class ThirdTab(object):
         clear_but.grid(row=3, column=0, pady=10, sticky="sw")
         clear_but = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
 
+        info = Label(self.model_frame, text="^ Drag layers ^").grid(row=1, column=1)
+
         self.layers_canvas = Canvas(self.model_frame)
         self.layers_canvas_dnd = dnd.DnD_Container(self.app, self.model_frame, self.layers_canvas)
         self.layers_canvas.config(borderwidth=2, relief="sunken", height=235, width=600)
-        self.layers_canvas.grid(row=1, column=1, padx=20, pady=10)
+        self.layers_canvas.grid(row=2, column=1, padx=20, pady=10)
         self.layers_canvas.grid_propagate(0)
 
         self.trash_canvas = Canvas(self.model_frame)
         self.trash_canvas.config(borderwidth=2, relief="groove", height=200, width=200)
         self.trash_canvas.create_image(108, 105, image=self.trash_pic)
         self.trash_dnd = dnd.DnD_Container(self.app, self.model_frame, self.trash_canvas)
-        self.trash_canvas.grid(row=1, column=2, padx=20, pady=20, stick='w')
+        self.trash_canvas.grid(row=2, column=2, padx=20, pady=20, stick='w')
         self.trash_canvas.grid_propagate(0)
 
         self.in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
@@ -167,8 +170,9 @@ class ThirdTab(object):
                         return
                 data = json.load(infile)
                 self.model_canvas.delete("all")
+                self.app.layers_list = {}
                 self.parse(data)
-                self.app.layers_list = data
+                self.saved.set(True)
 
     def parse(self, data):
         for item in data:
@@ -176,52 +180,52 @@ class ThirdTab(object):
             if data[item]['tag'] == "In":
                 self.new_in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
                 self.new_in_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_in_layer.id] = data.pop(item)
+                self.app.layers_list[self.new_in_layer.id] = data[item]
                 
             elif data[item]['tag'] == "Conv2d":
                 self.new_conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, ("Conv2d", "layer"))
                 self.new_conv2d_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_conv2d_layer.id] = data.pop(item)
+                self.app.layers_list[self.new_conv2d_layer.id] = data[item]
                 
             elif data[item]['tag'] == "Max_Pooling":
                 self.new_max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"))
                 self.new_max_p_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_max_p_layer.id] = data.pop(item)
-        
+                self.app.layers_list[self.new_max_p_layer.id] = data[item]
+
             elif data[item]['tag'] == "Flatten":
                 self.new_flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, ("Flatten", "layer"))
                 self.new_flatten_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_flatten_layer.id] = data.pop(item)
+                self.app.layers_list[self.new_flatten_layer.id] = data[item]
                 
             elif data[item]['tag'] == "Dense":
                 self.new_dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"))
                 self.new_dense_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_dense_layer.id] = data.pop(item)
+                self.app.layers_list[self.new_dense_layer.id] = data[item]
 
             elif data[item]['tag'] == "Out":  
                 self.new_out_layer = dnd.Icon(self.app, self.out_layer_pic, ("Out", "layer"))
                 self.new_out_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_out_layer.id] = data.pop(item)
+                self.app.layers_list[self.new_out_layer.id] = data[item]
 
             elif data[item]['tag'] == "Relu":
                 self.new_relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"))
                 self.new_relu_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_relu_activation.id] = data.pop(item)
+                self.app.layers_list[self.new_relu_activation.id] = data[item]
                 
             elif data[item]['tag'] == "Sigmoid":
                 self.new_sig_activation = dnd.Icon(self.app, self.sig_activation_pic, ("Sigmoid", "activation"))
                 self.new_sig_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_sig_activation.id] = data.pop(item)
+                self.app.layers_list[self.new_sig_activation.id] = data[item]
 
             elif data[item]['tag'] == "Softmax":
                 self.new_max_activation = dnd.Icon(self.app, self.max_activation_pic, ("Softmax", "activation"))
                 self.new_max_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_max_activation.id] = data.pop(item)
+                self.app.layers_list[self.new_max_activation.id] = data[item]
                 
             elif data[item]['tag'] == "Dropout":
                 self.new_dropout = dnd.Icon(self.app, self.dropout_pic, ("Dropout", "activation"))
                 self.new_dropout.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                data[self.new_dropout.id] = data.pop(item)
+                self.app.layers_list[self.new_dropout.id] = data[item]
 
 
     def write_coords(self):
