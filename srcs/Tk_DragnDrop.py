@@ -449,7 +449,7 @@ class DnD_Container:
                     labels.grid_columnconfigure(2, weight=1)
 
                     label_0 = tk.Label(labels)
-                    label_0.config(text='Conv2D Layer:', font=("Helvetica", 18))
+                    label_0.config(text='Dense Layer:', font=("Helvetica", 18))
                     label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
                     
                     label_1 = tk.Label(labels)
@@ -614,7 +614,7 @@ class DnD_Container:
                     val_1.focus_set()
                     
                 # Load values if exists
-                if source.id in self.app.layers_list:
+                if type(self) == srcs.Tk_DragnDrop.Icon and source.id in self.app.layers_list:
                     srcs.Tk_DragnDrop.DnD_Container.load_layer(self, source.id)
 
     def load_layer(self, id):
@@ -633,7 +633,7 @@ class DnD_Container:
             self.padding.set(self.app.layers_list[id]['padding'])
 
         elif self.app.layers_list[id]['tag'] == "Dense":
-            self.neurons.set(layers_list[id]['neurons'])
+            self.neurons.set(self.app.layers_list[id]['neurons'])
 
         elif self.app.layers_list[id]['tag'] == "Max_Pooling":
             self.pool_size_x.set(self.app.layers_list[id]['pool_size_x'])

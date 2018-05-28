@@ -50,6 +50,8 @@ class ThirdTab(object):
         self.dropout_pic = ImageTk.PhotoImage(Image.open('assets/dropout.png'))
         self.load_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
         self.save_pic = ImageTk.PhotoImage(Image.open('assets/save.png'))
+        self.compile_pic = ImageTk.PhotoImage(Image.open('assets/stack.png'))
+        self.logo_pic = ImageTk.PhotoImage(Image.open('assets/keras.jpeg'))
         self.clear_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
         self.photo_label = Label(self.model_frame, image=self.input_pic)
@@ -67,12 +69,15 @@ class ThirdTab(object):
         command_frame.grid_rowconfigure(0, weight=1)
         command_frame.grid_rowconfigure(1, weight=1)
         command_frame.grid_rowconfigure(2, weight=1)
+        command_frame.grid_rowconfigure(3, weight=1)
         command_frame.grid_columnconfigure(0, weight=1)
         command_frame.grid_columnconfigure(1, weight=1)
+        command_frame.grid_columnconfigure(2, weight=1)
 
         load_handler = lambda: self.load(self)
         save_handler = lambda: self.save(self)
         clear_handler = lambda: self.clear(self)
+        compile_handler = lambda: self.compile(self)
 
         load_but = Button(command_frame)
         load_but.config(image=self.load_pic, command=load_handler)
@@ -84,9 +89,20 @@ class ThirdTab(object):
         save_but.grid(row=1, column=1, padx=10, pady=10)
         save_but = ttp.ToolTip(save_but, 'Save Model', msgFunc=None, delay=1, follow=True)
 
+        compile_but = Button(command_frame)
+        compile_but.config(image=self.compile_pic, command=compile_handler)
+        compile_but.grid(row=1, column=2, padx=10, pady=10)
+        compile_but = ttp.ToolTip(compile_but, 'Compile Model', msgFunc=None, delay=1, follow=True)
+
+        powered_label = Label(command_frame, text="powered by:")
+        powered_label.grid(row=2, column=2, sticky="sew")
+
+        logo_label = Label(command_frame, image=self.logo_pic)
+        logo_label.grid(row=3, column=2, sticky="ne")
+
         clear_but = Button(command_frame)
         clear_but.config(image=self.clear_pic, command=clear_handler)
-        clear_but.grid(row=2, column=0, pady=10, sticky="sw")
+        clear_but.grid(row=3, column=0, pady=10, sticky="sw")
         clear_but = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
 
         self.layers_canvas = Canvas(self.model_frame)
@@ -154,48 +170,58 @@ class ThirdTab(object):
                 self.parse(data)
                 self.app.layers_list = data
 
-    def parse(self, data): # TODO LOAD DATAS
+    def parse(self, data):
         for item in data:
 
             if data[item]['tag'] == "In":
                 self.new_in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
                 self.new_in_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_in_layer.id] = data.pop(item)
                 
             elif data[item]['tag'] == "Conv2d":
                 self.new_conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, ("Conv2d", "layer"))
                 self.new_conv2d_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_conv2d_layer.id] = data.pop(item)
                 
             elif data[item]['tag'] == "Max_Pooling":
                 self.new_max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"))
                 self.new_max_p_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                
+                data[self.new_max_p_layer.id] = data.pop(item)
+        
             elif data[item]['tag'] == "Flatten":
                 self.new_flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, ("Flatten", "layer"))
                 self.new_flatten_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_flatten_layer.id] = data.pop(item)
                 
             elif data[item]['tag'] == "Dense":
                 self.new_dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"))
                 self.new_dense_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_dense_layer.id] = data.pop(item)
 
             elif data[item]['tag'] == "Out":  
                 self.new_out_layer = dnd.Icon(self.app, self.out_layer_pic, ("Out", "layer"))
                 self.new_out_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_out_layer.id] = data.pop(item)
 
             elif data[item]['tag'] == "Relu":
                 self.new_relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"))
                 self.new_relu_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_relu_activation.id] = data.pop(item)
                 
             elif data[item]['tag'] == "Sigmoid":
                 self.new_sig_activation = dnd.Icon(self.app, self.sig_activation_pic, ("Sigmoid", "activation"))
                 self.new_sig_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_sig_activation.id] = data.pop(item)
 
             elif data[item]['tag'] == "Softmax":
                 self.new_max_activation = dnd.Icon(self.app, self.max_activation_pic, ("Softmax", "activation"))
                 self.new_max_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_max_activation.id] = data.pop(item)
                 
             elif data[item]['tag'] == "Dropout":
                 self.new_dropout = dnd.Icon(self.app, self.dropout_pic, ("Dropout", "activation"))
                 self.new_dropout.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                data[self.new_dropout.id] = data.pop(item)
 
 
     def write_coords(self):
@@ -221,3 +247,6 @@ class ThirdTab(object):
 
     def modified(self, event):
         self.saved.set(False)
+
+    def compile(self, event):
+        pass
