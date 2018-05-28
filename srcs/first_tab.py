@@ -107,7 +107,7 @@ class FirstTab():
         del_but = Button(command_frame)
         del_but.config(image=self.del_pic, command=del_handler)
         del_but.grid(row=0, column=4, sticky="se")
-        del_but = ttp.ToolTip(del_but, 'Remove last snapshot', msgFunc=None, delay=1, follow=True)
+        del_but = ttp.ToolTip(del_but, 'Remove last Snap', msgFunc=None, delay=1, follow=True)
  
         count_frame = Frame(command_frame)
         count_frame.grid(row=0, column=5, sticky='w')
@@ -116,7 +116,7 @@ class FirstTab():
         count_frame.grid_rowconfigure(0, weight=1)
 
         snap_count_title = Label(count_frame)
-        snap_count_title.config(text="Snapshots :", font=("Helvetica", 16))
+        snap_count_title.config(text="Photos :", font=("Helvetica", 16))
         snap_count_title.grid(row=0, column=0, padx=10)
 
         snap_count = Label(count_frame)
@@ -208,9 +208,9 @@ class FirstTab():
                 self.prev_frame.image = pic
                 self.count.set(self.count.get() + 1)
             else:
-                showwarning("No destination", "Please select a destination dir in Options")
+                showwarning("No destination", "Please select a destination folder in Options")
         else:
-            showwarning("No video running", "Please start the video before you take a snap")
+            showwarning("No video running", "Please Start the video before you take a snap")
 
     def del_snap(event, self):
         os.remove(self.picname)
