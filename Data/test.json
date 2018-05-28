@@ -1,1 +1,76 @@
-{"2": {"tag": "In", "dim_1": "150", "dim_2": "80", "dim_3": "", "x": 42.0, "y": 116.0}, "4": {"tag": "Conv2d", "filters": "64", "kernel_size_x": "5", "kernel_size_y": "5", "stride_x": "2", "stride_y": "2", "padding": 1, "x": 109.0, "y": 83.0}, "11": {"tag": "Conv2d", "filters": "128", "kernel_size_x": "5", "kernel_size_y": "5", "stride_x": "2", "stride_y": "2", "padding": 1, "x": 197.0, "y": 81.0}, "18": {"tag": "Dense", "neurons": "10", "x": 329.0, "y": 80.0}, "22": {"tag": "Dense", "neurons": "5", "x": 417.0, "y": 79.0}, "26": {"tag": "Out", "out_type": 1, "out_nb": "3", "x": 505.0, "y": 117.0}, "7": {"tag": "Relu", "x": 153.0, "y": 81.0}, "13": {"tag": "Relu", "x": 241.0, "y": 80.0}, "15": {"tag": "Flatten", "x": 285.0, "y": 77.0}, "20": {"tag": "Relu", "x": 373.0, "y": 78.0}, "24": {"tag": "Sigmoid", "x": 461.0, "y": 80.0}}
+{
+    "2": {
+        "tag": "In",
+        "dim_1": "160",
+        "dim_2": "80",
+        "dim_3": "3",
+        "x": 39.0,
+        "y": 138.0
+    },
+    "4": {
+        "tag": "Conv2d",
+        "filters": "4",
+        "kernel_size_x": "2",
+        "kernel_size_y": "2",
+        "stride_x": "4",
+        "stride_y": "4",
+        "padding": 1,
+        "x": 113.0,
+        "y": 113.0
+    },
+    "7": {
+        "tag": "Relu",
+        "x": 166.0,
+        "y": 110.0
+    },
+    "9": {
+        "tag": "Conv2d",
+        "filters": "8",
+        "kernel_size_x": "2",
+        "kernel_size_y": "2",
+        "stride_x": "6",
+        "stride_y": "6",
+        "padding": 1,
+        "x": 231.0,
+        "y": 115.0
+    },
+    "11": {
+        "tag": "Relu",
+        "x": 275.0,
+        "y": 124.0
+    },
+    "13": {
+        "tag": "Flatten",
+        "x": 345.0,
+        "y": 125.0
+    },
+    "18": {
+        "tag": "Dense",
+        "neurons": "10",
+        "x": 425.0,
+        "y": 121.0
+    },
+    "20": {
+        "tag": "Relu",
+        "x": 500.0,
+        "y": 127.0
+    },
+    "22": {
+        "tag": "Dense",
+        "neurons": "5",
+        "x": 544.0,
+        "y": 135.0
+    },
+    "24": {
+        "tag": "Sigmoid",
+        "x": 595.0,
+        "y": 128.0
+    },
+    "26": {
+        "tag": "Out",
+        "out_type": 1,
+        "out_nb": "3",
+        "x": 639.0,
+        "y": 175.0
+    }
+}

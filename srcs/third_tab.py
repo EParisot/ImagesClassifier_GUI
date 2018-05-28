@@ -249,7 +249,11 @@ class ThirdTab(object):
             if os.path.exists(filename):
                 os.remove(filename)
             with open(filename, 'w') as outfile:
-                json.dump(self.app.layers_list, outfile)
+                items_sorted = sorted(self.app.layers_list, key=lambda x: self.app.layers_list[x]['x'])
+                sorted_data = {}
+                for item in items_sorted:
+                    sorted_data[item] = self.app.layers_list[item]
+                json.dump(sorted_data, outfile, indent=4, separators=(',', ': '))
 
     def modified(self, event):
         self.saved.set(False)
@@ -262,6 +266,10 @@ class ThirdTab(object):
         from keras.layers import Input, Conv2D, Dense, Flatten, Dropout, Activation, MaxPooling2D
         import keras.backend as K
 
+        items_sorted = sorted(self.app.layers_list, key=lambda x: self.app.layers_list[x]['x'])
+        for items in items_sorted:
+            print(self.app.layers_list[items])
+        
         # Build Model
         #
         #
