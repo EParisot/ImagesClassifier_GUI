@@ -251,4 +251,16 @@ class ThirdTab(object):
         self.saved.set(False)
 
     def compile(self, event):
-        pass
+        self.app.config(cursor="wait")
+        self.app.update()
+        
+        from  keras.models import Model, Sequential
+        from keras.layers import Input, Conv2D, Dense, Flatten, Dropout, Activation, MaxPooling2D
+        import keras.backend as K
+
+        # Build Model
+        #
+        #
+        #
+
+        self.app.config(cursor="")
