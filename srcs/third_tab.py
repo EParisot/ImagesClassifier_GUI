@@ -352,7 +352,7 @@ class ThirdTab(object):
                 
                 # Build Layer with Keras Sequential API
                 model.add(Conv2D(filters, (kernel_size_x, kernel_size_y), input_shape=input_shape))
-                print(filters, kernel_size_x, kernel_size_y, input_shape)
+
             else:
                 showwarning("Error", "Incorrect first layer, \nUse Conv or Dense as first layer (after In)");
                 self.app.config(cursor="")
@@ -367,4 +367,4 @@ class ThirdTab(object):
         
         self.app.config(cursor="")
 
-        model.summary()
+        #model.summary()
