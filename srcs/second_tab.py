@@ -8,6 +8,7 @@ from tkinter import ttk
 from tkinter.messagebox import *
 from tkinter.filedialog import *
 from tkinter.scrolledtext import ScrolledText
+from tkinter.font import Font
 
 import os
 import configparser
@@ -52,14 +53,42 @@ class SecondTab(object):
         self.command_frame.grid_rowconfigure(0, weight=1)
 
         load_handler = lambda: self.load(self)
-
         self.reload_pic = ImageTk.PhotoImage(Image.open('assets/reload.png'))
-
         self.reload_but = Button(self.command_frame)
         self.reload_but.config(image=self.reload_pic, command=load_handler)
         self.reload_but.grid(row=0, column=0, padx=10)
         reload_ttp = ttp.ToolTip(self.reload_but, 'Reload labelisation',
                 msgFunc=None, delay=1, follow=True)
+
+        prev_handler = lambda: self.last_photo()
+        self.prev_pic = ImageTk.PhotoImage(Image.open('assets/arrow_left.png'))
+        self.prev_but = Button(self.command_frame)
+        self.prev_but.config(image=self.prev_pic, command=prev_handler)
+        self.prev_but.grid(row=0, column=1, padx=10)
+        next_ttp = ttp.ToolTip(self.prev_but, 'Go to previous photo',
+                msgFunc=None, delay=1, follow=True)
+
+        next_handler = lambda: self.next_photo()
+        self.next_pic = ImageTk.PhotoImage(Image.open('assets/arrow_right.png'))
+        self.next_but = Button(self.command_frame)
+        self.next_but.config(image=self.next_pic, command=next_handler)
+        self.next_but.grid(row=0, column=2, padx=10)
+        next_ttp = ttp.ToolTip(self.next_but, 'Go to next photo',
+                msgFunc=None, delay=1, follow=True)
+
+        font = Font(family='Helvetica', size=43, weight='bold')
+        label_handler = [None for i in range(len(KEY_LABEL_CHARS))]
+        self.label_but = [None for i in range(len(KEY_LABEL_CHARS))]
+        label_ttp = [None for i in range(len(KEY_LABEL_CHARS))]
+        for (i, lab) in enumerate(KEY_LABEL_CHARS):
+            label_handler[i] = lambda: self.set_label(lab)
+            self.label_but[i] = Button(self.command_frame)
+            self.label_but[i].config(height=1, width=2)
+            self.label_but[i]['font'] = font
+            self.label_but[i].config(text=lab, command=label_handler[i])
+            self.label_but[i].grid(row=0, column=3 + i, padx=10)
+            label_ttp[i] = ttp.ToolTip(self.label_but[i], 'Give label ' + lab + \
+                    ' to this photo', msgFunc=None, delay=1, follow=True)
 
         self.dir_srcs = None  # directory with photos
         self.dir_dest = None  # directory with labelised photos
@@ -111,7 +140,7 @@ class SecondTab(object):
         self.fen['lab_photo'] = Label(self.fen['fen'], image=self.fen['photo'])
         self.fen['lab_photo'].pack(side=TOP)
         self.fen['lab_info'] = Label(self.fen['fen'], width=32, height=2, font=("Courier", 40))
-        self.fen['lab_info']['text'] = self.get_label() + '\t\t' + str(self.photo_act) + '/' + str(len(self.photos))
+        self.fen['lab_info']['text'] = 'label: ' + self.get_label() + '\t\t' + str(self.photo_act) + '/' + str(len(self.photos))
         self.fen['lab_info'].pack(side=BOTTOM)
 
 
@@ -136,10 +165,6 @@ class SecondTab(object):
         if len(self.photos) == 0:
             return
         self.set_label(event.char)
-        if self.auto_next == True:
-            self.next_photo()
-        else:
-            self.print_win()
 
 
     def set_label(self, label):
@@ -156,6 +181,10 @@ class SecondTab(object):
         print(GREEN + 'RENAME: ' + EOC + new)
         os.rename(self.photos[self.photo_act], new)
         self.photos[self.photo_act] = new
+        if self.auto_next == True:
+            self.next_photo()
+        else:
+            self.print_win()
 
 
     def get_label(self):
