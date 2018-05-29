@@ -96,6 +96,7 @@ class SecondTab(object):
         self.button_frame.grid_columnconfigure(4, weight=1)
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(1, weight=1)
+
         font = Font(family='Helvetica', size=43, weight='bold')
         label_handler = [None for i in range(len(KEY_LABEL_CHARS))]
         self.label_but = [None for i in range(len(KEY_LABEL_CHARS))]
@@ -220,7 +221,7 @@ class SecondTab(object):
             return
         try:
             char = self.photos[self.photo_act].split('/')[-1].split('_')[0]
-            if len(char) == 1 and char.isdigit():
+            if len(char) == 1 and char in KEY_LABEL_CHARS:
                 return char
         except:
             pass
