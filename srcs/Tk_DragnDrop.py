@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import srcs.layers
+import srcs
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import *
-
-from srcs.layers import layers_list 
+from srcs.const import *
 
 # The factory function
 
@@ -177,8 +177,8 @@ class Icon:
         if target:
             if target.canvas == self.app.third_tab.trash_canvas:
                 self.label.destroy()
-                if self.last_id in layers_list:
-                    layers_list.pop(self.last_id)
+                if self.last_id in self.app.layers_list:
+                    self.app.layers_list.pop(self.last_id)
                 
 class DnD_Container:
 
@@ -221,6 +221,7 @@ class DnD_Container:
                 if source.canvas == self.app.third_tab.layers_canvas:
                     self.set_layer_params(event, source)
             source.attach(self.canvas, x, y)
+            self.app.third_tab.saved.set(False)
         else:
             source.putback()
 
@@ -228,16 +229,7 @@ class DnD_Container:
         source_bbox = source.canvas.bbox(source.id)
         source_w = source_bbox[2] - source_bbox[0]
         source_h = source_bbox[3] - source_bbox[1]
-        
-        if x < 0:
-            x = 5
-        elif (x + source_w) > 900:
-            x = 900 - source_w + 4
-        if y < 0:
-            y = 5
-        elif (y + source_h) > 400:
-            y = 400 - source_h + 4
-            
+        # Check overlap and "recursively" execute it
         if len([z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]) > 0:
             items = [z for z in canvas.find_overlapping(x, y, x + source_w, y + source_h) if z != source.id]
             item_under = items[0]
@@ -254,6 +246,8 @@ class DnD_Container:
                     item_bbox = canvas.bbox(item_under)
                     item_w = item_bbox[2] - item_bbox[0]
                     item_h = item_bbox[3] - item_bbox[1]
+                    if x_under + item_w < 10 or x_under + item_w + item_w > MODEL_W - 10:
+                        break
                     canvas.move(item_under, item_w, 0)
                     x_bis = x_under + item_w
             elif x < x_under:
@@ -265,38 +259,24 @@ class DnD_Container:
                     item_bbox = canvas.bbox(item_under)
                     item_w = item_bbox[2] - item_bbox[0]
                     item_h = item_bbox[3] - item_bbox[1]
+                    if x_under - item_w < 10 or x_under > MODEL_W - 10:
+                        break
                     canvas.move(item_under, -item_w, 0)
                     x_bis = x_under - item_w
-
-##            if x_bis < 5:
-##                print("test1")
-##                x_bis = 5
-##                while len([z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]) > 0:
-##                    print("test")
-##                    items = [z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]
-##                    item_under = items[0]
-##                    x_under, y_under = canvas.coords(item_under)
-##                    item_bbox = canvas.bbox(item_under)
-##                    item_w = item_bbox[2] - item_bbox[0]
-##                    item_h = item_bbox[3] - item_bbox[1]
-##                    canvas.move(item_under, item_w, 0)
-##                    x_bis = x_under + item_w
-##            elif x_bis > 900 - source_w + 4:
-##                print("test2")
-##                x_bis = 900 - source_w + 4
-##                while len([z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]) > 0:
-##                    items = [z for z in canvas.find_overlapping(x_bis, y, x_bis + source_w, y + source_h) if z != item_under]
-##                    item_under = items[0]
-##                    x_under, y_under = canvas.coords(item_under)
-##                    item_bbox = canvas.bbox(item_under)
-##                    item_w = item_bbox[2] - item_bbox[0]
-##                    item_h = item_bbox[3] - item_bbox[1]
-##                    canvas.move(item_under, -item_w, 0)
-##                    x_bis = x_under - item_w
-
+        # check if initial moove is correct :           
+        if x < 0:
+            x = 5
+        elif (x + source_w) > MODEL_W:
+            x = MODEL_W - source_w + 4
+        if y < 0:
+            y = 5
+        elif (y + source_h) > MODEL_H:
+            y = MODEL_H - source_h + 4
+            
         return (x, y)
 
     def set_layer_params(self, event, source):
+        self.app.third_tab.saved.set(False)
         if type(self) == srcs.Tk_DragnDrop.DnD_Container:
             self.test_val = self.app.third_tab.model_canvas
         else:
@@ -310,12 +290,16 @@ class DnD_Container:
                 else:
                     x_clic = event.x
                     y_clic = event.y
+                if (x + x_clic) < 0:
+                    x_clic = 0
+                if (y + y_clic) < 0:
+                    y_clic = 0
                 self.param_frame = tk.Toplevel()
-                self.param_frame.geometry("%dx%d+%d+%d" % (250, 250, x + x_clic, y + y_clic))
+                self.param_frame.geometry("%dx%d+%d+%d" % (LAYER_INFO_W, LAYER_INFO_H, x + x_clic, y + y_clic))
                 self.param_frame.title(source.tags[0] + " parameters")
                 self.param_frame.transient(self.app)
                 self.param_frame.grab_set()
-                on_close_handler = lambda: srcs.Tk_DragnDrop.DnD_Container.on_close(self)
+                on_close_handler = lambda: srcs.Tk_DragnDrop.DnD_Container.on_close(self, source.id)
                 self.param_frame.protocol("WM_DELETE_WINDOW", on_close_handler)
                 self.test_val.master.config(bg='lightgrey')
                 for widget in self.test_val.master.winfo_children():
@@ -387,6 +371,7 @@ class DnD_Container:
                     labels.grid_rowconfigure(2, weight=1)
                     labels.grid_rowconfigure(3, weight=1)
                     labels.grid_rowconfigure(4, weight=1)
+                    labels.grid_rowconfigure(5, weight=1)
                     labels.grid_columnconfigure(0, weight=1)
                     labels.grid_columnconfigure(1, weight=1)
                     labels.grid_columnconfigure(2, weight=1)
@@ -423,24 +408,36 @@ class DnD_Container:
                     label_3.grid(row=3, column=0, sticky='nsw', pady=10)
                     
                     self.stride_x = tk.StringVar()
+                    self.stride_x.set('1')
                     
                     val_3_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
                     val_3_x.grid(row=3, column=1, sticky='nsw', pady=10)
 
                     self.stride_y = tk.StringVar()
+                    self.stride_y.set('1')
                     
                     val_3_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
                     val_3_y.grid(row=3, column=2, sticky='nsw', padx=5, pady=10)
 
+                    label_4 = tk.Label(labels)
+                    label_4.config(text='Padding:', font=("Helvetica", 14))
+                    label_4.grid(row=4, column=0, sticky='nsw', pady=10)
+
+                    self.padding = tk.IntVar()
+
+                    val_4 = tk.Checkbutton(labels, variable=self.padding)
+                    val_4.grid(row=4, column=2, sticky='nsw', padx=5, pady=5)
 
                     save_conv2d = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
-                                                         filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y, stride_x=self.stride_x, stride_y=self.stride_y)
+                                                                     filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y,
+                                                                     stride_x=self.stride_x, stride_y=self.stride_y, padding=self.padding
+                                                                     )
                     
                     save_but = tk.Button(labels)
                     save_but.config(text='Save', font=("Helvetica", 16))
                     save_but.bind("<ButtonPress-1>", save_conv2d)
                     save_but.bind("<Return>", save_conv2d)
-                    save_but.grid(row=4, column=1, sticky='nsew', pady=10)
+                    save_but.grid(row=5, column=1, sticky='nsew', pady=10)
 
                     val_1.focus_set()
                 
@@ -456,7 +453,7 @@ class DnD_Container:
                     labels.grid_columnconfigure(2, weight=1)
 
                     label_0 = tk.Label(labels)
-                    label_0.config(text='Conv2D Layer:', font=("Helvetica", 18))
+                    label_0.config(text='Dense Layer:', font=("Helvetica", 18))
                     label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
                     
                     label_1 = tk.Label(labels)
@@ -487,6 +484,7 @@ class DnD_Container:
                     labels.grid_rowconfigure(1, weight=1)
                     labels.grid_rowconfigure(2, weight=1)
                     labels.grid_rowconfigure(3, weight=1)
+                    labels.grid_rowconfigure(4, weight=1)
                     labels.grid_columnconfigure(0, weight=1)
                     labels.grid_columnconfigure(1, weight=1)
                     labels.grid_columnconfigure(2, weight=1)
@@ -507,84 +505,44 @@ class DnD_Container:
                     self.pool_size_y = tk.StringVar()
                     
                     val_1_y = tk.Entry(labels, width=10, textvariable=self.pool_size_y)
-                    val_1_y.grid(row=1, column=2, sticky='nsw', padx=5, pady=10)
+                    val_1_y.grid(row=1, column=2, sticky='nsw', pady=10)
 
                     label_2 = tk.Label(labels)
                     label_2.config(text='Stride:', font=("Helvetica", 14))
                     label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
                     
                     self.stride_x = tk.StringVar()
+                    self.stride_x.set('0')
                     
                     val_2_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
-                    val_2_x.grid(row=2, column=1, sticky='nsw', padx=5, pady=10)
+                    val_2_x.grid(row=2, column=1, sticky='nsw', pady=10)
 
                     self.stride_y = tk.StringVar()
+                    self.stride_y.set('0')
                     
                     val_2_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
                     val_2_y.grid(row=2, column=2, sticky='nsw', pady=10)
 
+                    label_3 = tk.Label(labels)
+                    label_3.config(text='Padding:', font=("Helvetica", 14))
+                    label_3.grid(row=3, column=0, sticky='nsw', padx=5, pady=10)
+
+                    self.mp_padding = tk.IntVar()
+
+                    val_3 = tk.Checkbutton(labels, variable=self.mp_padding)
+                    val_3.grid(row=3, column=2, sticky='nsw', padx=5, pady=5)
+
                     save_max_p = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
                                                          pool_size_x=self.pool_size_x, pool_size_y=self.pool_size_y,
-                                                         stride_x=self.stride_x, stride_y=self.stride_y)
+                                                         stride_x=self.stride_x, stride_y=self.stride_y, padding=self.mp_padding)
 
                     save_but = tk.Button(labels)
                     save_but.config(text='Save', font=("Helvetica", 16))
                     save_but.bind("<ButtonPress-1>", save_max_p)
                     save_but.bind("<Return>", save_max_p)
-                    save_but.grid(row=3, column=1, sticky='nsew', padx=5, pady=10)
+                    save_but.grid(row=4, column=1, sticky='nsew', padx=5, pady=10)
 
                     val_1_x.focus_set()
-                
-                elif source.tags[0] == "Out":
-                    
-                    labels = tk.Label(self.param_frame)
-                    labels.grid(row=0, column=0, sticky='nsw')
-                    labels.grid_rowconfigure(0, weight=1)
-                    labels.grid_rowconfigure(1, weight=1)
-                    labels.grid_rowconfigure(2, weight=1)
-                    labels.grid_rowconfigure(3, weight=1)
-                    labels.grid_rowconfigure(4, weight=1)
-                    labels.grid_columnconfigure(0, weight=1)
-                    labels.grid_columnconfigure(1, weight=1)
-
-                    label_0 = tk.Label(labels)
-                    label_0.config(text="Out Layer:", font=("Helvetica", 18))
-                    label_0.grid(row=0, column=0, sticky='new', columnspan=2, padx=10, pady=10)
-                    
-                    label_1 = tk.Label(labels)
-                    label_1.config(text="Output(s):", font=("Helvetica", 14))
-                    label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
-                    
-                    self.out_nb = tk.StringVar()
-                    self.values = ("1", "2", "3", "4")
-                    self.out_nb.set(self.values[0])
-                    
-                    val_1 = ttk.Combobox(labels, textvariable=self.out_nb, values=self.values, state="readonly", width=10)
-                    val_1.grid(row=1, column=1, sticky='nsw', padx=5, pady=10)
-
-                    label_2 = tk.Label(labels)
-                    label_2.config(text='Type:', font=("Helvetica", 14))
-                    label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
-                    
-                    self.out_type = tk.IntVar()
-                    self.out_type.set(1)
-                    
-                    val_2 = tk.Radiobutton(labels)
-                    val_2.config(text="Categories", variable=self.out_type, value=1)
-                    val_2.grid(row=2, column=1, sticky='nsw', padx=5, pady=10)
-                    val_2bis = tk.Radiobutton(labels)
-                    val_2bis.config(text="Values", variable=self.out_type, value=2)
-                    val_2bis.grid(row=3, column=1, sticky='nsw', padx=5, pady=10)
-
-                    save_out = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0], out_type=self.out_type, out_nb=self.out_nb)
-
-                    save_but = tk.Button(labels)
-                    save_but.config(text='Save', font=("Helvetica", 16))
-                    save_but.bind("<ButtonPress-1>", save_out)
-                    save_but.bind("<Return>", save_out)
-                    save_but.grid(row=4, column=0, columnspan=2, padx=5, pady=10)
-
-                    val_1.focus_set()
               
                 elif source.tags[0] == "Dropout":
                     
@@ -619,22 +577,42 @@ class DnD_Container:
                     save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
 
                     val_1.focus_set()
+                    
+                # Load values if exists
+                if type(self) == srcs.Tk_DragnDrop.Icon and source.id in self.app.layers_list:
+                    srcs.Tk_DragnDrop.DnD_Container.load_layer(self, source.id)
 
-    def on_close(self):
-        
-        ret = askquestion("Layer not saved", "Layer is not saved in model, quit anyway ? \n(you can save it later by double-clicking it)", icon='warning')
-        if ret == "yes":
-            self.test_val.master.config(bg='SystemButtonFace')
-            for widget in self.test_val.master.winfo_children():
-                widget.config(bg='SystemButtonFace')
-                for elem in widget.winfo_children():
-                    elem.config(bg='SystemButtonFace')
-            self.param_frame.destroy()
+    def load_layer(self, id):
 
+        if self.app.layers_list[id]['tag'] == "In":
+            self.dim_1.set(self.app.layers_list[id]['dim_1'])
+            self.dim_2.set(self.app.layers_list[id]['dim_2'])
+            self.dim_3.set(self.app.layers_list[id]['dim_3'])
+            
+        elif self.app.layers_list[id]['tag'] == "Conv2d":
+            self.filters.set(self.app.layers_list[id]['filters'])
+            self.kernel_size_x.set(self.app.layers_list[id]['kernel_size_x'])
+            self.kernel_size_y.set(self.app.layers_list[id]['kernel_size_y'])
+            self.stride_x.set(self.app.layers_list[id]['stride_x'])
+            self.stride_y.set(self.app.layers_list[id]['stride_y'])
+            self.padding.set(self.app.layers_list[id]['padding'])
+
+        elif self.app.layers_list[id]['tag'] == "Dense":
+            self.neurons.set(self.app.layers_list[id]['neurons'])
+
+        elif self.app.layers_list[id]['tag'] == "Max_pooling":
+            self.pool_size_x.set(self.app.layers_list[id]['pool_size_x'])
+            self.pool_size_y.set(self.app.layers_list[id]['pool_size_y'])
+            self.stride_x.set(self.app.layers_list[id]['stride_x'])
+            self.stride_y.set(self.app.layers_list[id]['stride_y'])
+            self.mp_padding.set(self.app.layers_list[id]['padding'])
+
+        elif self.app.layers_list[id]['tag'] == "Dropout":
+            self.ratio.set(self.app.layers_list[id]['ratio'])
 
     def save_layer(self, id, tag, **kwargs):
         
-        if id in layers_list:
+        if id in self.app.layers_list:
             res = askquestion("Modify Layer", "Layer already exists and will be overwriten...", icon='warning')
             if res == "no":
                 self.test_val.master.config(bg='SystemButtonFace')
@@ -648,7 +626,20 @@ class DnD_Container:
         layer_dict['tag'] = tag
         for key in kwargs:
             layer_dict[key] = kwargs[key].get()
-        layers_list[id] = layer_dict
+        self.app.layers_list[id] = layer_dict
+        self.test_val.master.config(bg='SystemButtonFace')
+        for widget in self.test_val.master.winfo_children():
+            widget.config(bg='SystemButtonFace')
+            for elem in widget.winfo_children():
+                elem.config(bg='SystemButtonFace')
+        self.param_frame.destroy()
+
+    def on_close(self, id):
+
+        if id not in self.app.layers_list:
+            ret = askquestion("Layer not saved", "Layer is not saved in model, quit anyway ? \n(you can save it later by double-clicking it)", icon='warning')
+            if ret == "no":
+                return
         self.test_val.master.config(bg='SystemButtonFace')
         for widget in self.test_val.master.winfo_children():
             widget.config(bg='SystemButtonFace')

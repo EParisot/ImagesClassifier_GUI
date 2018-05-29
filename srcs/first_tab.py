@@ -15,6 +15,7 @@ from time import time, localtime, strftime, sleep
 
 from PIL import Image, ImageTk
 import configparser
+from pathlib import Path
 
 import imutils
 
@@ -56,14 +57,14 @@ class FirstTab():
 
         if SYSTEM == 'Rpi':
             self.camera = PiCamera()
-            self.camera.resolution = (810, 500)
-            self.camera.framerate = 60
+            self.camera.resolution = (SNAP_W, SNAP_H)
+            self.camera.framerate = SNAP_FPS
             self.camera.hflip = True
             self.camera.vflip = True
-            self.rawCapture = PiRGBArray(self.camera, size=(810, 500))
-
+            self.rawCapture = PiRGBArray(self.camera, size=(SNAP_W, SNAP_H))
+        
         self.video_frame = Frame(self.snap_frame)
-        self.video_frame.config(borderwidth=2, relief="sunken", height=500, width=810)
+        self.video_frame.config(borderwidth=2, relief="sunken", height=SNAP_H, width=SNAP_W)
         self.video_frame.grid(row=0, column=0)
         self.video_frame.grid_propagate(0)
 
@@ -107,7 +108,7 @@ class FirstTab():
         del_but = Button(command_frame)
         del_but.config(image=self.del_pic, command=del_handler)
         del_but.grid(row=0, column=4, sticky="se")
-        del_but = ttp.ToolTip(del_but, 'Remove last snapshot', msgFunc=None, delay=1, follow=True)
+        del_but = ttp.ToolTip(del_but, 'Remove last Snap', msgFunc=None, delay=1, follow=True)
  
         count_frame = Frame(command_frame)
         count_frame.grid(row=0, column=5, sticky='w')
@@ -116,7 +117,7 @@ class FirstTab():
         count_frame.grid_rowconfigure(0, weight=1)
 
         snap_count_title = Label(count_frame)
-        snap_count_title.config(text="Snapshots :", font=("Helvetica", 16))
+        snap_count_title.config(text="Photos :", font=("Helvetica", 16))
         snap_count_title.grid(row=0, column=0, padx=10)
 
         snap_count = Label(count_frame)
@@ -128,7 +129,6 @@ class FirstTab():
             while not self.stopEvent.is_set():
                 if self.stopEvent.is_set():
                     break
-                #####SYSTEM DEPENDENT
                 ret, self.video = self.vs.read()
                 if ret is True:
                     self.video = imutils.resize(self.video, width=800)
@@ -192,22 +192,26 @@ class FirstTab():
 
     def snap(event, self):
         if self.thread.is_alive():
-            self.picname = self.app.snap_path + "/" + str(time()) + ".jpg"
-            if SYSTEM != 'Rpi':
-                pic = self.video
-                cv2.imwrite(self.picname, pic)
-                pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
+            p = Path(self.app.snap_path.get())
+            if p.exists():
+                self.picname = self.app.snap_path.get() + "/" + str(time()) + ".jpg"
+                if SYSTEM != 'Rpi':
+                    pic = self.video
+                    cv2.imwrite(self.picname, pic)
+                    pic = cv2.cvtColor(pic, cv2.COLOR_BGR2RGB)
+                else:
+                    pic = self.image
+                    self.camera.capture(self.picname)
+                pic = imutils.resize(pic, width=160)
+                pic = Image.fromarray(pic)
+                pic = ImageTk.PhotoImage(pic)
+                self.prev_frame.config(image=pic)
+                self.prev_frame.image = pic
+                self.count.set(self.count.get() + 1)
             else:
-                pic = self.image
-                self.camera.capture(self.picname)
-            pic = imutils.resize(pic, width=160)
-            pic = Image.fromarray(pic)
-            pic = ImageTk.PhotoImage(pic)
-            self.prev_frame.config(image=pic)
-            self.prev_frame.image = pic
-            self.count.set(self.count.get() + 1)
+                showwarning("No destination", "Please select a destination folder in Options")
         else:
-            showwarning("No video running", "Please start the video before you take a snap")
+            showwarning("No video running", "Please Start the video before you take a snap")
 
     def del_snap(event, self):
         os.remove(self.picname)
@@ -217,5 +221,9 @@ class FirstTab():
     def on_quit(self):
         if self.thread.is_alive():
             showwarning("Video running", "Please stop the video before you quit")
-        else:
-            self.app.quit()
+            return
+        if self.app.layers_list and self.app.third_tab.saved.get() == False:
+            res = askquestion("Quit", "This action may destroy unsaved model... \n Quit anyway ?", icon='warning')
+            if res == 'no':
+                return
+        self.app.quit()
