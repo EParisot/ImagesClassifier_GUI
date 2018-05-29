@@ -30,7 +30,10 @@ class SecondTab(object):
         self.label_frame = Frame(app.second_tab)
         self.label_frame.grid(row=0, column=0, stick='n')
         self.label_frame.grid_columnconfigure(0, weight=1)
+        self.label_frame.grid_columnconfigure(1, weight=1)
+        self.label_frame.grid_columnconfigure(2, weight=1)
         self.label_frame.grid_rowconfigure(0, weight=1)
+        self.label_frame.grid_rowconfigure(1, weight=1)
 
         self.fen = {
             'fen' : None,
@@ -38,17 +41,18 @@ class SecondTab(object):
             'slide_height1' : None,
             'slide_height2' : None,
             'photo' : None,
-            'lab_info' : None
+            'lab_info1' : None,
+            'lab_info2' : None
         }
         self.fen['fen'] = Frame(self.label_frame,
                 width=WIDTH_IMG, height=HEIGHT_IMG,
                 borderwidth=2, relief="sunken")
-        self.fen['fen'].grid(row=0, column=0, sticky='n')
+        self.fen['fen'].grid(row=0, column=1, sticky='n')
         self.fen['fen'].grid_propagate(0)
 
 
         self.command_frame = Frame(self.label_frame)
-        self.command_frame.grid(row=1, column=0, sticky='n')
+        self.command_frame.grid(row=1, column=1, sticky='n')
         self.command_frame.grid_columnconfigure(0, weight=1)
         self.command_frame.grid_columnconfigure(1, weight=1)
         self.command_frame.grid_columnconfigure(2, weight=1)
@@ -242,24 +246,30 @@ class SecondTab(object):
             return
         if self.fen['lab_photo'] != None:
             self.fen['lab_photo'].destroy()
-        if self.fen['lab_info'] != None:
-            self.fen['lab_info'].destroy()
+        if self.fen['lab_info1'] != None:
+            self.fen['lab_info1'].destroy()
+        if self.fen['lab_info2'] != None:
+            self.fen['lab_info2'].destroy()
         image = Image.open(self.photos[self.photo_act])
-        image = image.resize((WIDTH_IMG, HEIGHT_IMG - 50), Image.ANTIALIAS)
         self.fen['photo'] = ImageTk.PhotoImage(image)
-        if self.fen['slide_height1'] == None:
-            self.fen['slide_height1'] = Scale(self.fen['fen'],from_=image.size[1],
-                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
-            self.fen['slide_height1'].grid(row=0, column=1)
+#        if self.fen['slide_height1'] == None:
+#            self.fen['slide_height1'] = Scale(self.fen['fen'],from_=image.size[1],
+#                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
+#            self.fen['slide_height1'].grid(row=0, column=1)
         self.fen['lab_photo'] = Label(self.fen['fen'], image=self.fen['photo'])
-        self.fen['lab_photo'].grid(row=0, column=0)
-        if self.fen['slide_height2'] == None:
-            self.fen['slide_height2'] = Scale(self.fen['fen'], from_=image.size[1],
-                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
-            self.fen['slide_height2'].grid(row=0, column=2)
-        self.fen['lab_info'] = Label(self.fen['fen'], width=32, height=2, font=("Courier", 40))
-        self.fen['lab_info']['text'] = 'label: ' + self.get_label() + '\t\t' + str(self.photo_act) + '/' + str(len(self.photos))
-        self.fen['lab_info'].grid(row=1, column=0)
+        self.fen['lab_photo'].grid(row=0, column=0, sticky="nw")
+#        if self.fen['slide_height2'] == None:
+#            self.fen['slide_height2'] = Scale(self.fen['fen'], from_=image.size[1],
+#                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
+#            self.fen['slide_height2'].grid(row=0, column=2)
+
+        self.fen['lab_info1'] = Label(self.label_frame, height=2, width=15, font=("Courier", 20))
+        self.fen['lab_info1'].config(borderwidth=2, relief="sunken", text='Label: ' + self.get_label())
+        self.fen['lab_info1'].grid(row=1, column=2, padx=20, sticky="nsew")
+        
+        self.fen['lab_info2'] = Label(self.label_frame, height=2, font=("Courier", 20))
+        self.fen['lab_info2'].config(borderwidth=2, relief="sunken", text='Labelized : \n' + str(self.photo_act) + '/' + str(len(self.photos)))
+        self.fen['lab_info2'].grid(row=1, column=0, padx=20, sticky="nsew")
 
 
     def last_photo(self):
