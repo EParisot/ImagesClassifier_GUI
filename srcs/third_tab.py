@@ -44,7 +44,6 @@ class ThirdTab(object):
         self.dense_layer_pic = ImageTk.PhotoImage(Image.open('assets/hidden_layer2.png'))
         self.flatten_layer_pic = ImageTk.PhotoImage(Image.open('assets/hidden_layer3.png'))
         self.max_p_layer_pic = ImageTk.PhotoImage(Image.open('assets/hidden_layer4.png'))
-        self.out_layer_pic = ImageTk.PhotoImage(Image.open('assets/out_layer3.png'))
         self.sig_activation_pic = ImageTk.PhotoImage(Image.open('assets/sig_activation.png'))
         self.relu_activation_pic = ImageTk.PhotoImage(Image.open('assets/relu_activation.png'))
         self.max_activation_pic = ImageTk.PhotoImage(Image.open('assets/softmax_activation.png'))
@@ -136,9 +135,6 @@ class ThirdTab(object):
         self.dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"))
         self.dense_layer.attach(self.layers_canvas, x=250)
 
-        self.out_layer = dnd.Icon(self.app, self.out_layer_pic, ("Out", "layer"))
-        self.out_layer.attach(self.layers_canvas, x=310)
-
         self.relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"))
         self.relu_activation.attach(self.layers_canvas, x=370)
 
@@ -165,7 +161,7 @@ class ThirdTab(object):
         if filename:
             with open(filename, 'r') as infile:
                 if self.app.layers_list:
-                    res = askquestion("Load Model", "This action will overwrite existing model \n Load anyway ?", icon='warning')
+                    res = askquestion("Load Model", "This action will overwrite existing model \nLoad anyway ?", icon='warning')
                     if res == 'no':
                         return
                 data = json.load(infile)
@@ -201,11 +197,6 @@ class ThirdTab(object):
                 self.new_dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"))
                 self.new_dense_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
                 self.app.layers_list[self.new_dense_layer.id] = data[item]
-
-            elif data[item]['tag'] == "Out":  
-                self.new_out_layer = dnd.Icon(self.app, self.out_layer_pic, ("Out", "layer"))
-                self.new_out_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_out_layer.id] = data[item]
 
             elif data[item]['tag'] == "Relu":
                 self.new_relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"))
@@ -259,20 +250,121 @@ class ThirdTab(object):
         self.saved.set(False)
 
     def compile(self, event):
+        if self.saved.get() == False:
+            showwarning("Error", "Save model before you compile it.");
+            return
         self.app.config(cursor="wait")
         self.app.update()
+
+        # Order Datas
+        items_sorted = sorted(self.app.layers_list, key=lambda x: self.app.layers_list[x]['x'])
+        sorted_data = {}
+        for item in items_sorted:
+            sorted_data[item] = self.app.layers_list[item]
+        items_list = list(sorted_data.keys())
         
-        from  keras.models import Model, Sequential
+        # Check and Get In Layer
+        try:
+            in_id = items_list[0]
+            if sorted_data[in_id]['tag'] == 'In':
+                try:
+                    if int(sorted_data[in_id]['dim_1']) > 0:
+                        dim_1 = int(sorted_data[in_id]['dim_1'])
+                    else:
+                        showwarning("Error", "Negative or null 'dim_1' value in {} layer".format(sorted_data[in_id]['tag']));
+                        self.app.config(cursor="")
+                        return
+
+                    if int(sorted_data[in_id]['dim_2']) > 0:
+                        dim_2 = int(sorted_data[in_id]['dim_2'])
+                    else:
+                        showwarning("Error", "Negative or null 'dim_2' value in {} layer".format(sorted_data[in_id]['tag']));
+                        self.app.config(cursor="")
+                        return
+
+                    if int(sorted_data[in_id]['dim_3']) > 0:
+                        dim_3 = int(sorted_data[in_id]['dim_3'])
+                    else:
+                        showwarning("Error", "Negative or null 'dim_3' value in {} layer".format(sorted_data[in_id]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                except ValueError:
+                    showwarning("Error", "Incorrect value(s) in In Layer");
+                    self.app.config(cursor="")
+                    return
+                input_shape = (dim_1, dim_2, dim_3)
+            else:
+                showwarning("Error", "No Input Layer");
+                self.app.config(cursor="")
+                return 
+        except(IndexError):
+            showwarning("Error", "No layers");
+            self.app.config(cursor="")
+            return
+
+        # Import Keras
+        from  keras.models import Sequential, Model
         from keras.layers import Input, Conv2D, Dense, Flatten, Dropout, Activation, MaxPooling2D
         import keras.backend as K
+        K.clear_session()
 
-        items_sorted = sorted(self.app.layers_list, key=lambda x: self.app.layers_list[x]['x'])
-        for items in items_sorted:
-            print(self.app.layers_list[items])
+        # Buid Model
+        model = Sequential()
         
-        # Build Model
-        #
-        #
-        #
+        # Check and Get first layer
+        try:
+            first_layer_id = items_list[1]
+            
+            if sorted_data[first_layer_id]['tag'] == 'Dense':
+                showwarning("Error", "Dense as first layer not supported yet...");
+                self.app.config(cursor="")
+                return
+            
+            elif sorted_data[first_layer_id]['tag'] == 'Conv2d':
+                try:
+                    
+                    if int(sorted_data[first_layer_id]['filters']) > 0:
+                        filters = int(sorted_data[first_layer_id]['filters'])
+                    else:
+                        showwarning("Error", "Negative or null 'filters' value in {} layer".format(sorted_data[first_layer_id]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                    if int(sorted_data[first_layer_id]['kernel_size_x']) > 0:
+                        kernel_size_x = int(sorted_data[first_layer_id]['kernel_size_x'])
+                    else:
+                        showwarning("Error", "Negative or null 'kernel_size_x' value in {} layer".format(sorted_data[first_layer_id]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                    if int(sorted_data[first_layer_id]['kernel_size_y']) > 0:
+                        kernel_size_y = int(sorted_data[first_layer_id]['kernel_size_y'])
+                    else:
+                        showwarning("Error", "Negative or null 'kernel_size_y' value in {} layer".format(sorted_data[first_layer_id]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                except ValueError:
+                    showwarning("Error", "Incorrect value(s) in {}".format(sorted_data[first_layer_id]['tag']));
+                    self.app.config(cursor="")
+                    return
+                
+                # Build Layer with Keras Sequential API
+                model.add(Conv2D(filters, (kernel_size_x, kernel_size_y), input_shape=input_shape))
+                print(filters, kernel_size_x, kernel_size_y, input_shape)
+            else:
+                showwarning("Error", "Incorrect first layer, \nUse Conv or Dense as first layer (after In)");
+                self.app.config(cursor="")
+                return
+            
+        except IndexError:
+            showwarning("Error", "Not enough layers");
+            self.app.config(cursor="")
+            return
 
+        # TODO : Loop over next layers...
+        
         self.app.config(cursor="")
+
+        model.summary()
