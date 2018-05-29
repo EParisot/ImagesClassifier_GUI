@@ -579,9 +579,9 @@ class ThirdTab(object):
                     return
             
             i = i + 1
-        
-        self.app.config(cursor="")
 
         model.summary()
 
         model.save(self.filename.split('.')[0] + ".h5py");
+
+        self.app.config(cursor="")
