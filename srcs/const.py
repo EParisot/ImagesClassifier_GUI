@@ -29,11 +29,24 @@ MODEL_NAME = 'Model'
 TRAIN_NAME = 'Train'
 #####
 
+##### snap
+SNAP_W = 810
+SNAP_H = 500
+SNAP_FPS = 60
+#####
+
 ##### label
 EXT_PHOTOS = ('.png', '.jpg', '.PNG', '.JPG', '.jpeg', '.JPEG')
 WIDTH_IMG = 800
 HEIGHT_IMG = 500
 HEIGHT_IMG_INFO = 35
+#####
+
+##### model
+MODEL_W = 900
+MODEL_H = 400
+LAYER_INFO_W = 250
+LAYER_INFO_H = 300
 #####
 
 ##### shortcut
