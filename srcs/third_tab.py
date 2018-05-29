@@ -64,6 +64,8 @@ class ThirdTab(object):
         self.model_canvas.config(borderwidth=2, relief="sunken", height=MODEL_H, width=MODEL_W)
         self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
         self.model_canvas.grid_propagate(0)
+        model_ttp = ttp.ToolTip(self.model_canvas, 'Drop a to add it to the model \n \
+                                        Double clic on a layer to edit it', msgFunc=None, delay=1, follow=True)
 
         command_frame = Frame(self.model_frame)
         command_frame.grid(row=0, column=2, sticky='nsw')
@@ -83,17 +85,17 @@ class ThirdTab(object):
         load_but = Button(command_frame)
         load_but.config(image=self.load_pic, command=load_handler)
         load_but.grid(row=0, column=1, padx=10, pady=10)
-        load_but = ttp.ToolTip(load_but, 'Load Model', msgFunc=None, delay=1, follow=True)
+        load_but_ttp = ttp.ToolTip(load_but, 'Load Model', msgFunc=None, delay=1, follow=True)
 
         save_but = Button(command_frame)
         save_but.config(image=self.save_pic, command=save_handler)
         save_but.grid(row=1, column=1, padx=10, pady=10)
-        save_but = ttp.ToolTip(save_but, 'Save Model', msgFunc=None, delay=1, follow=True)
+        save_but_ttp = ttp.ToolTip(save_but, 'Save Model', msgFunc=None, delay=1, follow=True)
 
         compile_but = Button(command_frame)
         compile_but.config(image=self.compile_pic, command=compile_handler)
         compile_but.grid(row=1, column=2, padx=10, pady=10)
-        compile_but = ttp.ToolTip(compile_but, 'Compile Model', msgFunc=None, delay=1, follow=True)
+        compile_but_ttp = ttp.ToolTip(compile_but, 'Compile Model', msgFunc=None, delay=1, follow=True)
 
         powered_label = Label(command_frame, text="powered by:")
         powered_label.grid(row=2, column=2, sticky="sew")
@@ -104,7 +106,7 @@ class ThirdTab(object):
         clear_but = Button(command_frame)
         clear_but.config(image=self.clear_pic, command=clear_handler)
         clear_but.grid(row=3, column=0, pady=10, sticky="sw")
-        clear_but = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
+        clear_but_ttp = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
 
         info = Label(self.model_frame, text="^ Drag layers ^").grid(row=1, column=1)
 
@@ -113,6 +115,7 @@ class ThirdTab(object):
         self.layers_canvas.config(borderwidth=2, relief="sunken", height=235, width=600)
         self.layers_canvas.grid(row=2, column=1, padx=20, pady=10)
         self.layers_canvas.grid_propagate(0)
+        layers_ttp = ttp.ToolTip(self.layers_canvas, 'Drag a layer to upper area to add it to the model', msgFunc=None, delay=1, follow=True)
 
         self.trash_canvas = Canvas(self.model_frame)
         self.trash_canvas.config(borderwidth=2, relief="groove", height=200, width=200)
@@ -120,6 +123,7 @@ class ThirdTab(object):
         self.trash_dnd = dnd.DnD_Container(self.app, self.model_frame, self.trash_canvas)
         self.trash_canvas.grid(row=2, column=2, padx=20, pady=20, stick='w')
         self.trash_canvas.grid_propagate(0)
+        trash_ttp = ttp.ToolTip(self.trash_canvas, 'Drop a layer to remove it', msgFunc=None, delay=1, follow=True)
 
         self.in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
         self.in_layer.attach(self.layers_canvas)
