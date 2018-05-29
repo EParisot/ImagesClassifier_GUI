@@ -158,9 +158,9 @@ class ThirdTab(object):
             self.model_canvas.delete("all")
 
     def load(self, event):
-        filename =  askopenfilename(title = "Select Model",filetypes = (("json files","*.json"),("all files","*.*")))
-        if filename:
-            with open(filename, 'r') as infile:
+        self.filename =  askopenfilename(title = "Select Model",filetypes = (("json files","*.json"),("all files","*.*")))
+        if self.filename:
+            with open(self.filename, 'r') as infile:
                 if self.app.layers_list:
                     res = askquestion("Load Model", "This action will overwrite existing model \nLoad anyway ?", icon='warning')
                     if res == 'no':
@@ -232,15 +232,15 @@ class ThirdTab(object):
                 self.app.layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
                 self.app.layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
 
-
+    
     def save(self, event):
-        filename = asksaveasfilename(title = "Save Model", defaultextension=".json", filetypes = (("json files","*.json"),("all files","*.*")))
-        if filename:
+        self.filename = asksaveasfilename(title = "Save Model", defaultextension=".json", filetypes = (("json files","*.json"),("all files","*.*")))
+        if self.filename:
             self.saved.set(True)
             self.write_coords()
-            if os.path.exists(filename):
-                os.remove(filename)
-            with open(filename, 'w') as outfile:
+            if os.path.exists(self.filename):
+                os.remove(self.filename)
+            with open(self.filename, 'w') as outfile:
                 items_sorted = sorted(self.app.layers_list, key=lambda x: self.app.layers_list[x]['x'])
                 sorted_data = {}
                 for item in items_sorted:
@@ -583,3 +583,5 @@ class ThirdTab(object):
         self.app.config(cursor="")
 
         model.summary()
+
+        model.save(self.filename.split('.')[0] + ".h5py");
