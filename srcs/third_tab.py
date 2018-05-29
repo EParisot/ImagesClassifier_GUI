@@ -22,8 +22,9 @@ import json
 
 class ThirdTab(object):
 
-    def __init__(self, app):
+    def __init__(self, app, devMode):
         self.app = app
+        self.devMode = devMode
 
         self.saved = tk.BooleanVar()
         self.saved.set(False)

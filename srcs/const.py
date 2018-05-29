@@ -59,6 +59,6 @@ KEY_PREV_TAB = 'bracketleft' # ctrl + tab
 KEY_NEXT_PHOTO = 'd'
 KEY_LAST_PHOTO = 'a'
 KEY_DEL_PHOTO = 'BackSpace'
-KEY_LABEL_CHARS = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
+KEY_LABEL_CHARS = ('0', '5', '1', '6', '2', '7', '3', '8', '4', '9')
     #####
 #####
