@@ -218,16 +218,19 @@ class FirstTab():
         val_1 = tk.Entry(labels, width=10, textvariable=self.width)
         val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
 
-        label_2 = tk.Label(labels)
-        label_2.config(text='Heigth:', font=("Helvetica", 14))
-        label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
-        
         self.heigth = tk.StringVar()
         self.heigth.set(str(self.snap_h.get()))
-        
-        val_2 = tk.Entry(labels, width=10, textvariable=self.heigth)
-        val_2.grid(row=2, column=2, sticky='nse', padx=5, pady=10)
 
+        if SYSTEM == 'Rpi':
+            label_2 = tk.Label(labels)
+            label_2.config(text='Heigth:', font=("Helvetica", 14))
+            label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
+
+            val_2 = tk.Entry(labels, width=10, textvariable=self.heigth)
+            val_2.grid(row=2, column=2, sticky='nse', padx=5, pady=10)
+        else:
+            self.heigth.set(str(round((3/4) * int(self.width.get()))))
+            
         save_dense = lambda _: self.save_video_param(self.width, self.heigth)
         
         save_but = tk.Button(labels)
@@ -240,10 +243,12 @@ class FirstTab():
 
     def save_video_param(self, width, heigth):
         try:
-            if int(width.get()) - 10 <= 800 and int(heigth.get()) <= 600:
+            if int(width.get()) <= SNAP_W and int(heigth.get()) <= SNAP_H:
                 self.snap_w.set(int(width.get()) + 10)
                 self.snap_h.set(int(heigth.get()))
                 self.video_param_frame.destroy()
+            else:
+                showwarning("Error", "Too large value(s)")
         except ValueError:
             showwarning("Error", "Wrong value(s)")
 
