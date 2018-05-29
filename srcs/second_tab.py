@@ -98,18 +98,106 @@ class SecondTab(object):
         self.button_frame.grid_rowconfigure(1, weight=1)
 
         font = Font(family='Helvetica', size=43, weight='bold')
-        label_handler = [None for i in range(len(KEY_LABEL_CHARS))]
-        self.label_but = [None for i in range(len(KEY_LABEL_CHARS))]
-        label_ttp = [None for i in range(len(KEY_LABEL_CHARS))]
-        for (i, lab) in enumerate(KEY_LABEL_CHARS):
-            label_handler[i] = lambda: self.set_label(lab)
-            self.label_but[i] = Button(self.button_frame)
-            self.label_but[i].config(height=1, width=2)
-            self.label_but[i]['font'] = font
-            self.label_but[i].config(text=lab, command=label_handler[i])
-            self.label_but[i].grid(row=i % 2, column=int(i / 2), padx=10)
-            label_ttp[i] = ttp.ToolTip(self.label_but[i], 'Give label ' + lab + \
-                    ' to this photo', msgFunc=None, delay=1, follow=True)
+
+        label_handler0 = lambda: self.set_label(KEY_LABEL_CHARS[0])
+        self.label_but0 = Button(self.button_frame)
+        self.label_but0.config(height=1, width=2)
+        self.label_but0['font'] = font
+        self.label_but0.config(text=KEY_LABEL_CHARS[0], command=label_handler0)
+        self.label_but0.grid(row=0, column=0, padx=10)
+        label_ttp0 = ttp.ToolTip(self.label_but0, 'Set label ' +
+                KEY_LABEL_CHARS[0] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler1 = lambda: self.set_label(KEY_LABEL_CHARS[1])
+        self.label_but1 = Button(self.button_frame)
+        self.label_but1.config(height=1, width=2)
+        self.label_but1['font'] = font
+        self.label_but1.config(text=KEY_LABEL_CHARS[1], command=label_handler1)
+        self.label_but1.grid(row=0, column=1, padx=10)
+        label_ttp1 = ttp.ToolTip(self.label_but1, 'Set label ' +
+                KEY_LABEL_CHARS[1] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler2 = lambda: self.set_label(KEY_LABEL_CHARS[2])
+        self.label_but2 = Button(self.button_frame)
+        self.label_but2.config(height=1, width=2)
+        self.label_but2['font'] = font
+        self.label_but2.config(text=KEY_LABEL_CHARS[2], command=label_handler2)
+        self.label_but2.grid(row=0, column=2, padx=10)
+        label_ttp2 = ttp.ToolTip(self.label_but2, 'Set label ' +
+                KEY_LABEL_CHARS[2] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler3 = lambda: self.set_label(KEY_LABEL_CHARS[3])
+        self.label_but3 = Button(self.button_frame)
+        self.label_but3.config(height=1, width=2)
+        self.label_but3['font'] = font
+        self.label_but3.config(text=KEY_LABEL_CHARS[3], command=label_handler3)
+        self.label_but3.grid(row=0, column=3, padx=10)
+        label_ttp3 = ttp.ToolTip(self.label_but3, 'Set label ' +
+                KEY_LABEL_CHARS[3] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler4 = lambda: self.set_label(KEY_LABEL_CHARS[4])
+        self.label_but4 = Button(self.button_frame)
+        self.label_but4.config(height=1, width=2)
+        self.label_but4['font'] = font
+        self.label_but4.config(text=KEY_LABEL_CHARS[4], command=label_handler4)
+        self.label_but4.grid(row=0, column=4, padx=10)
+        label_ttp4 = ttp.ToolTip(self.label_but4, 'Set label ' +
+                KEY_LABEL_CHARS[4] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler5 = lambda: self.set_label(KEY_LABEL_CHARS[5])
+        self.label_but5 = Button(self.button_frame)
+        self.label_but5.config(height=1, width=2)
+        self.label_but5['font'] = font
+        self.label_but5.config(text=KEY_LABEL_CHARS[5], command=label_handler5)
+        self.label_but5.grid(row=1, column=0, padx=10)
+        label_ttp5 = ttp.ToolTip(self.label_but5, 'Set label ' +
+                KEY_LABEL_CHARS[5] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler6 = lambda: self.set_label(KEY_LABEL_CHARS[6])
+        self.label_but6 = Button(self.button_frame)
+        self.label_but6.config(height=1, width=2)
+        self.label_but6['font'] = font
+        self.label_but6.config(text=KEY_LABEL_CHARS[6], command=label_handler6)
+        self.label_but6.grid(row=1, column=1, padx=10)
+        label_ttp6 = ttp.ToolTip(self.label_but6, 'Set label ' +
+                KEY_LABEL_CHARS[6] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler7 = lambda: self.set_label(KEY_LABEL_CHARS[7])
+        self.label_but7 = Button(self.button_frame)
+        self.label_but7.config(height=1, width=2)
+        self.label_but7['font'] = font
+        self.label_but7.config(text=KEY_LABEL_CHARS[7], command=label_handler7)
+        self.label_but7.grid(row=1, column=2, padx=10)
+        label_ttp7 = ttp.ToolTip(self.label_but7, 'Set label ' +
+                KEY_LABEL_CHARS[7] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler8 = lambda: self.set_label(KEY_LABEL_CHARS[8])
+        self.label_but8 = Button(self.button_frame)
+        self.label_but8.config(height=1, width=2)
+        self.label_but8['font'] = font
+        self.label_but8.config(text=KEY_LABEL_CHARS[8], command=label_handler8)
+        self.label_but8.grid(row=1, column=3, padx=10)
+        label_ttp8 = ttp.ToolTip(self.label_but8, 'Set label ' +
+                KEY_LABEL_CHARS[8] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
+
+        label_handler9 = lambda: self.set_label(KEY_LABEL_CHARS[9])
+        self.label_but9 = Button(self.button_frame)
+        self.label_but9.config(height=1, width=2)
+        self.label_but9['font'] = font
+        self.label_but9.config(text=KEY_LABEL_CHARS[9], command=label_handler9)
+        self.label_but9.grid(row=1, column=4, padx=10)
+        label_ttp9 = ttp.ToolTip(self.label_but9, 'Set label ' +
+                KEY_LABEL_CHARS[9] + ' to this photo', msgFunc=None, delay=1,
+                follow=True)
 
         self.dir_srcs = None  # directory with photos
         self.dir_dest = None  # directory with labelised photos
