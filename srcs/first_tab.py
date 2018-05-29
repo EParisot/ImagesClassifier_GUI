@@ -292,9 +292,20 @@ class FirstTab():
             showwarning("No video running", "Please Start the video before you take a snap")
 
     def del_snap(event, self):
-        os.remove(self.picname)
-        self.count.set(self.count.get() - 1)
-        self.prev_frame.config(image=self.none_pic)
+        try:
+            dir_list = os.listdir(self.app.snap_path.get())
+            if len(dir_list) > 0:
+                os.remove(self.app.snap_path.get() + '/' + dir_list[-1])
+                dir_list = os.listdir(self.app.snap_path.get())
+                if len(dir_list) > 0:
+                    image = ImageTk.PhotoImage(Image.open(self.app.snap_path.get() + '/' + dir_list[-1]).resize((160, 120), Image.ANTIALIAS))
+                else:
+                    image = self.none_pic
+                self.count.set(self.count.get() - 1)
+                self.prev_frame.config(image=image)
+                self.prev_frame.image = image
+        except FileNotFoundError:
+            showwarning("File not found", "No file to remove")
 
     def on_quit(self):
         if self.thread.is_alive():
