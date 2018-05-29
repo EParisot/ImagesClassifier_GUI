@@ -60,7 +60,7 @@ class FirstTab():
             self.camera.hflip = True
             self.camera.vflip = True
             self.rawCapture = PiRGBArray(self.camera, size=(810, 500))
-        
+
         self.video_frame = Frame(self.snap_frame)
         self.video_frame.config(borderwidth=2, relief="sunken", height=500, width=810)
         self.video_frame.grid(row=0, column=0)

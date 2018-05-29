@@ -161,7 +161,7 @@ class ThirdTab(object):
                 layers_list[item_id]['x'] = self.model_canvas.coords(item_id)[0]
                 layers_list[item_id]['y'] = self.model_canvas.coords(item_id)[1]
 
-    
+
     def save(self, event):
         filename = asksaveasfilename(title = "Save Model",filetypes = (("json files","*.json"),("all files","*.*")))
         if filename is not None:

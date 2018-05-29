@@ -40,6 +40,8 @@ HEIGHT_IMG_INFO = 35
 KEY_OPTION = 'comma' # open option menu
 KEY_QUIT = 'Escape' # quit windows
 KEY_CTRL_L = 'Control_L'
+KEY_NEXT_TAB = 'bracketright' # ctrl + tab
+KEY_PREV_TAB = 'bracketleft' # ctrl + tab
     ##### label shortcut
 KEY_NEXT_PHOTO = 'd'
 KEY_LAST_PHOTO = 'a'

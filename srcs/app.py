@@ -8,6 +8,7 @@ from tkinter import ttk
 from tkinter.messagebox import *
 from tkinter.filedialog import *
 from tkinter.scrolledtext import ScrolledText
+import _tkinter
 
 import os
 import configparser
@@ -66,21 +67,35 @@ class App(tk.Tk):
         self.tabs.add(self.fourth_tab, text=TRAIN_NAME, compound=LEFT)
         self.fourth_tab.grid_columnconfigure(0, weight=1)
         self.fourth_tab.grid_rowconfigure(0, weight=1)
+        self.devMode = False
 
+    def setDevMode(self, devMode):
+        self.devMode = devMode
 
     def onKeyPress(self, event):
         """
         define action with keyboard shortcut
         """
+        if self.devMode:
+            print(YELLOW + 'key press: ' + EOC + event.keysym)
         if event.keysym == KEY_OPTION:
             self.open_options()
         elif event.keysym == KEY_QUIT:
             self.on_Quit()
         elif event.keysym == KEY_CTRL_L:
             self.l_ctrl_pressed = True;
-            print(YELLOW + "key press: " + EOC + "Control_L")
-        else:
-            print(YELLOW + 'key press: ' + EOC + event.keysym)
+
+        if self.l_ctrl_pressed == True:
+            if event.keysym == KEY_NEXT_TAB:
+                try:
+                    self.tabs.select(self.tabs.index(self.tabs.select()) + 1)
+                except _tkinter.TclError:
+                    pass
+            elif event.keysym == KEY_PREV_TAB:
+                try:
+                    self.tabs.select(self.tabs.index(self.tabs.select()) - 1)
+                except _tkinter.TclError:
+                    pass
 
         # if we are in label
         if self.tabs.tab(self.tabs.select(), "text") == LABEL_NAME:
@@ -94,9 +109,10 @@ class App(tk.Tk):
                 self.second_tab.event_win(event)
 
     def onKeyRelease(self, event):
+        if self.devMode:
+            print(YELLOW + 'key release: ' + EOC + event.keysym)
         if event.keysym == KEY_CTRL_L:
             self.l_ctrl_pressed = False;
-            print(YELLOW + "key release: " + EOC + "Control_L")
 
 
     def open_options(self):

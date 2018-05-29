@@ -30,13 +30,20 @@ This is a graphic implementation of the famous "Patate42"
 
 if __name__ == '__main__':
 
+    devMode = False
     if len(sys.argv) > 1:
         for arg in sys.argv[1:]:
             if arg in ('--usage', '--help'):
                 print('Usage: python3 Patate_for_kids')
                 exit(0)
+            elif arg == '--develop':
+                print(GREEN + '[+] ' + EOC + BOLD + 'develop mode activate' + EOC)
+                devMode = True
 
     app = App()
+
+    if devMode:
+        app.setDevMode(True)
 
     app.first_tab = FirstTab(app)
     app.second_tab = SecondTab(app)
