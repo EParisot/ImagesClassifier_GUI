@@ -56,8 +56,8 @@ KEY_CTRL_L = 'Control_L'
 KEY_NEXT_TAB = 'bracketright' # ctrl + tab
 KEY_PREV_TAB = 'bracketleft' # ctrl + tab
     ##### label shortcut
-KEY_NEXT_PHOTO = 'd'
-KEY_LAST_PHOTO = 'a'
+KEY_NEXT_PHOTO = 'Up'
+KEY_LAST_PHOTO = 'Down'
 KEY_DEL_PHOTO = 'BackSpace'
 KEY_LABEL_CHARS = ('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')
     #####

@@ -38,8 +38,8 @@ class SecondTab(object):
         self.fen = {
             'fen' : None,
             'lab_photo' : None,
-#            'slide_height1' : None,
-#            'slide_height2' : None,
+            'slide_height1' : None,
+            'slide_height2' : None,
             'photo' : None,
             'lab_info1' : None,
             'lab_info2' : None
@@ -255,7 +255,7 @@ class SecondTab(object):
 #        if self.fen['slide_height1'] == None:
 #            self.fen['slide_height1'] = Scale(self.fen['fen'],from_=image.size[1],
 #                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
-#            self.fen['slide_height1'].grid(row=0, column=0)
+#            self.fen['slide_height1'].grid(row=0, column=1)
         self.fen['lab_photo'] = Label(self.fen['fen'], image=self.fen['photo'])
         self.fen['lab_photo'].grid(row=0, column=0, sticky="nw")
 #        if self.fen['slide_height2'] == None:
@@ -270,7 +270,6 @@ class SecondTab(object):
         self.fen['lab_info2'] = Label(self.label_frame, height=2, font=("Courier", 20))
         self.fen['lab_info2'].config(borderwidth=2, relief="sunken", text='Labelized : \n' + str(self.photo_act) + '/' + str(len(self.photos)))
         self.fen['lab_info2'].grid(row=1, column=0, padx=20, sticky="nsew")
-
 
 
     def last_photo(self):
@@ -309,7 +308,10 @@ class SecondTab(object):
             new += label + '_' + self.photos[self.photo_act].split('/')[-1].split('_')[1:][0]
         if self.devMode:
             print(GREEN + 'RENAME: ' + EOC + new)
-        os.rename(self.photos[self.photo_act], new)
+        try:
+            os.rename(self.photos[self.photo_act], new)
+        except FileExistsError:
+            pass
         self.photos[self.photo_act] = new
         if self.auto_next == True:
             self.next_photo()
