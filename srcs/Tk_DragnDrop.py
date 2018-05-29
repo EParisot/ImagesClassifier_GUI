@@ -465,7 +465,6 @@ class DnD_Container:
                     val_1 = tk.Entry(labels, width=10, textvariable=self.neurons)
                     val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
 
-
                     save_dense = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0], neurons=self.neurons)
                     
                     save_but = tk.Button(labels)

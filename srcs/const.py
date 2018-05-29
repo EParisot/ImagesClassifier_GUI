@@ -31,7 +31,7 @@ TRAIN_NAME = 'Train'
 
 ##### snap
 SNAP_W = 810
-SNAP_H = 500
+SNAP_H = 600
 SNAP_FPS = 60
 #####
 
