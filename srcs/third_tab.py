@@ -183,7 +183,7 @@ class ThirdTab(object):
                 self.new_conv2d_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
                 self.app.layers_list[self.new_conv2d_layer.id] = data[item]
                 
-            elif data[item]['tag'] == "Max_Pooling":
+            elif data[item]['tag'] == "Max_pooling":
                 self.new_max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"))
                 self.new_max_p_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
                 self.app.layers_list[self.new_max_p_layer.id] = data[item]
@@ -289,11 +289,13 @@ class ThirdTab(object):
                         self.app.config(cursor="")
                         return
                     
+                    # Set Input Shape with Keras Sequential API
+                    input_shape = (dim_1, dim_2, dim_3)
+                    
                 except ValueError:
-                    showwarning("Error", "Incorrect value(s) in In Layer");
+                    showwarning("Error", "Incorrect or empty value(s) in In Layer");
                     self.app.config(cursor="")
                     return
-                input_shape = (dim_1, dim_2, dim_3)
             else:
                 showwarning("Error", "No Input Layer");
                 self.app.config(cursor="")
@@ -315,15 +317,29 @@ class ThirdTab(object):
         # Check and Get first layer
         try:
             first_layer_id = items_list[1]
-            
+
+            # If First Layer is Dense
             if sorted_data[first_layer_id]['tag'] == 'Dense':
-                showwarning("Error", "Dense as first layer not supported yet...");
-                self.app.config(cursor="")
-                return
-            
-            elif sorted_data[first_layer_id]['tag'] == 'Conv2d':
                 try:
+                    if int(sorted_data[first_layer_id]['neurons']) > 0:
+                        neurons = int(sorted_data[first_layer_id]['neurons'])
+                        
+                        # Build Dense Layer with Keras Sequential API
+                        model.add(Dense(units=neurons, input_shape=input_shape))
+
+                    else:
+                        showwarning("Error", "Negative or null 'neurons' value in {} layer".format(sorted_data[first_layer_id]['tag']));
+                        self.app.config(cursor="")
+                        return
                     
+                except ValueError:
+                    showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[first_layer_id]['tag']));
+                    self.app.config(cursor="")
+                    return
+                
+            # If First Layer is Conv2D
+            elif sorted_data[first_layer_id]['tag'] == 'Conv2d':
+                try:  
                     if int(sorted_data[first_layer_id]['filters']) > 0:
                         filters = int(sorted_data[first_layer_id]['filters'])
                     else:
@@ -344,15 +360,34 @@ class ThirdTab(object):
                         showwarning("Error", "Negative or null 'kernel_size_y' value in {} layer".format(sorted_data[first_layer_id]['tag']));
                         self.app.config(cursor="")
                         return
+
+                    if int(sorted_data[first_layer_id]['stride_x']) > 0:
+                        stride_x = int(sorted_data[first_layer_id]['stride_x'])
+                    else:
+                        showwarning("Error", "Negative or null 'stride_x' value in {} layer".format(sorted_data[first_layer_id]['tag']));
+                        self.app.config(cursor="")
+                        return
                     
+                    if int(sorted_data[first_layer_id]['stride_y']) > 0:
+                        stride_y = int(sorted_data[first_layer_id]['stride_y'])
+                    else:
+                        showwarning("Error", "Negative or null 'stride_y' value in {} layer".format(sorted_data[first_layer_id]['tag']));
+                        self.app.config(cursor="")
+                        return
+
+                    if int(sorted_data[first_layer_id]['padding']) == 2:
+                        padding = 'same'
+                    else:
+                        padding = 'valid'
+
+                    # Build Conv2D Layer with Keras Sequential API
+                    model.add(Conv2D(filters=filters, input_shape=input_shape, kernel_size=(kernel_size_x, kernel_size_y), strides=(stride_x, stride_y), padding=padding))
+                        
                 except ValueError:
-                    showwarning("Error", "Incorrect value(s) in {}".format(sorted_data[first_layer_id]['tag']));
+                    showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[first_layer_id]['tag']));
                     self.app.config(cursor="")
                     return
-                
-                # Build Layer with Keras Sequential API
-                model.add(Conv2D(filters, (kernel_size_x, kernel_size_y), input_shape=input_shape))
-
+ 
             else:
                 showwarning("Error", "Incorrect first layer, \nUse Conv or Dense as first layer (after In)");
                 self.app.config(cursor="")
@@ -364,7 +399,186 @@ class ThirdTab(object):
             return
 
         # TODO : Loop over next layers...
+        i = 2
+        while i < len(items_list):
+            item = items_list[i]
+
+            # If Layer is Dense
+            if sorted_data[item]['tag'] == 'Dense':
+                try:
+                    if int(sorted_data[item]['neurons']) > 0:
+                        neurons = int(sorted_data[item]['neurons'])
+                    else:
+                        showwarning("Error", "Negative or null 'neurons' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+
+                    # Build Dense Layer with Keras Sequential API
+                    model.add(Dense(units=neurons))
+                    
+                except ValueError:
+                    showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[item]['tag']));
+                    self.app.config(cursor="")
+                    return
+                
+            # If Layer is Conv2D
+            elif sorted_data[item]['tag'] == 'Conv2d':
+                try:
+                    if int(sorted_data[item]['filters']) > 0:
+                        filters = int(sorted_data[item]['filters'])
+                    else:
+                        showwarning("Error", "Negative or null 'filters' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                    if int(sorted_data[item]['kernel_size_x']) > 0:
+                        kernel_size_x = int(sorted_data[item]['kernel_size_x'])
+                    else:
+                        showwarning("Error", "Negative or null 'kernel_size_x' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                    if int(sorted_data[item]['kernel_size_y']) > 0:
+                        kernel_size_y = int(sorted_data[item]['kernel_size_y'])
+                    else:
+                        showwarning("Error", "Negative or null 'kernel_size_y' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+
+                    if int(sorted_data[item]['stride_x']) > 0:
+                        stride_x = int(sorted_data[item]['stride_x'])
+                    else:
+                        showwarning("Error", "Negative or null 'stride_x' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                    if int(sorted_data[item]['stride_y']) > 0:
+                        stride_y = int(sorted_data[item]['stride_y'])
+                    else:
+                        showwarning("Error", "Negative or null 'stride_y' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+
+                    if int(sorted_data[item]['padding']) == 1:
+                        padding = 'same'
+                    else:
+                        padding = 'valid'
+
+                    # Build Conv2D Layer with Keras Sequential API
+                    model.add(Conv2D(filters=filters, kernel_size=(kernel_size_x, kernel_size_y), input_shape=input_shape, strides=(stride_x, stride_y), padding=padding))
+
+                except ValueError:
+                    showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[item]['tag']));
+                    self.app.config(cursor="")
+                    return
+
+            # If Layer is Max Pooling
+            elif sorted_data[item]['tag'] == 'Max_pooling':
+                try:
+                    if int(sorted_data[item]['pool_size_x']) > 0:
+                        pool_size_x = int(sorted_data[item]['pool_size_x'])
+                    else:
+                        showwarning("Error", "Negative or null 'pool_size_x' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                    if int(sorted_data[item]['pool_size_y']) > 0:
+                        pool_size_y = int(sorted_data[item]['pool_size_y'])
+                    else:
+                        showwarning("Error", "Negative or null 'pool_size_y' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+
+                    if int(sorted_data[item]['stride_x']) >= 0:
+                        stride_x = int(sorted_data[item]['stride_x'])
+                    else:
+                        showwarning("Error", "Negative 'stride_x' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+                    
+                    if int(sorted_data[item]['stride_y']) >= 0:
+                        stride_y = int(sorted_data[item]['stride_y'])
+                    else:
+                        showwarning("Error", "Negative 'stride_y' value in {} layer".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+
+                    if int(sorted_data[item]['padding']) == 1:
+                        padding = 'same'
+                    else:
+                        padding = 'valid'
+
+                    # Build Max Pooling Layer with Keras Sequential API
+                    if stride_x > 0 and stride_y > 0:
+                        strides = (stride_x, stride_y)
+                    else:
+                        strides = None
+                    model.add(MaxPooling2D(pool_size=(pool_size_x, pool_size_y), strides=strides, padding=padding))
+
+                except ValueError:
+                    showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[item]['tag']));
+                    self.app.config(cursor="")
+                    return
+
+            # If Layer is Flatten
+            elif sorted_data[item]['tag'] == 'Flatten':
+                # Build Flatten Layer with Keras Sequential API
+                model.add(Flatten())
+
+            # If Layer is Relu
+            elif sorted_data[item]['tag'] == 'Relu':
+                if sorted_data[item - 1]['tag'] == 'Dense' or sorted_data[item - 1]['tag'] == 'Conv2d' or sorted_data[item - 1]['tag'] == 'Max_pooling':
+                    # Build Relu Layer with Keras Sequential API
+                    model.add(Activation('relu'))
+                else:
+                    showwarning("Error", "Activation layer {} is invalid after {} layer".format(sorted_data[item]['tag'], sorted_data[item - 1]['tag']));
+                    self.app.config(cursor="")
+                    return
+                
+            # If Layer is Sigmoid
+            elif sorted_data[item]['tag'] == 'Sigmoid':
+                if sorted_data[item - 1]['tag'] == 'Dense' or sorted_data[item - 1]['tag'] == 'Conv2d' or sorted_data[item - 1]['tag'] == 'Max_pooling':
+                    # Build Sigmoid Layer with Keras Sequential API
+                    model.add(Activation('sigmoid'))
+                else:
+                    showwarning("Error", "Activation layer {} is invalid after {} layer".format(sorted_data[item]['tag'], sorted_data[item - 1]['tag']));
+                    self.app.config(cursor="")
+                    return
+
+            # If Layer is Softmax
+            elif sorted_data[item]['tag'] == 'Softmax':
+                if sorted_data[item - 1]['tag'] == 'Dense' or sorted_data[item - 1]['tag'] == 'Conv2d' or sorted_data[item - 1]['tag'] == 'Max_pooling':
+                    # Build Softmax Layer with Keras Sequential API
+                    model.add(Activation('softmax'))
+                else:
+                    showwarning("Error", "Activation layer {} is invalid after {} layer".format(sorted_data[item]['tag'], sorted_data[item - 1]['tag']));
+                    self.app.config(cursor="")
+                    return
+
+            # If Layer is Dropout
+            elif sorted_data[item]['tag'] == 'Dropout':
+                if sorted_data[item - 1]['tag'] == 'Dense' or sorted_data[item - 1]['tag'] == 'Conv2d' or sorted_data[item - 1]['tag'] == 'Max_pooling':
+                    try:
+                        if int(sorted_data[item]['ratio']) > 0:
+                            ratio = int(sorted_data[item]['ratio'])
+                        else:
+                            showwarning("Error", "Negative or null 'ratio' value in {} layer".format(sorted_data[item]['tag']));
+                            self.app.config(cursor="")
+                            return
+                        # Build Dropout Layer with Keras Sequential API
+                        model.add(Activation('dropout', ratio))
+                    
+                    except ValueError:
+                        showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[item]['tag']));
+                        self.app.config(cursor="")
+                        return
+                else:
+                    showwarning("Error", "Activation layer {} is invalid after {} layer".format(sorted_data[item]['tag'], sorted_data[item - 1]['tag']));
+                    self.app.config(cursor="")
+                    return
+            
+            i = i + 1
         
         self.app.config(cursor="")
 
-        #model.summary()
+        model.summary()

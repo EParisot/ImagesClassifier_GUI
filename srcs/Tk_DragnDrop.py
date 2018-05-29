@@ -403,32 +403,34 @@ class DnD_Container:
                     val_2_y = tk.Entry(labels, width=10, textvariable=self.kernel_size_y)
                     val_2_y.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
 
-##                    label_3 = tk.Label(labels)
-##                    label_3.config(text='Stride:', font=("Helvetica", 14))
-##                    label_3.grid(row=3, column=0, sticky='nsw', pady=10)
-##                    
-##                    self.stride_x = tk.StringVar()
-##                    
-##                    val_3_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
-##                    val_3_x.grid(row=3, column=1, sticky='nsw', pady=10)
-##
-##                    self.stride_y = tk.StringVar()
-##                    
-##                    val_3_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
-##                    val_3_y.grid(row=3, column=2, sticky='nsw', padx=5, pady=10)
-##
-##                    label_4 = tk.Label(labels)
-##                    label_4.config(text='Padding:', font=("Helvetica", 14))
-##                    label_4.grid(row=4, column=0, sticky='nsw', pady=10)
-##
-##                    self.padding = tk.IntVar()
-##
-##                    val_4 = tk.Checkbutton(labels, variable=self.padding)
-##                    val_4.grid(row=4, column=2, sticky='nsw', padx=5, pady=5)
+                    label_3 = tk.Label(labels)
+                    label_3.config(text='Stride:', font=("Helvetica", 14))
+                    label_3.grid(row=3, column=0, sticky='nsw', pady=10)
+                    
+                    self.stride_x = tk.StringVar()
+                    self.stride_x.set('1')
+                    
+                    val_3_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
+                    val_3_x.grid(row=3, column=1, sticky='nsw', pady=10)
+
+                    self.stride_y = tk.StringVar()
+                    self.stride_y.set('1')
+                    
+                    val_3_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
+                    val_3_y.grid(row=3, column=2, sticky='nsw', padx=5, pady=10)
+
+                    label_4 = tk.Label(labels)
+                    label_4.config(text='Padding:', font=("Helvetica", 14))
+                    label_4.grid(row=4, column=0, sticky='nsw', pady=10)
+
+                    self.padding = tk.IntVar()
+
+                    val_4 = tk.Checkbutton(labels, variable=self.padding)
+                    val_4.grid(row=4, column=2, sticky='nsw', padx=5, pady=5)
 
                     save_conv2d = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
                                                                      filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y,
-                                                                     #stride_x=self.stride_x, stride_y=self.stride_y, padding=self.padding
+                                                                     stride_x=self.stride_x, stride_y=self.stride_y, padding=self.padding
                                                                      )
                     
                     save_but = tk.Button(labels)
@@ -482,6 +484,7 @@ class DnD_Container:
                     labels.grid_rowconfigure(1, weight=1)
                     labels.grid_rowconfigure(2, weight=1)
                     labels.grid_rowconfigure(3, weight=1)
+                    labels.grid_rowconfigure(4, weight=1)
                     labels.grid_columnconfigure(0, weight=1)
                     labels.grid_columnconfigure(1, weight=1)
                     labels.grid_columnconfigure(2, weight=1)
@@ -502,31 +505,42 @@ class DnD_Container:
                     self.pool_size_y = tk.StringVar()
                     
                     val_1_y = tk.Entry(labels, width=10, textvariable=self.pool_size_y)
-                    val_1_y.grid(row=1, column=2, sticky='nsw', padx=5, pady=10)
+                    val_1_y.grid(row=1, column=2, sticky='nsw', pady=10)
 
                     label_2 = tk.Label(labels)
                     label_2.config(text='Stride:', font=("Helvetica", 14))
                     label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
                     
                     self.stride_x = tk.StringVar()
+                    self.stride_x.set('0')
                     
                     val_2_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
-                    val_2_x.grid(row=2, column=1, sticky='nsw', padx=5, pady=10)
+                    val_2_x.grid(row=2, column=1, sticky='nsw', pady=10)
 
                     self.stride_y = tk.StringVar()
+                    self.stride_y.set('0')
                     
                     val_2_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
                     val_2_y.grid(row=2, column=2, sticky='nsw', pady=10)
 
+                    label_3 = tk.Label(labels)
+                    label_3.config(text='Padding:', font=("Helvetica", 14))
+                    label_3.grid(row=3, column=0, sticky='nsw', padx=5, pady=10)
+
+                    self.mp_padding = tk.IntVar()
+
+                    val_3 = tk.Checkbutton(labels, variable=self.mp_padding)
+                    val_3.grid(row=3, column=2, sticky='nsw', padx=5, pady=5)
+
                     save_max_p = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
                                                          pool_size_x=self.pool_size_x, pool_size_y=self.pool_size_y,
-                                                         stride_x=self.stride_x, stride_y=self.stride_y)
+                                                         stride_x=self.stride_x, stride_y=self.stride_y, padding=self.mp_padding)
 
                     save_but = tk.Button(labels)
                     save_but.config(text='Save', font=("Helvetica", 16))
                     save_but.bind("<ButtonPress-1>", save_max_p)
                     save_but.bind("<Return>", save_max_p)
-                    save_but.grid(row=3, column=1, sticky='nsew', padx=5, pady=10)
+                    save_but.grid(row=4, column=1, sticky='nsew', padx=5, pady=10)
 
                     val_1_x.focus_set()
               
@@ -586,11 +600,12 @@ class DnD_Container:
         elif self.app.layers_list[id]['tag'] == "Dense":
             self.neurons.set(self.app.layers_list[id]['neurons'])
 
-        elif self.app.layers_list[id]['tag'] == "Max_Pooling":
+        elif self.app.layers_list[id]['tag'] == "Max_pooling":
             self.pool_size_x.set(self.app.layers_list[id]['pool_size_x'])
             self.pool_size_y.set(self.app.layers_list[id]['pool_size_y'])
             self.stride_x.set(self.app.layers_list[id]['stride_x'])
             self.stride_y.set(self.app.layers_list[id]['stride_y'])
+            self.mp_padding.set(self.app.layers_list[id]['padding'])
 
         elif self.app.layers_list[id]['tag'] == "Dropout":
             self.ratio.set(self.app.layers_list[id]['ratio'])
