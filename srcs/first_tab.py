@@ -32,8 +32,9 @@ import srcs.Tk_Tooltips as ttp
 
 class FirstTab():
 
-    def __init__(self, app):
+    def __init__(self, app, devMode):
         self.app = app
+        self.devMode = devMode
         self.snap_frame = Frame(self.app.first_tab)
         self.snap_frame.grid(row=0, column=0, sticky="n")
         self.snap_frame.grid_columnconfigure(0, weight=1)

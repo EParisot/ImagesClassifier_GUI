@@ -24,8 +24,9 @@ labelisation
 
 class SecondTab(object):
 
-    def __init__(self, app):
+    def __init__(self, app, devMode):
         self.app = app
+        self.devMode = devMode
         self.label_frame = Frame(app.second_tab)
         self.label_frame.grid(row=0, column=0, stick='n')
         self.label_frame.grid_columnconfigure(0, weight=1)
@@ -34,6 +35,8 @@ class SecondTab(object):
         self.fen = {
             'fen' : None,
             'lab_photo' : None,
+#            'slide_height1' : None,
+#            'slide_height2' : None,
             'photo' : None,
             'lab_info' : None
         }
@@ -76,17 +79,34 @@ class SecondTab(object):
         next_ttp = ttp.ToolTip(self.next_but, 'Go to next photo',
                 msgFunc=None, delay=1, follow=True)
 
+        rm_handler = lambda: self.del_photo()
+        self.rm_pic = ImageTk.PhotoImage(Image.open('assets/trash64.png'))
+        self.rm_but = Button(self.command_frame)
+        self.rm_but.config(image=self.rm_pic, command=rm_handler)
+        self.rm_but.grid(row=0, column=3, padx=10)
+        rm_ttp = ttp.ToolTip(self.rm_but, 'Remove photo',
+                msgFunc=None, delay=1, follow=True)
+
+        self.button_frame = Frame(self.command_frame)
+        self.button_frame.grid(row=0, column=4, sticky='n')
+        self.button_frame.grid_columnconfigure(0, weight=1)
+        self.button_frame.grid_columnconfigure(1, weight=1)
+        self.button_frame.grid_columnconfigure(2, weight=1)
+        self.button_frame.grid_columnconfigure(3, weight=1)
+        self.button_frame.grid_columnconfigure(4, weight=1)
+        self.button_frame.grid_rowconfigure(0, weight=1)
+        self.button_frame.grid_rowconfigure(1, weight=1)
         font = Font(family='Helvetica', size=43, weight='bold')
         label_handler = [None for i in range(len(KEY_LABEL_CHARS))]
         self.label_but = [None for i in range(len(KEY_LABEL_CHARS))]
         label_ttp = [None for i in range(len(KEY_LABEL_CHARS))]
         for (i, lab) in enumerate(KEY_LABEL_CHARS):
             label_handler[i] = lambda: self.set_label(lab)
-            self.label_but[i] = Button(self.command_frame)
+            self.label_but[i] = Button(self.button_frame)
             self.label_but[i].config(height=1, width=2)
             self.label_but[i]['font'] = font
             self.label_but[i].config(text=lab, command=label_handler[i])
-            self.label_but[i].grid(row=0, column=3 + i, padx=10)
+            self.label_but[i].grid(row=i % 2, column=int(i / 2), padx=10)
             label_ttp[i] = ttp.ToolTip(self.label_but[i], 'Give label ' + lab + \
                     ' to this photo', msgFunc=None, delay=1, follow=True)
 
@@ -96,7 +116,6 @@ class SecondTab(object):
         self.auto_next = True # go automatically to next photo
 
         self.load()
-
 
     def load(self, event=None):
         self.dir_srcs = self.app.cfg.get('paths', 'snap_path')
@@ -137,11 +156,19 @@ class SecondTab(object):
         image = Image.open(self.photos[self.photo_act])
         image = image.resize((WIDTH_IMG, HEIGHT_IMG - 50), Image.ANTIALIAS)
         self.fen['photo'] = ImageTk.PhotoImage(image)
+#        if self.fen['slide_height1'] == None:
+#            self.fen['slide_height1'] = Scale(self.fen['fen'],from_=image.size[1],
+#                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
+#            self.fen['slide_height1'].grid(row=0, column=0)
         self.fen['lab_photo'] = Label(self.fen['fen'], image=self.fen['photo'])
-        self.fen['lab_photo'].pack(side=TOP)
+        self.fen['lab_photo'].grid(row=0, column=0)
+#        if self.fen['slide_height2'] == None:
+#            self.fen['slide_height2'] = Scale(self.fen['fen'], from_=image.size[1],
+#                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
+#            self.fen['slide_height2'].grid(row=0, column=2)
         self.fen['lab_info'] = Label(self.fen['fen'], width=32, height=2, font=("Courier", 40))
         self.fen['lab_info']['text'] = 'label: ' + self.get_label() + '\t\t' + str(self.photo_act) + '/' + str(len(self.photos))
-        self.fen['lab_info'].pack(side=BOTTOM)
+        self.fen['lab_info'].grid(row=1, column=0)
 
 
     def last_photo(self):
@@ -178,7 +205,8 @@ class SecondTab(object):
                 new += label + '_' + self.photos[self.photo_act].split('/')[-1]
         else:
             new += label + '_' + self.photos[self.photo_act].split('/')[-1].split('_')[1:][0]
-        print(GREEN + 'RENAME: ' + EOC + new)
+        if self.devMode:
+            print(GREEN + 'RENAME: ' + EOC + new)
         os.rename(self.photos[self.photo_act], new)
         self.photos[self.photo_act] = new
         if self.auto_next == True:
@@ -202,7 +230,8 @@ class SecondTab(object):
     def del_photo(self):
         if len(self.photos) == 0:
             return
-        print(RED + 'REMOVE: ' + EOC + self.photos[self.photo_act])
+        if self.devMode:
+            print(RED + 'REMOVE: ' + EOC + self.photos[self.photo_act])
         os.remove(self.photos[self.photo_act])
         self.photos.pop(self.photo_act)
         if self.photo_act >= len(self.photos):

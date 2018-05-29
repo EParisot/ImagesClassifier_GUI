@@ -24,8 +24,9 @@ from srcs.layers import layers_list
 
 class ThirdTab(object):
 
-    def __init__(self, app):
+    def __init__(self, app, devMode):
         self.app = app
+        self.devMode = devMode
 
         self.saved = False
         
