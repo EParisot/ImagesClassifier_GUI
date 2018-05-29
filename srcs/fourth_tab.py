@@ -13,17 +13,13 @@ import os
 import configparser
 from time import time, localtime, strftime, sleep
 
-import imutils
-from imutils.video import VideoStream
-import cv2
-import numpy as np
-import threading
-
-import Tk_Tooltips
+import srcs.Tk_Tooltips as ttp
 
 class FourthTab(object):
 
-    def __init__(self, app):
+    def __init__(self, app, devMode):
+        self.app = app
+        self.devMode = devMode
         self.train_frame = Frame(app.fourth_tab)
         self.train_frame.grid(row=0, column=0, stick='n')
         self.train_frame.grid_columnconfigure(0, weight=1)

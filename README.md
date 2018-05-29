@@ -3,69 +3,32 @@ Graphic implementation of the famous "Patate42"
 
 
 
-#### Download and Install Anaconda Python 3.6
+#### Download and Install Anaconda Python 3
 
 https://www.continuum.io/downloads
 
-#### Change to desired folder
-
+#### Clone Repo
 ```
-cd patate_for_kids
-```
-
-### Create the environment
-
-```
-conda env create
+git clone "https://github.com/EParisot/Patate_for_kids.git"
 ```
 
-wait for the environment to create.
-
-#### Activate the environment (Mac/Linux)
-```
-source activate patate_for_kids
-```
-
-#### Activate the environment (Windows)
-```
-activate patate_for_kids
-```
-
-Check that your prompt changed to
+#### Change to repo's folder:
 
 ```
-(patate_for_kids) $
+cd Patate_for_kids
 ```
 
-### And then start the program:
+#### Install for your system (WIN, MACOS, RPI):
 
 ```
-(patate_for_kids) $python Patate_for_kids.py
+./install_???.sh
 ```
+wait for Anaconda to build environnement
 
-You are good to go !!
-========================
-
-#### Stop the environnement :
+#### Start program:
 
 ```
-source deactivate
+./run.sh
 ```
 
-#### deactivate the environment (Windows 10):
-
-```
-deactivate patate_for_kids
-```
-
-#### delete the environment:
-
-```
-conda env remove patate_for_kids
-```
-
-These instructions have been tested on:
-
-- Mac OSX Sierra 10.12.4
-- Ubuntu 16.04
-- Windows 10
+### Enjoy !!
