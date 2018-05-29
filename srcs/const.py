@@ -31,14 +31,14 @@ TRAIN_NAME = 'Train'
 
 ##### snap
 SNAP_W = 810
-SNAP_H = 500
+SNAP_H = 600
 SNAP_FPS = 60
 #####
 
 ##### label
 EXT_PHOTOS = ('.png', '.jpg', '.PNG', '.JPG', '.jpeg', '.JPEG')
-WIDTH_IMG = 800
-HEIGHT_IMG = 500
+WIDTH_IMG = 810
+HEIGHT_IMG = 600
 HEIGHT_IMG_INFO = 35
 #####
 

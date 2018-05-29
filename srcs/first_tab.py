@@ -49,19 +49,25 @@ class FirstTab():
         self.panel = None
         self.image = None
 
+        self.snap_w = IntVar()
+        self.snap_w.set(SNAP_W)
+        self.snap_h = IntVar()
+        self.snap_h.set(SNAP_H)
+
         self.none_pic = ImageTk.PhotoImage(Image.open('assets/prev.png'))
         self.cam_pic = ImageTk.PhotoImage(Image.open('assets/webcam.png'))
         self.stop_pic = ImageTk.PhotoImage(Image.open('assets/stop.png'))
         self.snap_pic = ImageTk.PhotoImage(Image.open('assets/snap.png'))
         self.del_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
+        self.settings_pic = ImageTk.PhotoImage(Image.open('assets/settings.png'))
 
         if SYSTEM == 'Rpi':
             self.camera = PiCamera()
-            self.camera.resolution = (SNAP_W, SNAP_H)
+            self.camera.resolution = (self.snap_w.get(), self.snap_h.get())
             self.camera.framerate = SNAP_FPS
             self.camera.hflip = True
             self.camera.vflip = True
-            self.rawCapture = PiRGBArray(self.camera, size=(SNAP_W, SNAP_H))
+            self.rawCapture = PiRGBArray(self.camera, size=(self.snap_w.get(), self.snap_h.get()))
         
         self.video_frame = Frame(self.snap_frame)
         self.video_frame.config(borderwidth=2, relief="sunken", height=SNAP_H, width=SNAP_W)
@@ -79,39 +85,46 @@ class FirstTab():
         command_frame.grid_columnconfigure(3, weight=1)
         command_frame.grid_columnconfigure(4, weight=1)
         command_frame.grid_columnconfigure(5, weight=1)
+        command_frame.grid_columnconfigure(6, weight=1)
         command_frame.grid_rowconfigure(0, weight=1)
 
         cam_handler = lambda: self.open_cam(self)
         stop_handler = lambda: self.stop(self)
         snap_handler = lambda: self.snap(self)
         del_handler = lambda: self.del_snap(self)
+        settings_handler = lambda: self.set_video_param(self)
+
+        settings_but = Button(command_frame)
+        settings_but.config(image=self.settings_pic, command=settings_handler)
+        settings_but.grid(row=0, column=0, padx=10)
+        settings_ttp = ttp.ToolTip(settings_but, 'Setup Camera', msgFunc=None, delay=1, follow=True)     
 
         play_but = Button(command_frame)
         play_but.config(image=self.cam_pic, command=cam_handler)
-        play_but.grid(row=0, column=0, padx=10)
+        play_but.grid(row=0, column=1, padx=10)
         play_ttp = ttp.ToolTip(play_but, 'Start Camera', msgFunc=None, delay=1, follow=True)
 
         stop_but = Button(command_frame)
         stop_but.config(image=self.stop_pic, command=stop_handler)
-        stop_but.grid(row=0, column=1, padx=10)
+        stop_but.grid(row=0, column=2, padx=10)
         stop_ttp = ttp.ToolTip(stop_but, 'Stop Camera', msgFunc=None, delay=1, follow=True)
 
         snap_but = Button(command_frame)
         snap_but.config(image=self.snap_pic, command=snap_handler)
-        snap_but.grid(row=0, column=2, padx=10)
+        snap_but.grid(row=0, column=3, padx=10)
         snap_ttp = ttp.ToolTip(snap_but, 'Snapshot', msgFunc=None, delay=1, follow=True)
 
         self.prev_frame = Label(command_frame, image=self.none_pic)
         self.prev_frame.config(borderwidth=2, relief="sunken", height=120, width=160)
-        self.prev_frame.grid(row=0, column=3)
+        self.prev_frame.grid(row=0, column=4)
 
         del_but = Button(command_frame)
         del_but.config(image=self.del_pic, command=del_handler)
-        del_but.grid(row=0, column=4, sticky="se")
+        del_but.grid(row=0, column=5, sticky="se")
         del_but = ttp.ToolTip(del_but, 'Remove last Snap', msgFunc=None, delay=1, follow=True)
  
         count_frame = Frame(command_frame)
-        count_frame.grid(row=0, column=5, sticky='w')
+        count_frame.grid(row=0, column=6, sticky='w')
         count_frame.grid_columnconfigure(0, weight=1)
         count_frame.grid_rowconfigure(0, weight=1)
         count_frame.grid_rowconfigure(0, weight=1)
@@ -131,7 +144,7 @@ class FirstTab():
                     break
                 ret, self.video = self.vs.read()
                 if ret is True:
-                    self.video = imutils.resize(self.video, width=800)
+                    self.video = imutils.resize(self.video, width=self.snap_w.get() - 10)
                     image = cv2.cvtColor(self.video, cv2.COLOR_BGR2RGB)
                     image = Image.fromarray(image)
                     try:
@@ -174,6 +187,71 @@ class FirstTab():
             self.panel.image = None
             self.frame = None
 
+    def set_video_param(self, event):
+        self.video_param_frame = tk.Toplevel()
+        self.video_param_frame.geometry("%dx%d+%d+%d" % (LAYER_INFO_W, LAYER_INFO_H, 200, 200))
+        self.video_param_frame.title("Set Video Size")
+        self.video_param_frame.transient(self.app)
+        self.video_param_frame.grab_set()
+
+        labels = tk.Label(self.video_param_frame)
+        labels.grid(row=0, column=0, sticky='nsw')
+        labels.grid_rowconfigure(0, weight=1)
+        labels.grid_rowconfigure(1, weight=1)
+        labels.grid_rowconfigure(2, weight=1)
+        labels.grid_rowconfigure(3, weight=1)
+        labels.grid_columnconfigure(0, weight=1)
+        labels.grid_columnconfigure(1, weight=1)
+        labels.grid_columnconfigure(2, weight=1)
+
+        label_0 = tk.Label(labels)
+        label_0.config(text='Video Settings:', font=("Helvetica", 18))
+        label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
+        
+        label_1 = tk.Label(labels)
+        label_1.config(text='Width:', font=("Helvetica", 14))
+        label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
+
+        self.width = tk.StringVar()
+        self.width.set(str(self.snap_w.get() - 10))
+        
+        val_1 = tk.Entry(labels, width=10, textvariable=self.width)
+        val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
+
+        self.heigth = tk.StringVar()
+        self.heigth.set(str(self.snap_h.get()))
+
+        if SYSTEM == 'Rpi':
+            label_2 = tk.Label(labels)
+            label_2.config(text='Heigth:', font=("Helvetica", 14))
+            label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
+
+            val_2 = tk.Entry(labels, width=10, textvariable=self.heigth)
+            val_2.grid(row=2, column=2, sticky='nse', padx=5, pady=10)
+        else:
+            self.heigth.set(str(round((3/4) * int(self.width.get()))))
+            
+        save_dense = lambda _: self.save_video_param(self.width, self.heigth)
+        
+        save_but = tk.Button(labels)
+        save_but.config(text='Save', font=("Helvetica", 16))
+        save_but.bind("<ButtonPress-1>", save_dense)
+        save_but.bind("<Return>", save_dense)
+        save_but.grid(row=3, column=1, sticky='nsew', padx=5, pady=10)
+
+        val_1.focus_set()
+
+    def save_video_param(self, width, heigth):
+        try:
+            if int(width.get()) <= SNAP_W and int(heigth.get()) <= SNAP_H:
+                self.snap_w.set(int(width.get()) + 10)
+                self.snap_h.set(int(heigth.get()))
+                self.video_param_frame.destroy()
+            else:
+                showwarning("Error", "Too large value(s)")
+        except ValueError:
+            showwarning("Error", "Wrong value(s)")
+
     def open_cam(event, self):
         if self.thread.is_alive():
             showwarning("Video already running", "Please stop the video before you start again")
@@ -214,9 +292,20 @@ class FirstTab():
             showwarning("No video running", "Please Start the video before you take a snap")
 
     def del_snap(event, self):
-        os.remove(self.picname)
-        self.count.set(self.count.get() - 1)
-        self.prev_frame.config(image=self.none_pic)
+        try:
+            dir_list = os.listdir(self.app.snap_path.get())
+            if len(dir_list) > 0:
+                os.remove(self.app.snap_path.get() + '/' + dir_list[-1])
+                dir_list = os.listdir(self.app.snap_path.get())
+                if len(dir_list) > 0:
+                    image = ImageTk.PhotoImage(Image.open(self.app.snap_path.get() + '/' + dir_list[-1]).resize((160, 120), Image.ANTIALIAS))
+                else:
+                    image = self.none_pic
+                self.count.set(self.count.get() - 1)
+                self.prev_frame.config(image=image)
+                self.prev_frame.image = image
+        except FileNotFoundError:
+            showwarning("File not found", "No file to remove")
 
     def on_quit(self):
         if self.thread.is_alive():
