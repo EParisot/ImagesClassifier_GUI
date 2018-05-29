@@ -306,7 +306,7 @@ class ThirdTab(object):
             self.app.config(cursor="")
             return
 
-        # Import Keras
+        # Import Keras ######
         from  keras.models import Sequential, Model
         from keras.layers import Input, Conv2D, Dense, Flatten, Dropout, Activation, MaxPooling2D
         import keras.backend as K
@@ -382,7 +382,7 @@ class ThirdTab(object):
                         padding = 'valid'
 
                     # Build Conv2D Layer with Keras Sequential API
-                    model.add(Conv2D(filters=filters, input_shape=input_shape, kernel_size=(kernel_size_x, kernel_size_y), strides=(stride_x, stride_y), padding=padding))
+                    model.add(Conv2D(filters=filters, input_shape=input_shape, kernel_size=(kernel_size_y, kernel_size_x), strides=(stride_y, stride_x), padding=padding))
                         
                 except ValueError:
                     showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[first_layer_id]['tag']));
@@ -466,7 +466,7 @@ class ThirdTab(object):
                         padding = 'valid'
 
                     # Build Conv2D Layer with Keras Sequential API
-                    model.add(Conv2D(filters=filters, kernel_size=(kernel_size_x, kernel_size_y), input_shape=input_shape, strides=(stride_x, stride_y), padding=padding))
+                    model.add(Conv2D(filters=filters, kernel_size=(kernel_size_y, kernel_size_x), input_shape=input_shape, strides=(stride_y, stride_x), padding=padding))
 
                 except ValueError:
                     showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[item]['tag']));
@@ -511,7 +511,7 @@ class ThirdTab(object):
 
                     # Build Max Pooling Layer with Keras Sequential API
                     if stride_x > 0 and stride_y > 0:
-                        strides = (stride_x, stride_y)
+                        strides = (stride_y, stride_x)
                     else:
                         strides = None
                     model.add(MaxPooling2D(pool_size=(pool_size_x, pool_size_y), strides=strides, padding=padding))
