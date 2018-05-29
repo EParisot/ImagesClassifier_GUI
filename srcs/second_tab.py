@@ -35,8 +35,8 @@ class SecondTab(object):
         self.fen = {
             'fen' : None,
             'lab_photo' : None,
-#            'slide_height1' : None,
-#            'slide_height2' : None,
+            'slide_height1' : None,
+            'slide_height2' : None,
             'photo' : None,
             'lab_info' : None
         }
@@ -245,16 +245,16 @@ class SecondTab(object):
         image = Image.open(self.photos[self.photo_act])
         image = image.resize((WIDTH_IMG, HEIGHT_IMG - 50), Image.ANTIALIAS)
         self.fen['photo'] = ImageTk.PhotoImage(image)
-#        if self.fen['slide_height1'] == None:
-#            self.fen['slide_height1'] = Scale(self.fen['fen'],from_=image.size[1],
-#                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
-#            self.fen['slide_height1'].grid(row=0, column=0)
+        if self.fen['slide_height1'] == None:
+            self.fen['slide_height1'] = Scale(self.fen['fen'],from_=image.size[1],
+                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
+            self.fen['slide_height1'].grid(row=0, column=1)
         self.fen['lab_photo'] = Label(self.fen['fen'], image=self.fen['photo'])
         self.fen['lab_photo'].grid(row=0, column=0)
-#        if self.fen['slide_height2'] == None:
-#            self.fen['slide_height2'] = Scale(self.fen['fen'], from_=image.size[1],
-#                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
-#            self.fen['slide_height2'].grid(row=0, column=2)
+        if self.fen['slide_height2'] == None:
+            self.fen['slide_height2'] = Scale(self.fen['fen'], from_=image.size[1],
+                    to=0, orient=VERTICAL, length=HEIGHT_IMG - 50)
+            self.fen['slide_height2'].grid(row=0, column=2)
         self.fen['lab_info'] = Label(self.fen['fen'], width=32, height=2, font=("Courier", 40))
         self.fen['lab_info']['text'] = 'label: ' + self.get_label() + '\t\t' + str(self.photo_act) + '/' + str(len(self.photos))
         self.fen['lab_info'].grid(row=1, column=0)
@@ -296,7 +296,10 @@ class SecondTab(object):
             new += label + '_' + self.photos[self.photo_act].split('/')[-1].split('_')[1:][0]
         if self.devMode:
             print(GREEN + 'RENAME: ' + EOC + new)
-        os.rename(self.photos[self.photo_act], new)
+        try:
+            os.rename(self.photos[self.photo_act], new)
+        except FileExistsError:
+            pass
         self.photos[self.photo_act] = new
         if self.auto_next == True:
             self.next_photo()
