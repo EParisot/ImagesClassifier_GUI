@@ -36,10 +36,10 @@ if __name__ == '__main__':
             if arg in ('--usage', '--help'):
                 print('Usage: python3 Patate_for_kids [--usage] [--develop]\n' + \
                         '\t--usage: print usage\n' + \
-                        '\t--develop: print develloper information')
+                        '\t--develop: print developer information')
                 exit(0)
             elif arg == '--develop':
-                print(GREEN + '[+] ' + EOC + BOLD + 'develop mode activate' + EOC)
+                print(GREEN + '[+] ' + EOC + BOLD + 'develop mode activated' + EOC)
                 devMode = True
 
     app = App()

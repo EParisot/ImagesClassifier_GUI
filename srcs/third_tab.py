@@ -7,7 +7,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import *
 from tkinter.filedialog import *
-from tkinter.scrolledtext import ScrolledText
 
 import os
 import configparser
@@ -51,7 +50,7 @@ class ThirdTab(object):
         self.dropout_pic = ImageTk.PhotoImage(Image.open('assets/dropout.png'))
         self.load_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
         self.save_pic = ImageTk.PhotoImage(Image.open('assets/save.png'))
-        self.compile_pic = ImageTk.PhotoImage(Image.open('assets/stack.png'))
+        self.export_pic = ImageTk.PhotoImage(Image.open('assets/export.png'))
         self.logo_pic = ImageTk.PhotoImage(Image.open('assets/keras.jpeg'))
         self.clear_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
@@ -80,7 +79,7 @@ class ThirdTab(object):
         load_handler = lambda: self.load(self)
         save_handler = lambda: self.save(self)
         clear_handler = lambda: self.clear(self)
-        compile_handler = lambda: self.compile(self)
+        export_handler = lambda: self.export(self)
 
         load_but = Button(command_frame)
         load_but.config(image=self.load_pic, command=load_handler)
@@ -89,19 +88,19 @@ class ThirdTab(object):
 
         save_but = Button(command_frame)
         save_but.config(image=self.save_pic, command=save_handler)
-        save_but.grid(row=1, column=1, padx=10, pady=10)
+        save_but.grid(row=0, column=2, padx=10, pady=10)
         save_but_ttp = ttp.ToolTip(save_but, 'Save Model', msgFunc=None, delay=1, follow=True)
 
-        compile_but = Button(command_frame)
-        compile_but.config(image=self.compile_pic, command=compile_handler)
-        compile_but.grid(row=1, column=2, padx=10, pady=10)
-        compile_but_ttp = ttp.ToolTip(compile_but, 'Compile Model', msgFunc=None, delay=1, follow=True)
+        export_but = Button(command_frame)
+        export_but.config(image=self.export_pic, command=export_handler)
+        export_but.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
+        export_but_ttp = ttp.ToolTip(export_but, 'Export Model', msgFunc=None, delay=1, follow=True)
 
         powered_label = Label(command_frame, text="powered by:")
-        powered_label.grid(row=2, column=2, sticky="sew")
+        powered_label.grid(row=2, column=1, columnspan=2, sticky="nsew")
 
         logo_label = Label(command_frame, image=self.logo_pic)
-        logo_label.grid(row=3, column=2, sticky="ne")
+        logo_label.grid(row=3, column=1, columnspan=2, sticky="new")
 
         clear_but = Button(command_frame)
         clear_but.config(image=self.clear_pic, command=clear_handler)
@@ -254,9 +253,9 @@ class ThirdTab(object):
     def modified(self, event):
         self.saved.set(False)
 
-    def compile(self, event):
+    def export(self, event):
         if self.saved.get() == False:
-            showwarning("Error", "Save model before you compile it.");
+            showwarning("Error", "Save model before you export it.");
             return
         self.app.config(cursor="wait")
         self.app.update()
@@ -584,7 +583,9 @@ class ThirdTab(object):
             
             i = i + 1
 
-        model.summary()
+        # Verbose output
+        if self.devMode == True:
+            model.summary()
 
         model.save(self.filename.split('.')[0] + ".h5py");
 

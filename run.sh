@@ -9,6 +9,6 @@ then
 	deactivate
 else
 	source activate patate_for_kids
-	python Patate_for_kids.py
+	python Patate_for_kids.py $1
 	source deactivate
 fi
