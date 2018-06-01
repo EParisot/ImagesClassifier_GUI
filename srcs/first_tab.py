@@ -38,7 +38,7 @@ class FirstTab():
         self.devMode = devMode
         
         self.snap_frame = Frame(self.app.first_tab)
-        self.snap_frame.grid(row=0, column=0, sticky="n")
+        self.snap_frame.grid(row=0, column=0, sticky="nsew")
         self.snap_frame.grid_columnconfigure(0, weight=1)
         self.snap_frame.grid_columnconfigure(1, weight=1)
         self.snap_frame.grid_columnconfigure(2, weight=1)
