@@ -209,8 +209,6 @@ class SecondTab(object):
         except FileNotFoundError:
             self.photos = []
         self.photo_act = 0
-        if len(self.photos) == 0:
-            return
 
         for i in range(len(self.photos) - 1, -1, -1):
             remove = 1
@@ -226,13 +224,16 @@ class SecondTab(object):
 
 
     def print_win(self):
-        if len(self.photos) == 0:
-            return
 
-        pic = Image.open(self.photos[self.photo_act])
-        image = ImageTk.PhotoImage(pic)
+        if len(self.photos) > 0:
+            pic = Image.open(self.photos[self.photo_act])
+            image = ImageTk.PhotoImage(pic)
+        else:
+            pic = Image.open('assets/prev.png')
+            image = ImageTk.PhotoImage(pic)
             
         self.pic_frame = Frame(self.label_frame)
+        self.pic_frame.config(height=SNAP_H + 100, width=SNAP_W + 100)
         self.pic_frame.grid(row=0, column=1, sticky='nsew')
         self.pic_frame.grid_rowconfigure(0, weight=1)
         self.pic_frame.grid_rowconfigure(1, weight=1)
@@ -240,51 +241,54 @@ class SecondTab(object):
         self.pic_frame.grid_columnconfigure(0, weight=1)
         self.pic_frame.grid_columnconfigure(1, weight=1)
         self.pic_frame.grid_columnconfigure(2, weight=1)
+        self.pic_frame.grid_propagate(0)
         
-
-        self.pic_canvas = Canvas(self.pic_frame)
+        self.pic_canvas = Canvas(self.pic_frame, borderwidth=2, relief="sunken", height=SNAP_H, width=SNAP_W)
         self.pic_canvas.grid(row=1, column=1, sticky="nsew")
-        self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
+        self.pic_canvas.create_image((SNAP_W / 2) - (pic.size[0] / 2) , (SNAP_H / 2) - (pic.size[1] / 2), image=image, anchor=NW)
         self.pic_canvas.image = image
-        
 
-        h1 = IntVar()
-        h1.set(0)
-        self.h1_id = None
-        h2 = IntVar()
-        h2.set(pic.size[1])
-        self.h2_id = None
-        w1 = IntVar()
-        w1.set(0)
-        self.w1_id = None
-        w2 = IntVar()
-        w2.set(pic.size[0])
-        self.w2_id = None
-        
-        h1_handler = lambda _: self.draw_h1(h1.get(), pic.size[0])
-        self.slide_height1 = Scale(self.pic_frame ,from_=0, to=pic.size[1], orient=VERTICAL, length=pic.size[1], variable=h1, command=h1_handler)
-        self.slide_height1.grid(row=1, column=0, sticky="nse")
+            
+        if len(self.photos) > 0:
 
-        h2_handler = lambda _: self.draw_h2(h2.get(), pic.size[0], pic.size[1])
-        self.slide_height2 = Scale(self.pic_frame, from_=0, to=pic.size[1], orient=VERTICAL, length=pic.size[1], variable=h2, command=h2_handler)
-        self.slide_height2.grid(row=1, column=2, sticky="nsw")
+            h1 = IntVar()
+            h1.set(0)
+            self.h1_id = None
+            h2 = IntVar()
+            h2.set(pic.size[1])
+            self.h2_id = None
+            w1 = IntVar()
+            w1.set(0)
+            self.w1_id = None
+            w2 = IntVar()
+            w2.set(pic.size[0])
+            self.w2_id = None
+            
+            h1_handler = lambda _: self.draw_h1(h1.get(), pic.size[0])
+            self.slide_height1 = Scale(self.pic_frame ,from_=0, to=pic.size[1], orient=VERTICAL, length=pic.size[1], variable=h1, command=h1_handler)
+            self.slide_height1.grid(row=1, column=0, sticky="nse")
 
-        w1_handler = lambda _: self.draw_w1(w1.get(), pic.size[1])
-        self.slide_width1 = Scale(self.pic_frame ,from_=0, to=pic.size[0], orient=HORIZONTAL, length=pic.size[0], variable=w1, command=w1_handler)
-        self.slide_width1.grid(row=0, column=1, sticky="sew")
+            h2_handler = lambda _: self.draw_h2(h2.get(), pic.size[0], pic.size[1])
+            self.slide_height2 = Scale(self.pic_frame, from_=0, to=pic.size[1], orient=VERTICAL, length=pic.size[1], variable=h2, command=h2_handler)
+            self.slide_height2.grid(row=1, column=2, sticky="nsw")
 
-        w2_handler = lambda _: self.draw_w2(w2.get(), pic.size[0], pic.size[1])
-        self.slide_width2 = Scale(self.pic_frame, from_=0, to=pic.size[0], orient=HORIZONTAL, length=pic.size[0], variable=w2, command=w2_handler)
-        self.slide_width2.grid(row=2, column=1, sticky="new")
+            w1_handler = lambda _: self.draw_w1(w1.get(), pic.size[1])
+            self.slide_width1 = Scale(self.pic_frame ,from_=0, to=pic.size[0], orient=HORIZONTAL, length=pic.size[0], variable=w1, command=w1_handler)
+            self.slide_width1.grid(row=0, column=1, sticky="sew")
+
+            w2_handler = lambda _: self.draw_w2(w2.get(), pic.size[0], pic.size[1])
+            self.slide_width2 = Scale(self.pic_frame, from_=0, to=pic.size[0], orient=HORIZONTAL, length=pic.size[0], variable=w2, command=w2_handler)
+            self.slide_width2.grid(row=2, column=1, sticky="new")
 
         self.lab_info1 = Label(self.label_frame, height=2, width=15, font=("Courier", 20))
-        self.lab_info1.config(borderwidth=2, relief="sunken", text='Labelized : \n' + str(self.photo_act) + '/' + str(len(self.photos)))
-        self.lab_info1.grid(row=0, column=2, padx=20, sticky="nsew")
-        
+        self.lab_info1.config(borderwidth=2, relief="sunken", text='Photo(s) : \n' + str(self.photo_act) + '/' + str(len(self.photos)))
+        self.lab_info1.grid(row=0, column=2, padx=20, sticky="ew")
+            
         self.lab_info2 = Label(self.command_frame, height=2, width=15, font=("Courier", 20))
         self.lab_info2.config(borderwidth=2, relief="sunken", text='Label: ' + self.get_label())
         self.lab_info2.grid(row=5, column=0, columnspan=2, padx=20, sticky="nsew")
-
+            
+            
     def draw_h1(self, h1, w):
         self.pic_canvas.delete(self.h1_id)
         self.h1_id = self.pic_canvas.create_rectangle(0, h1, w, 0, fill="black")
@@ -350,8 +354,6 @@ class SecondTab(object):
 
 
     def get_label(self):
-        if len(self.photos) == 0:
-            return
         try:
             char = self.photos[self.photo_act].split('/')[-1].split('_')[0]
             if len(char) == 1 and char in KEY_LABEL_CHARS:
