@@ -38,7 +38,7 @@ class App(tk.Tk):
 
         self.dir_open_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
         self.save_pic = ImageTk.PhotoImage(Image.open('assets/save.png'))
-                                               
+
         self.cfg = configparser.ConfigParser()
         self.cfg.read(FILE_CONFIG)
         self.snap_path = StringVar()
