@@ -123,8 +123,8 @@ class FirstTab():
         del_but.grid(row=0, column=5, sticky="se")
         del_but = ttp.ToolTip(del_but, 'Remove last Snap', msgFunc=None, delay=1, follow=True)
  
-        count_frame = Frame(command_frame)
-        count_frame.grid(row=0, column=6, sticky='w')
+        count_frame = Frame(command_frame, borderwidth=2, relief="sunken")
+        count_frame.grid(row=0, column=6, sticky='w', padx=10)
         count_frame.grid_columnconfigure(0, weight=1)
         count_frame.grid_rowconfigure(0, weight=1)
         count_frame.grid_rowconfigure(0, weight=1)
