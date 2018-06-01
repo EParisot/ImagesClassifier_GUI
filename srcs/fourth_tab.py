@@ -56,7 +56,7 @@ class FourthTab(object):
         self.labo_photos_pic = ImageTk.PhotoImage(Image.open('assets/edit_pic.png'))
         self.resize_pic = ImageTk.PhotoImage(Image.open('assets/resize.png'))
         self.crop_pic = ImageTk.PhotoImage(Image.open('assets/crop.png'))
-        self.train_model_pic = ImageTk.PhotoImage(Image.open('assets/train.png'))
+        self.train_model_pic = ImageTk.PhotoImage(Image.open('assets/brain.png'))
         self.accolade_pic = ImageTk.PhotoImage(Image.open('assets/accolade.png'))
         self.accolade_v1_pic = ImageTk.PhotoImage(Image.open('assets/accolade_v1.png'))
         self.accolade_v2_pic = ImageTk.PhotoImage(Image.open('assets/accolade_v2.png'))
@@ -64,7 +64,7 @@ class FourthTab(object):
         load_dataset_handler = lambda: self.load_dataset(self)
         self.load_dataset_but = Button(command_frame)
         self.load_dataset_but.config(image=self.load_dataset_pic, command=load_dataset_handler)
-        self.load_dataset_but.grid(row=0, column=0, padx=10, pady=10)
+        self.load_dataset_but.grid(row=0, column=0, padx=10, pady=5)
         self.load_dataset_ttp = ttp.ToolTip(self.load_dataset_but, 'Select Dataset folder', msgFunc=None, delay=1, follow=True)
 
         accolade_v1_label = Label(command_frame, image=self.accolade_v1_pic)
@@ -108,7 +108,6 @@ class FourthTab(object):
         self.pix_out = StringVar()
         self.out_model = StringVar()
 
-
         w_out = Label(checks_label, textvariable=self.w_out, font=("Helvetica", 16), borderwidth=2, relief="ridge", width=5)
         w_out.grid(row=0, column=2, sticky='nwe', padx=5)
         h_out = Label(checks_label, textvariable=self.h_out, font=("Helvetica", 16), borderwidth=2, relief="ridge", width=5)
@@ -124,7 +123,7 @@ class FourthTab(object):
         labo_photos_handler = lambda: self.labo_photos(self.images)
         self.labo_photos_but = Button(command_frame)
         self.labo_photos_but.config(image=self.labo_photos_pic, command=labo_photos_handler, state="disabled")
-        self.labo_photos_but.grid(row=1, column=0, padx=10, pady=10)
+        self.labo_photos_but.grid(row=1, column=0, padx=10, pady=5, sticky="n")
         self.labo_photos_ttp = ttp.ToolTip(self.labo_photos_but, 'Crop pictures', msgFunc=None, delay=1, follow=True)
         
         load_model_handler = lambda: self.load_model(self)
@@ -136,11 +135,11 @@ class FourthTab(object):
         train_handler = lambda: self.train_model(self)
         self.train_model_but = Button(command_frame)
         self.train_model_but.config(image=self.train_model_pic, command=train_handler, state="disabled")
-        self.train_model_but.grid(row=2, column=5, padx=10, pady=10)
+        self.train_model_but.grid(row=2, column=5, padx=10, pady=5, sticky="n")
         self.train_model_ttp = ttp.ToolTip(self.train_model_but, 'Train Model', msgFunc=None, delay=1, follow=True)
 
         hyper_param_frame = Frame(command_frame, borderwidth=2, relief="sunken")
-        hyper_param_frame.grid(row=0, column=5, sticky='nw', padx=5, pady=40)
+        hyper_param_frame.grid(row=0, column=5, sticky='nw', padx=5, pady=10)
         hyper_param_frame.grid_rowconfigure(0, weight=1)
         hyper_param_frame.grid_rowconfigure(1, weight=1)
         hyper_param_frame.grid_columnconfigure(0, weight=1)
@@ -193,7 +192,7 @@ class FourthTab(object):
         self.stop_entry.grid(row=1, column=5, padx=5, pady=5)
 
         accolade_label = Label(command_frame, image=self.accolade_pic)
-        accolade_label.grid(row=1, column=5, sticky="nsew")
+        accolade_label.grid(row=1, column=5, sticky="new")
 
     def grey_patience(self):
         if self.stop_on.get() == 1:
