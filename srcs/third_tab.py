@@ -29,7 +29,7 @@ class ThirdTab(object):
         self.saved.set(False)
         
         self.model_frame = Frame(app.third_tab)
-        self.model_frame.grid(row=0, column=0, stick='n')
+        self.model_frame.grid(row=0, column=0, stick='nsew')
         self.model_frame.grid_columnconfigure(0, weight=1)
         self.model_frame.grid_columnconfigure(1, weight=1)
         self.model_frame.grid_columnconfigure(2, weight=1)

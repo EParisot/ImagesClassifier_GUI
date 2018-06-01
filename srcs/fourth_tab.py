@@ -34,7 +34,7 @@ class FourthTab(object):
         self.labels = None
         
         self.train_frame = Frame(app.fourth_tab)
-        self.train_frame.grid(row=0, column=0, stick='n')
+        self.train_frame.grid(row=0, column=0, stick='nsew')
         self.train_frame.grid_columnconfigure(0, weight=1)
         self.train_frame.grid_rowconfigure(0, weight=1)
 
@@ -87,7 +87,7 @@ class FourthTab(object):
             self.images = np.array(self.images)
             self.images /= 255
             
-            #convert labels to dummy values ---->>> ADD BUTTON TO CHECK/MODIFY LABELS
+            #convert labels to dummy values
             self.labels = np.array(self.labels)
             self.labels = np.array(pd.get_dummies(self.labels))
             

@@ -35,7 +35,6 @@ class SecondTab(object):
         self.label_frame.grid_columnconfigure(2, weight=1)
         self.label_frame.grid_rowconfigure(0, weight=1)
 
-
         self.command_frame = Frame(self.label_frame)
         self.command_frame.grid(row=0, column=0, sticky='n')
         self.command_frame.grid_rowconfigure(0, weight=1)
@@ -245,7 +244,7 @@ class SecondTab(object):
         
         self.pic_canvas = Canvas(self.pic_frame, borderwidth=2, relief="sunken", height=SNAP_H, width=SNAP_W)
         self.pic_canvas.grid(row=1, column=1, sticky="nsew")
-        self.pic_canvas.create_image((SNAP_W / 2) - (pic.size[0] / 2) , (SNAP_H / 2) - (pic.size[1] / 2), image=image, anchor=NW)
+        self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
         self.pic_canvas.image = image
 
             

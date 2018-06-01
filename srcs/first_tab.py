@@ -38,7 +38,7 @@ class FirstTab():
         self.devMode = devMode
         
         self.snap_frame = Frame(self.app.first_tab)
-        self.snap_frame.grid(row=0, column=0, sticky="n")
+        self.snap_frame.grid(row=0, column=0, sticky="nsew")
         self.snap_frame.grid_columnconfigure(0, weight=1)
         self.snap_frame.grid_columnconfigure(1, weight=1)
         self.snap_frame.grid_columnconfigure(2, weight=1)
@@ -73,7 +73,7 @@ class FirstTab():
         
         self.video_frame = Frame(self.snap_frame)
         self.video_frame.config(borderwidth=2, relief="sunken", height=SNAP_H, width=SNAP_W)
-        self.video_frame.grid(row=0, column=1, pady=50, padx=50)
+        self.video_frame.grid(row=0, column=1, pady=40)
         self.video_frame.grid_propagate(0)
 
         self.count = IntVar()
@@ -98,35 +98,35 @@ class FirstTab():
 
         settings_but = Button(command_frame)
         settings_but.config(image=self.settings_pic, command=settings_handler)
-        settings_but.grid(row=0, column=0, padx=10)
+        settings_but.grid(row=0, column=0, padx=10, pady=5)
         settings_ttp = ttp.ToolTip(settings_but, 'Setup Camera', msgFunc=None, delay=1, follow=True)     
 
         play_but = Button(command_frame)
         play_but.config(image=self.cam_pic, command=cam_handler)
-        play_but.grid(row=1, column=0, padx=10)
+        play_but.grid(row=1, column=0, padx=10, pady=5)
         play_ttp = ttp.ToolTip(play_but, 'Start Camera', msgFunc=None, delay=1, follow=True)
 
         stop_but = Button(command_frame)
         stop_but.config(image=self.stop_pic, command=stop_handler)
-        stop_but.grid(row=2, column=0, padx=10)
+        stop_but.grid(row=2, column=0, padx=10, pady=5)
         stop_ttp = ttp.ToolTip(stop_but, 'Stop Camera', msgFunc=None, delay=1, follow=True)
 
         snap_but = Button(command_frame)
         snap_but.config(image=self.snap_pic, command=snap_handler)
-        snap_but.grid(row=3, column=0, padx=10)
+        snap_but.grid(row=3, column=0, padx=10, pady=5)
         snap_ttp = ttp.ToolTip(snap_but, 'Snapshot', msgFunc=None, delay=1, follow=True)
 
         self.prev_frame = Label(command_frame, image=self.none_pic)
         self.prev_frame.config(borderwidth=2, relief="sunken", height=120, width=160)
-        self.prev_frame.grid(row=4, column=0)
+        self.prev_frame.grid(row=4, column=0, pady=5)
 
         del_but = Button(command_frame)
         del_but.config(image=self.del_pic, command=del_handler)
-        del_but.grid(row=5, column=0, sticky="se")
+        del_but.grid(row=5, column=0, sticky="se", pady=5)
         del_but = ttp.ToolTip(del_but, 'Remove last Snap', msgFunc=None, delay=1, follow=True)
  
         count_frame = Frame(command_frame, borderwidth=2, relief="sunken")
-        count_frame.grid(row=6, column=0, sticky='w', padx=10)
+        count_frame.grid(row=6, column=0, sticky='w', padx=5)
         count_frame.grid_columnconfigure(0, weight=1)
         count_frame.grid_rowconfigure(0, weight=1)
         count_frame.grid_rowconfigure(1, weight=1)
