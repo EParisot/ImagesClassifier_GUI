@@ -26,6 +26,7 @@ class FourthTab(object):
     def __init__(self, app, devMode):
         self.app = app
         self.devMode = devMode
+        
         self.model = None
         self.model_filename = None
         self.input_shape = None

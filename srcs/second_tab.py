@@ -293,8 +293,8 @@ class SecondTab(object):
 
         self.pic_canvas = Canvas(self.pic_frame, borderwidth=2, relief="sunken")
         self.pic_canvas.grid(row=1, column=1, sticky="nsew")
-        self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
-        self.pic_canvas.image = image
+        #self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
+        #self.pic_canvas.image = image
 
         self.h1 = IntVar()
         self.h1.set(0)
@@ -412,13 +412,16 @@ class SecondTab(object):
 
 
     def del_photo(self):
-        if len(self.photos) == 0:
-            return
-        if self.devMode:
-            print(RED + 'REMOVE: ' + EOC + self.photos[self.photo_act])
-        if self.photos[self.photo_act].endswith(EXT_PHOTOS):
-            os.remove(self.photos[self.photo_act])
-            self.photos.pop(self.photo_act)
-            if self.photo_act >= len(self.photos):
-                self.photo_act = 0
+        if len(self.photos) != 0 and self.photos[self.photo_act].endswith(EXT_PHOTOS):
+            if self.devMode:
+                print(RED + 'REMOVE: ' + EOC + self.photos[self.photo_act])
+            try:
+                os.remove(self.photos[self.photo_act])
+                self.photos.pop(self.photo_act)
+                if self.photo_act >= len(self.photos):
+                    self.photo_act = 0
+            except:
+               showwarning("File not found", "No file to remove") 
+        else:
+            showwarning("File not found", "No file to remove")
         self.print_win()

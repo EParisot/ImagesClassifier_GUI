@@ -73,7 +73,7 @@ class FirstTab():
         
         self.video_frame = Frame(self.snap_frame)
         self.video_frame.config(borderwidth=2, relief="sunken", height=SNAP_H, width=SNAP_W)
-        self.video_frame.grid(row=0, column=1, pady=40)
+        self.video_frame.grid(row=0, column=1)
         self.video_frame.grid_propagate(0)
 
         self.count = IntVar()
@@ -303,9 +303,13 @@ class FirstTab():
                     image = ImageTk.PhotoImage(Image.open(self.app.snap_path.get() + '/' + dir_list[-1]).resize((160, 120), Image.ANTIALIAS))
                 else:
                     image = self.none_pic
+                    showwarning("File not found", "No file to remove")
                 self.count.set(self.count.get() - 1)
                 self.prev_frame.config(image=image)
                 self.prev_frame.image = image
+            else:
+                image = self.none_pic
+                showwarning("File not found", "No file to remove")
         except FileNotFoundError:
             showwarning("File not found", "No file to remove")
 
