@@ -7,7 +7,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.messagebox import *
 from tkinter.filedialog import *
-from tkinter.scrolledtext import ScrolledText
 
 import os
 import configparser
@@ -51,7 +50,7 @@ class ThirdTab(object):
         self.dropout_pic = ImageTk.PhotoImage(Image.open('assets/dropout.png'))
         self.load_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
         self.save_pic = ImageTk.PhotoImage(Image.open('assets/save.png'))
-        self.compile_pic = ImageTk.PhotoImage(Image.open('assets/stack.png'))
+        self.export_pic = ImageTk.PhotoImage(Image.open('assets/export.png'))
         self.logo_pic = ImageTk.PhotoImage(Image.open('assets/keras.jpeg'))
         self.clear_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
@@ -64,6 +63,8 @@ class ThirdTab(object):
         self.model_canvas.config(borderwidth=2, relief="sunken", height=MODEL_H, width=MODEL_W)
         self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
         self.model_canvas.grid_propagate(0)
+        model_ttp = ttp.ToolTip(self.model_canvas, 'Drop a to add it to the model \n \
+                                        Double clic on a layer to edit it', msgFunc=None, delay=1, follow=True)
 
         command_frame = Frame(self.model_frame)
         command_frame.grid(row=0, column=2, sticky='nsw')
@@ -78,33 +79,33 @@ class ThirdTab(object):
         load_handler = lambda: self.load(self)
         save_handler = lambda: self.save(self)
         clear_handler = lambda: self.clear(self)
-        compile_handler = lambda: self.compile(self)
+        export_handler = lambda: self.export(self)
 
         load_but = Button(command_frame)
         load_but.config(image=self.load_pic, command=load_handler)
         load_but.grid(row=0, column=1, padx=10, pady=10)
-        load_but = ttp.ToolTip(load_but, 'Load Model', msgFunc=None, delay=1, follow=True)
+        load_but_ttp = ttp.ToolTip(load_but, 'Load Model', msgFunc=None, delay=1, follow=True)
 
         save_but = Button(command_frame)
         save_but.config(image=self.save_pic, command=save_handler)
-        save_but.grid(row=1, column=1, padx=10, pady=10)
-        save_but = ttp.ToolTip(save_but, 'Save Model', msgFunc=None, delay=1, follow=True)
+        save_but.grid(row=0, column=2, padx=10, pady=10)
+        save_but_ttp = ttp.ToolTip(save_but, 'Save Model', msgFunc=None, delay=1, follow=True)
 
-        compile_but = Button(command_frame)
-        compile_but.config(image=self.compile_pic, command=compile_handler)
-        compile_but.grid(row=1, column=2, padx=10, pady=10)
-        compile_but = ttp.ToolTip(compile_but, 'Compile Model', msgFunc=None, delay=1, follow=True)
+        export_but = Button(command_frame)
+        export_but.config(image=self.export_pic, command=export_handler)
+        export_but.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
+        export_but_ttp = ttp.ToolTip(export_but, 'Export Model', msgFunc=None, delay=1, follow=True)
 
         powered_label = Label(command_frame, text="powered by:")
-        powered_label.grid(row=2, column=2, sticky="sew")
+        powered_label.grid(row=2, column=1, columnspan=2, sticky="nsew")
 
         logo_label = Label(command_frame, image=self.logo_pic)
-        logo_label.grid(row=3, column=2, sticky="ne")
+        logo_label.grid(row=3, column=1, columnspan=2, sticky="new")
 
         clear_but = Button(command_frame)
         clear_but.config(image=self.clear_pic, command=clear_handler)
         clear_but.grid(row=3, column=0, pady=10, sticky="sw")
-        clear_but = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
+        clear_but_ttp = ttp.ToolTip(clear_but, 'Clear Model', msgFunc=None, delay=1, follow=True)
 
         info = Label(self.model_frame, text="^ Drag layers ^").grid(row=1, column=1)
 
@@ -113,6 +114,7 @@ class ThirdTab(object):
         self.layers_canvas.config(borderwidth=2, relief="sunken", height=235, width=600)
         self.layers_canvas.grid(row=2, column=1, padx=20, pady=10)
         self.layers_canvas.grid_propagate(0)
+        layers_ttp = ttp.ToolTip(self.layers_canvas, 'Drag a layer to upper area to add it to the model', msgFunc=None, delay=1, follow=True)
 
         self.trash_canvas = Canvas(self.model_frame)
         self.trash_canvas.config(borderwidth=2, relief="groove", height=200, width=200)
@@ -120,6 +122,7 @@ class ThirdTab(object):
         self.trash_dnd = dnd.DnD_Container(self.app, self.model_frame, self.trash_canvas)
         self.trash_canvas.grid(row=2, column=2, padx=20, pady=20, stick='w')
         self.trash_canvas.grid_propagate(0)
+        trash_ttp = ttp.ToolTip(self.trash_canvas, 'Drop a layer to remove it', msgFunc=None, delay=1, follow=True)
 
         self.in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
         self.in_layer.attach(self.layers_canvas)
@@ -250,9 +253,9 @@ class ThirdTab(object):
     def modified(self, event):
         self.saved.set(False)
 
-    def compile(self, event):
+    def export(self, event):
         if self.saved.get() == False:
-            showwarning("Error", "Save model before you compile it.");
+            showwarning("Error", "Save model before you export it.");
             return
         self.app.config(cursor="wait")
         self.app.update()
@@ -306,7 +309,7 @@ class ThirdTab(object):
             self.app.config(cursor="")
             return
 
-        # Import Keras
+        # Import Keras ######
         from  keras.models import Sequential, Model
         from keras.layers import Input, Conv2D, Dense, Flatten, Dropout, Activation, MaxPooling2D
         import keras.backend as K
@@ -382,7 +385,7 @@ class ThirdTab(object):
                         padding = 'valid'
 
                     # Build Conv2D Layer with Keras Sequential API
-                    model.add(Conv2D(filters=filters, input_shape=input_shape, kernel_size=(kernel_size_x, kernel_size_y), strides=(stride_x, stride_y), padding=padding))
+                    model.add(Conv2D(filters=filters, input_shape=input_shape, kernel_size=(kernel_size_y, kernel_size_x), strides=(stride_y, stride_x), padding=padding))
                         
                 except ValueError:
                     showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[first_layer_id]['tag']));
@@ -466,7 +469,7 @@ class ThirdTab(object):
                         padding = 'valid'
 
                     # Build Conv2D Layer with Keras Sequential API
-                    model.add(Conv2D(filters=filters, kernel_size=(kernel_size_x, kernel_size_y), input_shape=input_shape, strides=(stride_x, stride_y), padding=padding))
+                    model.add(Conv2D(filters=filters, kernel_size=(kernel_size_y, kernel_size_x), input_shape=input_shape, strides=(stride_y, stride_x), padding=padding))
 
                 except ValueError:
                     showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[item]['tag']));
@@ -511,7 +514,7 @@ class ThirdTab(object):
 
                     # Build Max Pooling Layer with Keras Sequential API
                     if stride_x > 0 and stride_y > 0:
-                        strides = (stride_x, stride_y)
+                        strides = (stride_y, stride_x)
                     else:
                         strides = None
                     model.add(MaxPooling2D(pool_size=(pool_size_x, pool_size_y), strides=strides, padding=padding))
@@ -579,9 +582,11 @@ class ThirdTab(object):
                     return
             
             i = i + 1
-        
-        self.app.config(cursor="")
 
-        model.summary()
+        # Verbose output
+        if self.devMode == True:
+            model.summary()
 
         model.save(self.filename.split('.')[0] + ".h5py");
+
+        self.app.config(cursor="")

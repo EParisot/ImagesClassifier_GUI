@@ -36,11 +36,13 @@ class FirstTab():
     def __init__(self, app, devMode):
         self.app = app
         self.devMode = devMode
+        
         self.snap_frame = Frame(self.app.first_tab)
         self.snap_frame.grid(row=0, column=0, sticky="n")
         self.snap_frame.grid_columnconfigure(0, weight=1)
-        self.snap_frame.grid_rowconfigure(0, weight=1000)
-        self.snap_frame.grid_rowconfigure(1, weight=1)
+        self.snap_frame.grid_columnconfigure(1, weight=1)
+        self.snap_frame.grid_columnconfigure(2, weight=1)
+        self.snap_frame.grid_rowconfigure(0, weight=1)
 
         self.frame = None
         self.vs = None
@@ -71,22 +73,22 @@ class FirstTab():
         
         self.video_frame = Frame(self.snap_frame)
         self.video_frame.config(borderwidth=2, relief="sunken", height=SNAP_H, width=SNAP_W)
-        self.video_frame.grid(row=0, column=0)
+        self.video_frame.grid(row=0, column=1, pady=50, padx=50)
         self.video_frame.grid_propagate(0)
 
         self.count = IntVar()
         self.count.set(0)
 
         command_frame = Frame(self.snap_frame)
-        command_frame.grid(row=1, column=0, sticky='n')
-        command_frame.grid_columnconfigure(0, weight=1)
-        command_frame.grid_columnconfigure(1, weight=1)
-        command_frame.grid_columnconfigure(2, weight=1)
-        command_frame.grid_columnconfigure(3, weight=1)
-        command_frame.grid_columnconfigure(4, weight=1)
-        command_frame.grid_columnconfigure(5, weight=1)
-        command_frame.grid_columnconfigure(6, weight=1)
+        command_frame.grid(row=0, column=0)
         command_frame.grid_rowconfigure(0, weight=1)
+        command_frame.grid_rowconfigure(1, weight=1)
+        command_frame.grid_rowconfigure(2, weight=1)
+        command_frame.grid_rowconfigure(3, weight=1)
+        command_frame.grid_rowconfigure(4, weight=1)
+        command_frame.grid_rowconfigure(5, weight=1)
+        command_frame.grid_rowconfigure(6, weight=1)
+        command_frame.grid_columnconfigure(0, weight=1)
 
         cam_handler = lambda: self.open_cam(self)
         stop_handler = lambda: self.stop(self)
@@ -101,33 +103,33 @@ class FirstTab():
 
         play_but = Button(command_frame)
         play_but.config(image=self.cam_pic, command=cam_handler)
-        play_but.grid(row=0, column=1, padx=10)
+        play_but.grid(row=1, column=0, padx=10)
         play_ttp = ttp.ToolTip(play_but, 'Start Camera', msgFunc=None, delay=1, follow=True)
 
         stop_but = Button(command_frame)
         stop_but.config(image=self.stop_pic, command=stop_handler)
-        stop_but.grid(row=0, column=2, padx=10)
+        stop_but.grid(row=2, column=0, padx=10)
         stop_ttp = ttp.ToolTip(stop_but, 'Stop Camera', msgFunc=None, delay=1, follow=True)
 
         snap_but = Button(command_frame)
         snap_but.config(image=self.snap_pic, command=snap_handler)
-        snap_but.grid(row=0, column=3, padx=10)
+        snap_but.grid(row=3, column=0, padx=10)
         snap_ttp = ttp.ToolTip(snap_but, 'Snapshot', msgFunc=None, delay=1, follow=True)
 
         self.prev_frame = Label(command_frame, image=self.none_pic)
         self.prev_frame.config(borderwidth=2, relief="sunken", height=120, width=160)
-        self.prev_frame.grid(row=0, column=4)
+        self.prev_frame.grid(row=4, column=0)
 
         del_but = Button(command_frame)
         del_but.config(image=self.del_pic, command=del_handler)
-        del_but.grid(row=0, column=5, sticky="se")
+        del_but.grid(row=5, column=0, sticky="se")
         del_but = ttp.ToolTip(del_but, 'Remove last Snap', msgFunc=None, delay=1, follow=True)
  
-        count_frame = Frame(command_frame)
-        count_frame.grid(row=0, column=6, sticky='w')
+        count_frame = Frame(command_frame, borderwidth=2, relief="sunken")
+        count_frame.grid(row=6, column=0, sticky='w', padx=10)
         count_frame.grid_columnconfigure(0, weight=1)
         count_frame.grid_rowconfigure(0, weight=1)
-        count_frame.grid_rowconfigure(0, weight=1)
+        count_frame.grid_rowconfigure(1, weight=1)
 
         snap_count_title = Label(count_frame)
         snap_count_title.config(text="Photos :", font=("Helvetica", 16))

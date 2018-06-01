@@ -7,6 +7,8 @@ from tkinter import ttk
 from tkinter.messagebox import *
 from srcs.const import *
 
+import srcs.Tk_Tooltips as ttp
+
 # The factory function
 
 def dnd_start(source, event):
@@ -306,6 +308,7 @@ class DnD_Container:
                     widget.config(bg='lightgrey')
                     for elem in widget.winfo_children():
                         elem.config(bg='lightgrey')
+                # IN
                 if source.tags[0] == "In":
                     
                     labels = tk.Label(self.param_frame)
@@ -328,32 +331,44 @@ class DnD_Container:
                     label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
                     
                     self.dim_1 = tk.StringVar()
+                    self.dim_1.set(str(self.app.first_tab.snap_h.get()))
                     
                     val_1 = tk.Entry(labels, width=10, textvariable=self.dim_1)
                     val_1.grid(row=1, column=2, sticky='nsw', padx=5, pady=10)
+                    val_1_ttp = ttp.ToolTip(val_1, 'First vector dimension : \n \
+                                            basicaly, the heigth of the pictures \n \
+                                            Mandatory, Default is Video feed size', msgFunc=None, delay=1, follow=True)     
 
                     label_2 = tk.Label(labels)
                     label_2.config(text='Dim 2:', font=("Helvetica", 14))
                     label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
                     
                     self.dim_2 = tk.StringVar()
+                    self.dim_2.set(str(self.app.first_tab.snap_w.get()))
                     
                     val_2 = tk.Entry(labels, width=10, textvariable=self.dim_2)
                     val_2.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
+                    val_2_ttp = ttp.ToolTip(val_2, 'Second vector dimension : \n \
+                                            basicaly, the width of the pictures \n \
+                                            Mandatory, Default is Video feed size', msgFunc=None, delay=1, follow=True)     
 
                     label_3 = tk.Label(labels)
                     label_3.config(text='Dim 3:', font=("Helvetica", 14))
                     label_3.grid(row=3, column=0, sticky='nsw', padx=5, pady=10)
                     
                     self.dim_3 = tk.StringVar()
+                    self.dim_3.set('3')  
                     
                     val_3 = tk.Entry(labels, width=10, textvariable=self.dim_3)
                     val_3.grid(row=3, column=2, sticky='nsw', padx=5, pady=10)
+                    val_3_ttp = ttp.ToolTip(val_3, 'Third vector dimension : \n \
+                                            Define the shape of a single pixel of the pictures \n \
+                                            and represent color mode : \n \
+                                            Mandatory, Default is "3" for colors, use "1" for grayscaled pictures', msgFunc=None, delay=1, follow=True)   
     
 
                     save_in = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
                                                          dim_1=self.dim_1, dim_2=self.dim_2, dim_3=self.dim_3)
-
                     save_but = tk.Button(labels)
                     save_but.config(text='Save', font=("Helvetica", 16))
                     save_but.bind("<ButtonPress-1>", save_in)
@@ -362,6 +377,7 @@ class DnD_Container:
 
                     val_1.focus_set()
                     
+                # Conv2D    
                 elif source.tags[0] == "Conv2d":
                     
                     labels = tk.Label(self.param_frame)
@@ -388,6 +404,9 @@ class DnD_Container:
                     
                     val_1 = tk.Entry(labels, width=10, textvariable=self.filters)
                     val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
+                    val_1_ttp = ttp.ToolTip(val_1, 'Filters number : \n \
+                                            Number of filters you want the layer to apply \n \
+                                            Mandatory', msgFunc=None, delay=1, follow=True)     
                     
                     label_2 = tk.Label(labels)
                     label_2.config(text='Kernel size:', font=("Helvetica", 14))
@@ -397,11 +416,17 @@ class DnD_Container:
                     
                     val_2_x = tk.Entry(labels, width=10, textvariable=self.kernel_size_x)
                     val_2_x.grid(row=2, column=1, sticky='nsw', pady=10)
+                    val_2_x_ttp = ttp.ToolTip(val_2_x, 'Kernel size X : \n \
+                                            Specify the width of the 2D convolution window \n \
+                                            Mandatory', msgFunc=None, delay=1, follow=True)  
 
                     self.kernel_size_y = tk.StringVar()
                     
                     val_2_y = tk.Entry(labels, width=10, textvariable=self.kernel_size_y)
                     val_2_y.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
+                    val_2_y_ttp = ttp.ToolTip(val_2_y, 'Kernel size Y : \n \
+                                            Specify the height of the 2D convolution window \n \
+                                            Mandatory', msgFunc=None, delay=1, follow=True) 
 
                     label_3 = tk.Label(labels)
                     label_3.config(text='Stride:', font=("Helvetica", 14))
@@ -412,12 +437,18 @@ class DnD_Container:
                     
                     val_3_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
                     val_3_x.grid(row=3, column=1, sticky='nsw', pady=10)
+                    val_3_x_ttp = ttp.ToolTip(val_3_x, 'Stride over X : \n \
+                                            Specify the strides of the convolution along the width\n \
+                                            Optional, Default to "1" (keep default if no use)', msgFunc=None, delay=1, follow=True) 
 
                     self.stride_y = tk.StringVar()
                     self.stride_y.set('1')
                     
                     val_3_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
                     val_3_y.grid(row=3, column=2, sticky='nsw', padx=5, pady=10)
+                    val_3_y_ttp = ttp.ToolTip(val_3_y, 'Stride over Y : \n \
+                                            Specify the strides of the convolution along the height\n \
+                                            Optional, Default to "1" (keep default if no use)', msgFunc=None, delay=1, follow=True)
 
                     label_4 = tk.Label(labels)
                     label_4.config(text='Padding:', font=("Helvetica", 14))
@@ -427,11 +458,13 @@ class DnD_Container:
 
                     val_4 = tk.Checkbutton(labels, variable=self.padding)
                     val_4.grid(row=4, column=2, sticky='nsw', padx=5, pady=5)
+                    val_4_ttp = ttp.ToolTip(val_4, 'Padding : \n \
+                                            If checked, pad with zeros while kernel go out of picture\n \
+                                            Optional, Default to unchecked (keep default if no use)', msgFunc=None, delay=1, follow=True)
 
                     save_conv2d = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
                                                                      filters=self.filters, kernel_size_x=self.kernel_size_x, kernel_size_y=self.kernel_size_y,
-                                                                     stride_x=self.stride_x, stride_y=self.stride_y, padding=self.padding
-                                                                     )
+                                                                     stride_x=self.stride_x, stride_y=self.stride_y, padding=self.padding)
                     
                     save_but = tk.Button(labels)
                     save_but.config(text='Save', font=("Helvetica", 16))
@@ -440,7 +473,8 @@ class DnD_Container:
                     save_but.grid(row=5, column=1, sticky='nsew', pady=10)
 
                     val_1.focus_set()
-                
+
+                # Dense
                 elif source.tags[0] == "Dense":
                     
                     labels = tk.Label(self.param_frame)
@@ -464,6 +498,9 @@ class DnD_Container:
                     
                     val_1 = tk.Entry(labels, width=10, textvariable=self.neurons)
                     val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
+                    val_1_ttp = ttp.ToolTip(val_1, 'Neurons number : \n \
+                                            Number of neurons / parameters you want to train \n \
+                                            Mandatory', msgFunc=None, delay=1, follow=True) 
 
                     save_dense = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0], neurons=self.neurons)
                     
@@ -474,7 +511,8 @@ class DnD_Container:
                     save_but.grid(row=2, column=1, sticky='nsew', padx=5, pady=10)
 
                     val_1.focus_set()
-                    
+
+                # Max Pooling    
                 elif source.tags[0] == "Max_pooling":
                     
                     labels = tk.Label(self.param_frame)
@@ -500,11 +538,17 @@ class DnD_Container:
                     
                     val_1_x = tk.Entry(labels, width=10, textvariable=self.pool_size_x)
                     val_1_x.grid(row=1, column=1, sticky='nsw', pady=10)
+                    val_1_x_ttp = ttp.ToolTip(val_1_x, 'Pool size X : \n \
+                                            Specify the factor by which to downscale (width) \n \
+                                            Mandatory', msgFunc=None, delay=1, follow=True)  
 
                     self.pool_size_y = tk.StringVar()
                     
                     val_1_y = tk.Entry(labels, width=10, textvariable=self.pool_size_y)
                     val_1_y.grid(row=1, column=2, sticky='nsw', pady=10)
+                    val_1_y_ttp = ttp.ToolTip(val_1_y, 'Pool size Y : \n \
+                                            Specify the factor by which to downscale (heigth) \n \
+                                            Mandatory', msgFunc=None, delay=1, follow=True)  
 
                     label_2 = tk.Label(labels)
                     label_2.config(text='Stride:', font=("Helvetica", 14))
@@ -515,12 +559,18 @@ class DnD_Container:
                     
                     val_2_x = tk.Entry(labels, width=10, textvariable=self.stride_x)
                     val_2_x.grid(row=2, column=1, sticky='nsw', pady=10)
+                    val_2_x_ttp = ttp.ToolTip(val_2_x, 'Stride over X : \n \
+                                            Specify the strides of the convolution along the width\n \
+                                            Optional, Default to "0" (keep default if no use)', msgFunc=None, delay=1, follow=True) 
 
                     self.stride_y = tk.StringVar()
                     self.stride_y.set('0')
                     
                     val_2_y = tk.Entry(labels, width=10, textvariable=self.stride_y)
                     val_2_y.grid(row=2, column=2, sticky='nsw', pady=10)
+                    val_2_y_ttp = ttp.ToolTip(val_2_y, 'Stride over Y : \n \
+                                            Specify the strides of the convolution along the heith\n \
+                                            Optional, Default to "0" (keep default if no use)', msgFunc=None, delay=1, follow=True) 
 
                     label_3 = tk.Label(labels)
                     label_3.config(text='Padding:', font=("Helvetica", 14))
@@ -530,6 +580,9 @@ class DnD_Container:
 
                     val_3 = tk.Checkbutton(labels, variable=self.mp_padding)
                     val_3.grid(row=3, column=2, sticky='nsw', padx=5, pady=5)
+                    val_3_ttp = ttp.ToolTip(val_3, 'Padding : \n \
+                                            If checked, pad with zeros while pool go out of picture\n \
+                                            Optional, Default to unchecked (keep default if no use)', msgFunc=None, delay=1, follow=True)
 
                     save_max_p = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0],
                                                          pool_size_x=self.pool_size_x, pool_size_y=self.pool_size_y,
@@ -542,7 +595,8 @@ class DnD_Container:
                     save_but.grid(row=4, column=1, sticky='nsew', padx=5, pady=10)
 
                     val_1_x.focus_set()
-              
+
+                # Dropout
                 elif source.tags[0] == "Dropout":
                     
                     labels = tk.Label(self.param_frame)
@@ -563,9 +617,14 @@ class DnD_Container:
                     label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
 
                     self.ratio = tk.StringVar()
+                    self.ratio.set('0.2')
                     
                     val_1 = tk.Entry(labels, width=10, textvariable=self.ratio)
                     val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
+                    val_1_ttp = ttp.ToolTip(val_1, 'Dropout ratio : \n \
+                                            Randomly shut down connexions from input to output \n \
+                                            (prevent overfitting) \n \
+                                            Mandatory', msgFunc=None, delay=1, follow=True)
 
                     save_dropout = lambda _: DnD_Container.save_layer(self=self, id=source.id, tag=source.tags[0], ratio=self.ratio)
 
