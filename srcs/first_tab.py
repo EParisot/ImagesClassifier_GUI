@@ -296,10 +296,10 @@ class FirstTab():
     def del_snap(event, self):
         try:
             dir_list = os.listdir(self.app.snap_path.get())
-            if len(dir_list) > 0:
+            if len(dir_list) > 0 and dir_list[-1].endswith(EXT_PHOTOS):
                 os.remove(self.app.snap_path.get() + '/' + dir_list[-1])
                 dir_list = os.listdir(self.app.snap_path.get())
-                if len(dir_list) > 0:
+                if len(dir_list) > 0 and dir_list[-1].endswith(EXT_PHOTOS):
                     image = ImageTk.PhotoImage(Image.open(self.app.snap_path.get() + '/' + dir_list[-1]).resize((160, 120), Image.ANTIALIAS))
                 else:
                     image = self.none_pic

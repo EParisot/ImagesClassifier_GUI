@@ -416,8 +416,9 @@ class SecondTab(object):
             return
         if self.devMode:
             print(RED + 'REMOVE: ' + EOC + self.photos[self.photo_act])
-        os.remove(self.photos[self.photo_act])
-        self.photos.pop(self.photo_act)
-        if self.photo_act >= len(self.photos):
-            self.photo_act = 0
+        if self.photos[self.photo_act].endswith(EXT_PHOTOS):
+            os.remove(self.photos[self.photo_act])
+            self.photos.pop(self.photo_act)
+            if self.photo_act >= len(self.photos):
+                self.photo_act = 0
         self.print_win()
