@@ -36,21 +36,26 @@ class FourthTab(object):
         self.train_frame = Frame(app.fourth_tab)
         self.train_frame.grid(row=0, column=0, stick='nsew')
         self.train_frame.grid_columnconfigure(0, weight=1)
+        self.train_frame.grid_columnconfigure(1, weight=1)
         self.train_frame.grid_rowconfigure(0, weight=1)
 
         command_frame = Frame(self.train_frame)
-        command_frame.grid(row=0, column=0, sticky='nw')
+        command_frame.grid(row=0, column=1, sticky='nw')
         command_frame.grid_rowconfigure(0, weight=1)
         command_frame.grid_rowconfigure(1, weight=1)
+        command_frame.grid_rowconfigure(2, weight=1)
         command_frame.grid_columnconfigure(0, weight=1)
         command_frame.grid_columnconfigure(1, weight=1)
         command_frame.grid_columnconfigure(2, weight=1)
+        command_frame.grid_columnconfigure(3, weight=1)
 
         self.load_dataset_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
         self.load_model_pic = ImageTk.PhotoImage(Image.open('assets/import.png'))
         self.labo_photos_pic = ImageTk.PhotoImage(Image.open('assets/edit_pic.png'))
         self.resize_pic = ImageTk.PhotoImage(Image.open('assets/resize.png'))
         self.crop_pic = ImageTk.PhotoImage(Image.open('assets/crop.png'))
+        self.train_model_pic = ImageTk.PhotoImage(Image.open('assets/train.png'))
+        self.accolade_pic = ImageTk.PhotoImage(Image.open('assets/accolade.png'))
 
         load_dataset_handler = lambda: self.load_dataset(self)
         
@@ -63,7 +68,7 @@ class FourthTab(object):
         
         self.labo_photos_but = Button(command_frame)
         self.labo_photos_but.config(image=self.labo_photos_pic, command=labo_photos_handler, state="disabled")
-        self.labo_photos_but.grid(row=0, column=1, padx=10, pady=10)
+        self.labo_photos_but.grid(row=1, column=0, padx=10, pady=10)
         self.labo_photos_ttp = ttp.ToolTip(self.labo_photos_but, 'Edit pictures', msgFunc=None, delay=1, follow=True)
         
         load_model_handler = lambda: self.load_model(self)
@@ -73,6 +78,57 @@ class FourthTab(object):
         self.load_model_but.grid(row=0, column=2, padx=10, pady=10)
         self.load_model_ttp = ttp.ToolTip(self.load_model_but, 'Import Model', msgFunc=None, delay=1, follow=True)
                 
+        train_handler = lambda: self.train_model(self)
+        
+        self.train_model_but = Button(command_frame)
+        self.train_model_but.config(image=self.train_model_pic, command=train_handler, state="disabled")
+        self.train_model_but.grid(row=2, column=3, padx=10, pady=10)
+        self.train_model_ttp = ttp.ToolTip(self.train_model_but, 'Train Model', msgFunc=None, delay=1, follow=True)
+
+        hyper_param_frame = Frame(command_frame, borderwidth=2, relief="sunken")
+        hyper_param_frame.grid(row=0, column=3, sticky='nw', padx=5, pady=5)
+        hyper_param_frame.grid_rowconfigure(0, weight=1)
+        hyper_param_frame.grid_rowconfigure(1, weight=1)
+        hyper_param_frame.grid_columnconfigure(0, weight=1)
+        hyper_param_frame.grid_columnconfigure(1, weight=1)
+        hyper_param_frame.grid_columnconfigure(2, weight=1)
+        hyper_param_frame.grid_columnconfigure(3, weight=1)
+        hyper_param_frame.grid_columnconfigure(4, weight=1)
+
+        opti_label = Label(hyper_param_frame, text="Optimizer :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
+        opti_label.grid(row=0, column=0, padx=5, pady=5)
+        optimizers = ["SGD", "RMSprop", "Adam", "Adadelta", "Nadam"]
+        self.opti = StringVar()
+        opti_box = ttk.Combobox(hyper_param_frame, textvariable=self.opti, values=optimizers, justify="center", width=10)
+        opti_box.grid(row=1, column=0, padx=5, pady=5)
+
+        batch_label = Label(hyper_param_frame, text="Batch size :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
+        batch_label.grid(row=0, column=1, padx=5, pady=5)
+        self.batch = StringVar()
+        self.batch.set("32")
+        batch_entry = Entry(hyper_param_frame, textvariable=self.batch, justify="center", width=10)
+        batch_entry.grid(row=1, column=1, padx=5, pady=5)
+
+        epochs_label = Label(hyper_param_frame, text="Epochs :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
+        epochs_label.grid(row=0, column=2, padx=5, pady=5)
+        self.epochs = StringVar()
+        self.epochs.set("1")
+        epochs_entry = Entry(hyper_param_frame, textvariable=self.epochs, justify="center", width=10)
+        epochs_entry.grid(row=1, column=2, padx=5, pady=5)
+
+        split_label = Label(hyper_param_frame, text="Batch size :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
+        split_label.grid(row=0, column=3, padx=5, pady=5)
+        self.split = StringVar()
+        self.split.set("0.3")
+        split_entry = Entry(hyper_param_frame, textvariable=self.split, justify="center", width=10)
+        split_entry.grid(row=1, column=3, padx=5, pady=5)
+
+        stop_label = Label(hyper_param_frame, text="Early stop :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
+        stop_label.grid(row=0, column=4, padx=5, pady=5)
+
+        accolade_label = Label(command_frame, image=self.accolade_pic)
+        accolade_label.grid(row=1, column=3, sticky="nsew")
+
 
     def load_dataset(self, event):
         dataset_dir =  askdirectory(title = "Select Dataset folder")
@@ -86,7 +142,7 @@ class FourthTab(object):
             #normalise datas
             self.images = np.array(self.images)
             self.images /= 255
-            
+    
             #convert labels to dummy values
             self.labels = np.array(self.labels)
             self.labels = np.array(pd.get_dummies(self.labels))
@@ -213,8 +269,11 @@ class FourthTab(object):
                 import keras
                 from keras.models import load_model
                 self.model = load_model(self.model_filename)
-                if self.devMode == True:
-                    model_dict = json.loads(self.model.to_json())
-                    self.input_shape = model_dict['config'][0]['config']['batch_input_shape']
+                self.train_model_but.config(state="normal")
         else:
             showwarning("Error", "Load a dataset before you import a model");
+
+    def train_model(self, event):
+        pass
+        # TODO : get hyper parameters and start train, print history each epoch
+        

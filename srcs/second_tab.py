@@ -281,7 +281,7 @@ class SecondTab(object):
 
         self.pic_frame = Frame(self.label_frame)
         self.pic_frame.config(height=SNAP_H + 100, width=SNAP_W + 100)
-        self.pic_frame.grid(row=0, column=1, sticky='nsew')
+        self.pic_frame.grid(row=0, column=1)
         self.pic_frame.grid_rowconfigure(0, weight=1)
         self.pic_frame.grid_rowconfigure(1, weight=1)
         self.pic_frame.grid_rowconfigure(2, weight=1)

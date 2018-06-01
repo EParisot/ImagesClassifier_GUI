@@ -91,10 +91,10 @@ class ThirdTab(object):
         save_but.grid(row=0, column=2, padx=10, pady=10)
         save_but_ttp = ttp.ToolTip(save_but, 'Save Model', msgFunc=None, delay=1, follow=True)
 
-        export_but = Button(command_frame)
-        export_but.config(image=self.export_pic, command=export_handler)
-        export_but.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
-        export_but_ttp = ttp.ToolTip(export_but, 'Export Model', msgFunc=None, delay=1, follow=True)
+        self.export_but = Button(command_frame)
+        self.export_but.config(image=self.export_pic, command=export_handler, state="disabled")
+        self.export_but.grid(row=1, column=1, columnspan=2, padx=10, pady=10)
+        export_but_ttp = ttp.ToolTip(self.export_but, 'Export Model', msgFunc=None, delay=1, follow=True)
 
         powered_label = Label(command_frame, text="powered by:")
         powered_label.grid(row=2, column=1, columnspan=2, sticky="nsew")
@@ -173,6 +173,7 @@ class ThirdTab(object):
                 self.app.layers_list = {}
                 self.parse(data)
                 self.saved.set(True)
+                self.export_but.config(state="normal")
 
     def parse(self, data):
         for item in data:
@@ -249,9 +250,11 @@ class ThirdTab(object):
                 for item in items_sorted:
                     sorted_data[item] = self.app.layers_list[item]
                 json.dump(sorted_data, outfile, indent=4, separators=(',', ': '))
+                self.export_but.config(state="normal")
 
     def modified(self, event):
         self.saved.set(False)
+        self.export_but.config(state="disabled")
 
     def export(self, event):
         if self.saved.get() == False:
