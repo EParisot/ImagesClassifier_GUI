@@ -241,13 +241,14 @@ class SecondTab(object):
         if len(self.photos) > 0:
             pic = Image.open(self.photos[self.photo_act])
             image = ImageTk.PhotoImage(pic)
-        else:
-            pic = Image.open('assets/prev.png')
-            image = ImageTk.PhotoImage(pic)
             self.h1.set(0)
             self.h2.set(pic.size[1])
             self.w1.set(0)
             self.w2.set(pic.size[0])
+
+        else:
+            pic = Image.open('assets/prev.png')
+            image = ImageTk.PhotoImage(pic)
 
         self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
         self.pic_canvas.image = image
@@ -295,7 +296,6 @@ class SecondTab(object):
         self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
         self.pic_canvas.image = image
 
-
         self.h1 = IntVar()
         self.h1.set(0)
         self.h1_id = None
@@ -339,19 +339,19 @@ class SecondTab(object):
 
     def draw_h1(self, h1, w):
         self.pic_canvas.delete(self.h1_id)
-        self.h1_id = self.pic_canvas.create_rectangle(0, h1, w, 0, fill="black")
+        self.h1_id = self.pic_canvas.create_rectangle(0, h1, w, 0, fill="")
 
     def draw_h2(self, h2, w, h):
         self.pic_canvas.delete(self.h2_id)
-        self.h2_id = self.pic_canvas.create_rectangle(0, h2, w, h, fill="black")
+        self.h2_id = self.pic_canvas.create_rectangle(0, h2, w, h, fill="")
 
     def draw_w1(self, w1, h):
         self.pic_canvas.delete(self.w1_id)
-        self.w1_id = self.pic_canvas.create_rectangle(w1, 0, 0, h, fill="black")
+        self.w1_id = self.pic_canvas.create_rectangle(w1, 0, 0, h, fill="")
 
     def draw_w2(self, w2, w, h):
         self.pic_canvas.delete(self.w2_id)
-        self.w2_id = self.pic_canvas.create_rectangle(w2, 0, w, h, fill="black")
+        self.w2_id = self.pic_canvas.create_rectangle(w2, 0, w, h, fill="")
 
 
     def last_photo(self):
