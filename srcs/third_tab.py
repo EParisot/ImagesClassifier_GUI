@@ -590,6 +590,7 @@ class ThirdTab(object):
         if self.devMode == True:
             model.summary()
 
+        showinfo("Success", "Model Exported with 'h5py' format");
         model.save(self.filename.split('.')[0] + ".h5py");
 
         self.app.config(cursor="")

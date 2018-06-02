@@ -61,6 +61,8 @@ class FourthTab(object):
         self.accolade_pic = ImageTk.PhotoImage(Image.open('assets/accolade.png'))
         self.accolade_v1_pic = ImageTk.PhotoImage(Image.open('assets/accolade_v1.png'))
         self.accolade_v2_pic = ImageTk.PhotoImage(Image.open('assets/accolade_v2.png'))
+        self.ok_pic = ImageTk.PhotoImage(Image.open('assets/ok.png'))
+        self.nok_pic = ImageTk.PhotoImage(Image.open('assets/nok.png'))
 
         load_dataset_handler = lambda: self.load_dataset(self)
         self.load_dataset_but = Button(command_frame)
@@ -127,6 +129,9 @@ class FourthTab(object):
         self.labo_photos_but.grid(row=1, column=0, padx=10, pady=5, sticky="n")
         self.labo_photos_ttp = ttp.ToolTip(self.labo_photos_but, 'Crop pictures', msgFunc=None, delay=1, follow=True)
         
+        self.check_label = Label(command_frame)
+        self.check_label.grid(row=1, column=2, padx=10, pady=5, sticky="ne")
+        
         load_model_handler = lambda: self.load_model(self)
         self.load_model_but = Button(command_frame)
         self.load_model_but.config(image=self.load_model_pic, command=load_model_handler, state="disabled")
@@ -171,7 +176,7 @@ class FourthTab(object):
         epochs_entry = Entry(hyper_param_frame, textvariable=self.epochs, justify="center", width=10)
         epochs_entry.grid(row=1, column=2, padx=5, pady=5)
 
-        split_label = Label(hyper_param_frame, text="Batch size :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
+        split_label = Label(hyper_param_frame, text="Validation Split :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
         split_label.grid(row=0, column=3, padx=5, pady=5)
         self.split = StringVar()
         self.split.set("0.1")
@@ -228,6 +233,7 @@ class FourthTab(object):
             self.h_in.set(str(self.images.shape[1]))
             self.pix_in.set(str(self.images.shape[3]))
             self.out_dataset.set(str(self.labels.shape[1]))
+            self.check()
             
             showinfo('Success', '%d Images and labels loaded' % nb_images)
             self.app.config(cursor="")
@@ -361,15 +367,19 @@ class FourthTab(object):
         self.w2_id = self.pic_canvas.create_rectangle(w2, 0, w, h, fill="")
         
     def crop(self, h1, h2, w1, w2):
-        self.images = self.images[:, h1:h2, w1:w2, :]
-        
-        # update images dim
-        self.w_in.set(str(self.images.shape[2]))
-        self.h_in.set(str(self.images.shape[1]))
-        self.pix_in.set(str(self.images.shape[3]))
-        
-        self.labo_photos_frame.destroy()
-        showinfo("Cropped Images", "Images datas have been croped \n New size = %d x %d\n(your images are still complete on disk...)" % (self.images.shape[2], self.images.shape[1]));
+        if h1 < self.images.shape[1] and h1 < self.images.shape[1] and w1 < self.images.shape[2] and w2 < self.images.shape[2]:
+            # crop images
+            self.images = self.images[:, h1:h2, w1:w2, :]
+            
+            # update images dim
+            self.w_in.set(str(self.images.shape[2]))
+            self.h_in.set(str(self.images.shape[1]))
+            self.pix_in.set(str(self.images.shape[3]))
+            self.check()
+            
+            self.labo_photos_frame.destroy()
+            self.labo_photos_but.config(state="disabled")
+            showinfo("Cropped Images", "Images datas have been croped \n New size = %d x %d\n(your images are still complete on disk...)" % (self.images.shape[2], self.images.shape[1]));
 
     def load_model(self, event):
         if self.dataset_dir:
@@ -386,11 +396,26 @@ class FourthTab(object):
                 self.w_out.set(str(self.input_shape[2]))
                 self.h_out.set(str(self.input_shape[1]))
                 self.pix_out.set(str(self.input_shape[3]))
-                self.out_model.set(str(self.model.layers[-2].get_output_at(0).get_shape().as_list()[1]))
+                self.out_model.set(str(self.model.layers[-1].get_output_at(0).get_shape().as_list()[1]))
+                self.check()
                 
                 showinfo("Model Loaded", "Model '%s' loaded" % (self.model_filename.split('/')[-1]))
         else:
             showwarning("Error", "Load a dataset before you import a model");
+
+    def check(self):
+        try:
+            if int(self.w_in.get()) != int(self.w_out.get()) or \
+                            int(self.h_in.get()) != int(self.h_out.get()) or \
+                            int(self.pix_in.get()) != int(self.pix_out.get()) or \
+                            int(self.out_dataset.get()) != int(self.out_model.get()):
+                self.check_label.config(image=self.nok_pic)
+                self.check_label.image = self.nok_pic
+            else:
+                self.check_label.config(image=self.ok_pic)
+                self.check_label.image = self.ok_pic
+        except ValueError:
+            pass
 
     def train_model(self, event):
         pass

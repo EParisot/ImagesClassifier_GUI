@@ -249,6 +249,10 @@ class SecondTab(object):
         else:
             pic = Image.open('assets/prev.png')
             image = ImageTk.PhotoImage(pic)
+            self.h1.set(0)
+            self.h2.set(0)
+            self.w1.set(0)
+            self.w2.set(0)
 
         self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
         self.pic_canvas.image = image
@@ -293,8 +297,6 @@ class SecondTab(object):
 
         self.pic_canvas = Canvas(self.pic_frame, borderwidth=2, relief="sunken")
         self.pic_canvas.grid(row=1, column=1, sticky="nsew")
-        #self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
-        #self.pic_canvas.image = image
 
         self.h1 = IntVar()
         self.h1.set(0)
