@@ -38,6 +38,8 @@ class FourthTab(object):
         self.dataset_dir = None
         self.images = None
         self.labels = None
+##        self.stop = BooleanVar()
+##        self.stop.set(False)
         
         self.train_frame = Frame(app.fourth_tab)
         self.train_frame.grid(row=0, column=0, stick='nsew')
@@ -159,7 +161,13 @@ class FourthTab(object):
         self.train_model_but = Button(train_label)
         self.train_model_but.config(image=self.train_model_pic, command=train_handler, state="disabled")
         self.train_model_but.grid(row=0, column=0, padx=10, pady=5, sticky="n")
-        self.train_model_ttp = ttp.ToolTip(self.train_model_but, 'Train Model', msgFunc=None, delay=1, follow=True)  
+        self.train_model_ttp = ttp.ToolTip(self.train_model_but, 'Train Model', msgFunc=None, delay=1, follow=True)
+
+##        stop_train_handler = lambda: self.stop_train(self)
+##        self.stop_train_but = Button(train_label)
+##        self.stop_train_but.config(image=self.stop_pic, command=stop_train_handler, state="disabled")
+##        self.stop_train_but.grid(row=0, column=1, padx=10, pady=5, sticky="s")
+##        self.stop_train_ttp = ttp.ToolTip(self.stop_train_but, 'Stop Training', msgFunc=None, delay=1, follow=True)
 
         hyper_param_frame = Frame(command_frame, borderwidth=2, relief="sunken")
         hyper_param_frame.grid(row=0, column=5, sticky='nw', padx=5, pady=10)
@@ -385,8 +393,9 @@ class FourthTab(object):
         self.w2_id = self.pic_canvas.create_rectangle(w2, 0, w, h, fill="")
         
     def crop(self, h1, h2, w1, w2):
-        if h1 < self.images.shape[1] and h1 < self.images.shape[1] and w1 < self.images.shape[2] and w2 < self.images.shape[2]:
+        if h1 < self.images.shape[1] and h2 <= self.images.shape[1] and w1 < self.images.shape[2] and w2 <= self.images.shape[2]:
             # crop images
+            self.app.config(cursor="wait")
             self.images = self.images[:, h1:h2, w1:w2, :]
             
             # update images dim
@@ -397,10 +406,12 @@ class FourthTab(object):
             
             self.labo_photos_frame.destroy()
             self.labo_photos_but.config(state="disabled")
+            self.app.config(cursor="")
             showinfo("Cropped Images", "Images datas have been croped \n New size = %d x %d\n(your images are still complete on disk...)" % (self.images.shape[2], self.images.shape[1]));
 
     def load_model(self, event):
         if self.dataset_dir:
+            self.app.config(cursor="wait")
             self.model_filename =  askopenfilename(title = "Select Model", filetypes = (("h5py files","*.h5py"),("all files","*.*")))
             if self.model_filename:
                 import keras
@@ -417,8 +428,10 @@ class FourthTab(object):
                 self.out_model.set(str(self.model.layers[-1].get_output_at(0).get_shape().as_list()[1]))
                 self.check_model()
                 
+                self.app.config(cursor="")
                 showinfo("Model Loaded", "Model '%s' loaded" % (self.model_filename.split('/')[-1]))
         else:
+            self.app.config(cursor="")
             showwarning("Error", "Load a dataset before you import a model")
 
     def check_model(self):
@@ -439,27 +452,36 @@ class FourthTab(object):
 
     def train_model(self, event):
         if self.check.get() is True:
+            self.app.config(cursor="wait")
+            self.stop_train_but.config(state="normal")
+##            self.stop.set(False)
+            
             if self.devMode:
                 verbose = 1
                 self.model.summary()
             try:
                 batch = int(self.batch.get())
                 if batch <= 0 :
+                    self.app.config(cursor="")
                     showwarning("Error", "Null or negative batch size value")
                     return
                 epochs = int(self.epochs.get())
                 if epochs <= 0 :
+                    self.app.config(cursor="")
                     showwarning("Error", "Null or negative epochs value")
                     return
                 split = round(float(self.split.get()), 2)
                 if split <= 0 :
+                    self.app.config(cursor="")
                     showwarning("Error", "Null or negative split value")
                     return
                 patience = int(self.patience.get())
                 if patience <= 0 :
+                    self.app.config(cursor="")
                     showwarning("Error", "Null or negative patience value")
                     return
             except ValueError:
+                self.app.config(cursor="")
                 showwarning("Error", "Wrong hyper-parameter value")
                 return
 
@@ -490,7 +512,7 @@ class FourthTab(object):
             handles, labels = self.graph.get_legend_handles_labels()
             self.graph.legend(handles, labels)
 
-            while x < epochs:
+            while x < epochs and self.stop.get() == False:
                 # Train on 1 epoch
                 history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, callbacks=callbacks, verbose=verbose)
                 # plot in graph
@@ -507,11 +529,19 @@ class FourthTab(object):
                 self.graph_canvas.draw()
                 x = x + 1
 
+            self.app.config(cursor="")
             res = askquestion("Success", "Training done on %d epochs \n Save trained model ?" % epochs)
+##            self.stop_train_but.config(state="disabled")
             if res == "yes":
                 filename = asksaveasfilename(title = "Save Model", defaultextension=".h5", filetypes = (("h5py files","*.h5"),("all files","*.*")))
                 if filename :
                     self.model.save(filename)
         else:
+            self.app.config(cursor="")
             showwarning("Error", "Incompatible model / dataset")
+##            self.stop_train_but.config(state="disabled")
+
+##    def stop_train(self, event):
+##        self.stop.set(True)
+##        self.stop_train_but.config(state="disabled")
 
