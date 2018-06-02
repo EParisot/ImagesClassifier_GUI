@@ -1,4 +1,6 @@
 {
+    "output_type": "Categorical",
+    "optimizer": "adadelta",
     "1": {
         "tag": "In",
         "dim_1": "600",
@@ -81,7 +83,7 @@
         "x": 486.0,
         "y": 83.0
     },
-    "13": {
+    "12": {
         "tag": "Softmax",
         "x": 530.0,
         "y": 86.0

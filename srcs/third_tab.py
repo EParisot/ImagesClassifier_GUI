@@ -190,57 +190,61 @@ class ThirdTab(object):
                 data = json.load(infile)
                 self.model_canvas.delete("all")
                 self.app.layers_list = {}
+                if 'output_type' in data:
+                    self.out_type.set(data['output_type'])
+                if 'optimizer' in data:
+                    self.opti.set(data['optimizer'])
                 self.parse(data)
                 self.saved.set(True)
                 self.export_but.config(state="normal")
 
     def parse(self, data):
         for item in data:
+            if item != "optimizer" and item != "output_type":
+                if data[item]['tag'] == "In":
+                    self.new_in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
+                    self.new_in_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_in_layer.id] = data[item]
+                    
+                elif data[item]['tag'] == "Conv2d":
+                    self.new_conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, ("Conv2d", "layer"))
+                    self.new_conv2d_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_conv2d_layer.id] = data[item]
+                    
+                elif data[item]['tag'] == "Max_pooling":
+                    self.new_max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"))
+                    self.new_max_p_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_max_p_layer.id] = data[item]
 
-            if data[item]['tag'] == "In":
-                self.new_in_layer = dnd.Icon(self.app, self.in_layer_pic, ("In", "layer"))
-                self.new_in_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_in_layer.id] = data[item]
-                
-            elif data[item]['tag'] == "Conv2d":
-                self.new_conv2d_layer = dnd.Icon(self.app, self.conv2d_layer_pic, ("Conv2d", "layer"))
-                self.new_conv2d_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_conv2d_layer.id] = data[item]
-                
-            elif data[item]['tag'] == "Max_pooling":
-                self.new_max_p_layer = dnd.Icon(self.app, self.max_p_layer_pic, ("Max_pooling", "layer"))
-                self.new_max_p_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_max_p_layer.id] = data[item]
+                elif data[item]['tag'] == "Flatten":
+                    self.new_flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, ("Flatten", "layer"))
+                    self.new_flatten_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_flatten_layer.id] = data[item]
+                    
+                elif data[item]['tag'] == "Dense":
+                    self.new_dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"))
+                    self.new_dense_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_dense_layer.id] = data[item]
 
-            elif data[item]['tag'] == "Flatten":
-                self.new_flatten_layer = dnd.Icon(self.app, self.flatten_layer_pic, ("Flatten", "layer"))
-                self.new_flatten_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_flatten_layer.id] = data[item]
-                
-            elif data[item]['tag'] == "Dense":
-                self.new_dense_layer = dnd.Icon(self.app, self.dense_layer_pic, ("Dense", "layer"))
-                self.new_dense_layer.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_dense_layer.id] = data[item]
+                elif data[item]['tag'] == "Relu":
+                    self.new_relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"))
+                    self.new_relu_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_relu_activation.id] = data[item]
+                    
+                elif data[item]['tag'] == "Sigmoid":
+                    self.new_sig_activation = dnd.Icon(self.app, self.sig_activation_pic, ("Sigmoid", "activation"))
+                    self.new_sig_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_sig_activation.id] = data[item]
 
-            elif data[item]['tag'] == "Relu":
-                self.new_relu_activation = dnd.Icon(self.app, self.relu_activation_pic, ("Relu", "activation"))
-                self.new_relu_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_relu_activation.id] = data[item]
-                
-            elif data[item]['tag'] == "Sigmoid":
-                self.new_sig_activation = dnd.Icon(self.app, self.sig_activation_pic, ("Sigmoid", "activation"))
-                self.new_sig_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_sig_activation.id] = data[item]
-
-            elif data[item]['tag'] == "Softmax":
-                self.new_max_activation = dnd.Icon(self.app, self.max_activation_pic, ("Softmax", "activation"))
-                self.new_max_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_max_activation.id] = data[item]
-                
-            elif data[item]['tag'] == "Dropout":
-                self.new_dropout = dnd.Icon(self.app, self.dropout_pic, ("Dropout", "activation"))
-                self.new_dropout.attach(self.model_canvas, data[item]['x'], data[item]['y'])
-                self.app.layers_list[self.new_dropout.id] = data[item]
+                elif data[item]['tag'] == "Softmax":
+                    self.new_max_activation = dnd.Icon(self.app, self.max_activation_pic, ("Softmax", "activation"))
+                    self.new_max_activation.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_max_activation.id] = data[item]
+                    
+                elif data[item]['tag'] == "Dropout":
+                    self.new_dropout = dnd.Icon(self.app, self.dropout_pic, ("Dropout", "activation"))
+                    self.new_dropout.attach(self.model_canvas, data[item]['x'], data[item]['y'])
+                    self.app.layers_list[self.new_dropout.id] = data[item]
 
 
     def write_coords(self):
@@ -266,6 +270,8 @@ class ThirdTab(object):
             with open(self.filename, 'w') as outfile:
                 items_sorted = sorted(self.app.layers_list, key=lambda x: self.app.layers_list[x]['x'])
                 sorted_data = {}
+                sorted_data['output_type'] = self.out_type.get()
+                sorted_data['optimizer'] = self.opti.get()
                 for item in items_sorted:
                     sorted_data[item] = self.app.layers_list[item]
                 json.dump(sorted_data, outfile, indent=4, separators=(',', ': '))

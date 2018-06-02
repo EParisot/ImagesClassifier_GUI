@@ -156,13 +156,7 @@ class FourthTab(object):
         self.train_model_but = Button(train_label)
         self.train_model_but.config(image=self.train_model_pic, command=train_handler, state="disabled")
         self.train_model_but.grid(row=0, column=0, padx=10, pady=5, sticky="n")
-        self.train_model_ttp = ttp.ToolTip(self.train_model_but, 'Train Model', msgFunc=None, delay=1, follow=True)
-
-        stop_train_handler = lambda: self.stop_train(self)
-        self.stop_train_but = Button(train_label)
-        self.stop_train_but.config(image=self.stop_pic, command=stop_train_handler, state="disabled")
-        self.stop_train_but.grid(row=0, column=1, padx=10, pady=5, sticky="s")
-        self.stop_train_ttp = ttp.ToolTip(self.stop_train_but, 'Stop Training', msgFunc=None, delay=1, follow=True)      
+        self.train_model_ttp = ttp.ToolTip(self.train_model_but, 'Train Model', msgFunc=None, delay=1, follow=True)  
 
         hyper_param_frame = Frame(command_frame, borderwidth=2, relief="sunken")
         hyper_param_frame.grid(row=0, column=5, sticky='nw', padx=5, pady=10)
@@ -433,66 +427,45 @@ class FourthTab(object):
 
     def train_model(self, event):
         if self.check.get() is True:
-##            if self.thread.is_alive():
-##                showwarning("Training already running", "Please stop the current training you start again")
-##            else:
-##                self.thread = threading.Thread(target=self.training, args=())
-##                self.stopEvent = threading.Event()
-##            sleep(0.2)
-##            self.thread.start()
-            self.training()
-##            self.stop_train_but.config(state="normal")
+            if self.devMode:
+                verbose = 1
+                self.model.summary()
+            try:
+                batch = int(self.batch.get())
+                if batch <= 0 :
+                    showwarning("Error", "Null or negative batch size value")
+                    return
+                epochs = int(self.epochs.get())
+                if epochs <= 0 :
+                    showwarning("Error", "Null or negative epochs value")
+                    return
+                split = round(float(self.split.get()), 2)
+                if split <= 0 :
+                    showwarning("Error", "Null or negative split value")
+                    return
+                patience = int(self.patience.get())
+                if patience <= 0 :
+                    showwarning("Error", "Null or negative patience value")
+                    return
+            except ValueError:
+                showwarning("Error", "Wrong hyper-parameter value")
+                return
+
+            import keras
+            import keras.backend as K
+            from srcs.keras_classes import CustomModelCheckPoint
+            
+            checkpoint = CustomModelCheckPoint()
+
+            early_stop = None
+            if self.stop_on.get() == 1:
+                early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=patience, verbose=0, mode='auto', baseline=None)
+                callbacks = [checkpoint, early_stop]
+            else:
+                callbacks = [checkpoint]
+            
+            h = self.model.fit(self.images, self.labels, batch_size=batch, epochs=epochs, validation_split=split, callbacks=callbacks, verbose=verbose)
+
         else:
             showwarning("Error", "Incompatible model / dataset")
-
-    def training(self):
-        #TODO
-        
-        if self.devMode:
-            verbose = 1
-            self.model.summary()
-        try:
-            batch = int(self.batch.get())
-            if batch <= 0 :
-                showwarning("Error", "Null or negative batch size value")
-                return
-            epochs = int(self.epochs.get())
-            if epochs <= 0 :
-                showwarning("Error", "Null or negative epochs value")
-                return
-            split = round(float(self.split.get()), 2)
-            if split <= 0 :
-                showwarning("Error", "Null or negative split value")
-                return
-            patience = int(self.patience.get())
-            if patience <= 0 :
-                showwarning("Error", "Null or negative patience value")
-                return
-        except ValueError:
-            showwarning("Error", "Wrong hyper-parameter value")
-            return
-
-        import keras
-        import keras.backend as K
-        from srcs.keras_classes import CustomModelCheckPoint
-        
-        checkpoint = CustomModelCheckPoint()
-
-        early_stop = None
-        if self.stop_on.get() == 1:
-            early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=patience, verbose=0, mode='auto', baseline=None)
-            callbacks = [checkpoint, early_stop]
-        else:
-            callbacks = [checkpoint]
-        
-        h = self.model.fit(self.images, self.labels, batch_size=batch, epochs=epochs, validation_split=split, callbacks=callbacks, verbose=verbose)
-
-##        self.stop_train_but.config(state="disabled")
-
-##    def stop_train(self, event):
-##        if self.thread.is_alive():
-##            self.thread._Thread_stop()
-##        else:
-##            showwarning("Error", "No training running")
-##        self.stop_train_but.config(state="disabled")
 
