@@ -2,6 +2,7 @@
 
 from srcs.const import *
 import sys
+import threading
 
 import tkinter as tk
 from tkinter import ttk
@@ -16,6 +17,7 @@ import configparser
 from time import time, localtime, strftime, sleep
 
 import srcs.Tk_Tooltips as ttp
+from srcs.keras_classes import CustomModelCheckPoint
 
 import json
 import numpy as np
@@ -26,7 +28,9 @@ class FourthTab(object):
     def __init__(self, app, devMode):
         self.app = app
         self.devMode = devMode
-        
+
+        self.thread = threading.Thread(target=self.training, args=())
+        self.stopEvent = threading.Event()
         self.model = None
         self.model_filename = None
         self.input_shape = None
@@ -51,6 +55,7 @@ class FourthTab(object):
         command_frame.grid_columnconfigure(3, weight=1)
         command_frame.grid_columnconfigure(4, weight=1)
         command_frame.grid_columnconfigure(5, weight=1)
+        command_frame.grid_columnconfigure(6, weight=1)
 
         self.load_dataset_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
         self.load_model_pic = ImageTk.PhotoImage(Image.open('assets/import.png'))
@@ -63,6 +68,7 @@ class FourthTab(object):
         self.accolade_v2_pic = ImageTk.PhotoImage(Image.open('assets/accolade_v2.png'))
         self.ok_pic = ImageTk.PhotoImage(Image.open('assets/ok.png'))
         self.nok_pic = ImageTk.PhotoImage(Image.open('assets/nok.png'))
+        self.stop_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
         load_dataset_handler = lambda: self.load_dataset(self)
         self.load_dataset_but = Button(command_frame)
@@ -140,12 +146,24 @@ class FourthTab(object):
         self.load_model_but.config(image=self.load_model_pic, command=load_model_handler, state="disabled")
         self.load_model_but.grid(row=0, column=4, padx=10, pady=10)
         self.load_model_ttp = ttp.ToolTip(self.load_model_but, 'Import Model', msgFunc=None, delay=1, follow=True)
+
+        train_label = Label(command_frame)
+        train_label.grid(row=2, column=5, sticky="n")
+        train_label.grid_rowconfigure(0, weight=1)
+        train_label.grid_columnconfigure(0, weight=1)
+        train_label.grid_columnconfigure(1, weight=1)
                 
         train_handler = lambda: self.train_model(self)
-        self.train_model_but = Button(command_frame)
+        self.train_model_but = Button(train_label)
         self.train_model_but.config(image=self.train_model_pic, command=train_handler, state="disabled")
-        self.train_model_but.grid(row=2, column=5, padx=10, pady=5, sticky="n")
+        self.train_model_but.grid(row=0, column=0, padx=10, pady=5, sticky="n")
         self.train_model_ttp = ttp.ToolTip(self.train_model_but, 'Train Model', msgFunc=None, delay=1, follow=True)
+
+        stop_train_handler = lambda: self.stop_train(self)
+        self.stop_train_but = Button(train_label)
+        self.stop_train_but.config(image=self.stop_pic, command=stop_train_handler, state="disabled")
+        self.stop_train_but.grid(row=0, column=1, padx=10, pady=5, sticky="s")
+        self.stop_train_ttp = ttp.ToolTip(self.stop_train_but, 'Stop Training', msgFunc=None, delay=1, follow=True)      
 
         hyper_param_frame = Frame(command_frame, borderwidth=2, relief="sunken")
         hyper_param_frame.grid(row=0, column=5, sticky='nw', padx=5, pady=10)
@@ -156,49 +174,41 @@ class FourthTab(object):
         hyper_param_frame.grid_columnconfigure(2, weight=1)
         hyper_param_frame.grid_columnconfigure(3, weight=1)
         hyper_param_frame.grid_columnconfigure(4, weight=1)
-        hyper_param_frame.grid_columnconfigure(5, weight=1)
-
-        opti_label = Label(hyper_param_frame, text="Optimizer :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
-        opti_label.grid(row=0, column=0, padx=5, pady=5)
-        optimizers = ["Adadelta", "Adam", "Nadam", "RMSprop", "SGD"]
-        self.opti = StringVar()
-        opti_box = ttk.Combobox(hyper_param_frame, textvariable=self.opti, values=optimizers, justify="center", width=10)
-        opti_box.grid(row=1, column=0, padx=5, pady=5)
 
         batch_label = Label(hyper_param_frame, text="Batch size :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
-        batch_label.grid(row=0, column=1, padx=5, pady=5)
+        batch_label.grid(row=0, column=0, padx=5, pady=5)
         self.batch = StringVar()
         self.batch.set("1")
         batch_entry = Entry(hyper_param_frame, textvariable=self.batch, justify="center", width=10)
-        batch_entry.grid(row=1, column=1, padx=5, pady=5)
+        batch_entry.grid(row=1, column=0, padx=5, pady=5)
 
         epochs_label = Label(hyper_param_frame, text="Epochs :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
-        epochs_label.grid(row=0, column=2, padx=5, pady=5)
+        epochs_label.grid(row=0, column=1, padx=5, pady=5)
         self.epochs = StringVar()
         self.epochs.set("1")
         epochs_entry = Entry(hyper_param_frame, textvariable=self.epochs, justify="center", width=10)
-        epochs_entry.grid(row=1, column=2, padx=5, pady=5)
+        epochs_entry.grid(row=1, column=1, padx=5, pady=5)
 
         split_label = Label(hyper_param_frame, text="Validation Split :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
-        split_label.grid(row=0, column=3, padx=5, pady=5)
+        split_label.grid(row=0, column=2, padx=5, pady=5)
         self.split = StringVar()
         self.split.set("0.1")
         split_entry = Entry(hyper_param_frame, textvariable=self.split, justify="center", width=10)
-        split_entry.grid(row=1, column=3, padx=5, pady=5)
+        split_entry.grid(row=1, column=2, padx=5, pady=5)
 
         stop_label = Label(hyper_param_frame, text="Early stop :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
-        stop_label.grid(row=0, column=4, padx=5, pady=5)
+        stop_label.grid(row=0, column=3, padx=5, pady=5)
         self.stop_on = IntVar()
         self.stop_on.set(0)
         stop_check = Checkbutton(hyper_param_frame, variable=self.stop_on, command=self.grey_patience)
-        stop_check.grid(row=1, column=4, padx=5, pady=5)
+        stop_check.grid(row=1, column=3, padx=5, pady=5)
 
         patience_label = Label(hyper_param_frame, text="Patience :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
-        patience_label.grid(row=0, column=5, padx=5, pady=5)
-        self.stop = StringVar()
-        self.stop.set("1")
-        self.stop_entry = Entry(hyper_param_frame, textvariable=self.stop, justify="center", width=10, state="disabled")
-        self.stop_entry.grid(row=1, column=5, padx=5, pady=5)
+        patience_label.grid(row=0, column=4, padx=5, pady=5)
+        self.patience = StringVar()
+        self.patience.set("1")
+        self.patience_entry = Entry(hyper_param_frame, textvariable=self.patience, justify="center", width=10, state="disabled")
+        self.patience_entry.grid(row=1, column=4, padx=5, pady=5)
 
         accolade_label = Label(command_frame, image=self.accolade_pic)
         accolade_label.grid(row=1, column=5, sticky="new")
@@ -424,8 +434,61 @@ class FourthTab(object):
 
     def train_model(self, event):
         if self.check.get() is True:
-            pass
-            # TODO : get hyper parameters, start thread and start train, print history each epoch
+            if self.thread.is_alive():
+                showwarning("Training already running", "Please stop the current training you start again")
+            else:
+                self.thread = threading.Thread(target=self.training, args=())
+                self.stopEvent = threading.Event()
+            sleep(0.2)
+            self.thread.start()
+            self.stop_train_but.config(state="normal")
         else:
-            showwarning("Erorr", "Incompatible model / dataset")
+            showwarning("Error", "Incompatible model / dataset")
+
+    def training(self):
+        #TODO
         
+        if self.devMode:
+            verbose = 1
+            self.model.summary()
+        try:
+            batch = int(self.batch.get())
+            if batch <= 0 :
+                showwarning("Error", "Null or negative batch size value")
+                return
+            epochs = int(self.epochs.get())
+            if epochs <= 0 :
+                showwarning("Error", "Null or negative epochs value")
+                return
+            split = round(float(self.split.get()), 2)
+            if split <= 0 :
+                showwarning("Error", "Null or negative split value")
+                return
+            patience = int(self.patience.get())
+            if patience <= 0 :
+                showwarning("Error", "Null or negative patience value")
+                return
+        except ValueError:
+            showwarning("Error", "Wrong hyper-parameter value")
+            return
+
+        import keras
+        import keras.backend as K
+        
+        checkpoint = CustomModelCheckPoint()
+
+        early_stop = None
+        if self.stop_on.get() == 1:
+            early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=patience, verbose=0, mode='auto', baseline=None)
+        
+        h = self.model.fit(self.images, self.labels, batch_size=batch, epochs=epochs, validation_split=split, callbacks=[checkpoint, early_stop], verbose=verbose)
+
+        self.stop_train_but.config(state="disabled")
+
+    def stop_train(self, event):
+        if self.thread.is_alive():
+            self.thread._Thread_stop()
+        else:
+            showwarning("Error", "No training running")
+        self.stop_train_but.config(state="disabled")
+

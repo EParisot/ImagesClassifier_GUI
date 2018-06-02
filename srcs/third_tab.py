@@ -54,9 +54,6 @@ class ThirdTab(object):
         self.logo_pic = ImageTk.PhotoImage(Image.open('assets/keras.jpeg'))
         self.clear_pic = ImageTk.PhotoImage(Image.open('assets/pass.png'))
 
-        self.photo_label = Label(self.model_frame, image=self.input_pic)
-        self.photo_label.grid(row=0, column=0, padx=20, pady=10, stick='e')
-
         self.model_canvas = Canvas(self.model_frame)
         self.model_canvas.bind("<ButtonPress>", self.modified)
         self.model_canvas_dnd = dnd.DnD_Container(self.app, self.model_frame, self.model_canvas)
@@ -65,6 +62,28 @@ class ThirdTab(object):
         self.model_canvas.grid_propagate(0)
         model_ttp = ttp.ToolTip(self.model_canvas, 'Drop a to add it to the model \n \
                                         Double clic on a layer to edit it', msgFunc=None, delay=1, follow=True)
+
+        self.param_frame = Frame(self.model_frame)
+        self.param_frame.grid(row=0, column=0, padx=20, pady=10, stick='e')
+        self.param_frame.grid_columnconfigure(0, weight=1)
+        self.param_frame.grid_rowconfigure(0, weight=1)
+        self.param_frame.grid_rowconfigure(1, weight=1)
+        self.param_frame.grid_rowconfigure(2, weight=1)
+        self.param_frame.grid_rowconfigure(3, weight=1)
+
+        output_label = Label(self.param_frame, text="Output type :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
+        output_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
+        output = ["Binary", "Categorical", "MSE"]
+        self.out_type = StringVar()
+        output_box = ttk.Combobox(self.param_frame, textvariable=self.out_type, values=output, justify="center", width=10)
+        output_box.grid(row=1, column=0, padx=5, pady=5, sticky="n")
+
+        opti_label = Label(self.param_frame, text="Optimizer :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
+        opti_label.grid(row=2, column=0, padx=5, pady=5, sticky="s")
+        self.optimizers = ["adadelta", "adam", "nadam", "rmsprop", "sgd"]
+        self.opti = StringVar()
+        opti_box = ttk.Combobox(self.param_frame, textvariable=self.opti, values=self.optimizers, justify="center", width=10)
+        opti_box.grid(row=3, column=0, padx=5, pady=5, sticky="s")
 
         command_frame = Frame(self.model_frame)
         command_frame.grid(row=0, column=2, sticky='nsw')
@@ -586,11 +605,31 @@ class ThirdTab(object):
             
             i = i + 1
 
-        # Verbose output
-        if self.devMode == True:
+        output = self.out_type.get()
+        if output == "Binary":
+            loss = 'binary_crossentropy'
+        elif output == "Categorical":
+            loss = 'categorical_crossentropy'
+        elif output == "MSE":
+            loss = 'mse'
+        else:
+            showwarning("Error", "Wrong output type value")
+            self.app.config(cursor="")
+            return
+        opti = self.opti.get()
+        if opti not in self.optimizers:
+            showwarning("Error", "Wrong optimizer value")
+            self.app.config(cursor="")
+            return
+
+        model.compile(optimizer=opti, loss=loss, metrics=['accuracy'])
+
+        model.save(self.filename.split('.')[0] + ".h5py");
+
+        if self.devMode:
             model.summary()
 
         showinfo("Success", "Model Exported with 'h5py' format");
-        model.save(self.filename.split('.')[0] + ".h5py");
+
 
         self.app.config(cursor="")
