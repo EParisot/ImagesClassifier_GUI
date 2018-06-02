@@ -2,7 +2,6 @@
 
 from srcs.const import *
 import sys
-#import threading
 
 import tkinter as tk
 from tkinter import ttk
@@ -22,10 +21,10 @@ import json
 import numpy as np
 import pandas as pd
 
-##import matplotlib
-##matplotlib.use("TkAgg")
-##from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-##from matplotlib.figure import Figure
+import matplotlib
+matplotlib.use("TkAgg")
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 class FourthTab(object):
 
@@ -209,6 +208,14 @@ class FourthTab(object):
 
         accolade_label = Label(command_frame, image=self.accolade_pic)
         accolade_label.grid(row=1, column=5, sticky="new")
+
+        self.fig = Figure(figsize=(10, 2), dpi=100)
+        self.graph = self.fig.add_subplot(111)
+        
+        self.graph.set_title("Training history")
+        self.graph_canvas = FigureCanvasTkAgg(self.fig, self.train_frame)
+        self.graph_canvas.draw()
+        self.graph_canvas.get_tk_widget().grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
 
     def grey_patience(self):
@@ -412,7 +419,7 @@ class FourthTab(object):
                 
                 showinfo("Model Loaded", "Model '%s' loaded" % (self.model_filename.split('/')[-1]))
         else:
-            showwarning("Error", "Load a dataset before you import a model");
+            showwarning("Error", "Load a dataset before you import a model")
 
     def check_model(self):
         try:
@@ -458,20 +465,53 @@ class FourthTab(object):
 
             import keras
             import keras.backend as K
-            
-            #from srcs.keras_classes import CustomModelCheckPoint
-            #checkpoint = CustomModelCheckPoint(graph=self.graph, canvas=self.graph_canvas)
 
-            early_stop = None
+            callbacks=[]
             if self.stop_on.get() == 1:
                 early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=patience, verbose=0, mode='auto', baseline=None)
-                callbacks = [early_stop]
-            else:
-                callbacks = None
+                callbacks.append(early_stop)
+
+            # init graph values
+            x = 0
+            tab_x = []
+            tab_acc = []
+            tab_loss = []
+            tab_val_acc = []
+            tab_val_loss = []
+
+            self.graph.cla()
+            self.graph_canvas.draw()
             
-            history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=epochs, validation_split=split, callbacks=callbacks, verbose=verbose)
+            self.graph.plot(tab_x, tab_acc, "g", label="Accuracy")
+            self.graph.plot(tab_x, tab_loss, "y", label="Loss")
+            self.graph.plot(tab_x, tab_val_acc, "b", label="Validation Accuracy")
+            self.graph.plot(tab_x, tab_val_loss, "r", label="Validation Loss")
+            self.graph.autoscale(enable=None, axis='both', tight=True)
+            handles, labels = self.graph.get_legend_handles_labels()
+            self.graph.legend(handles, labels)
 
+            while x < epochs:
+                # Train on 1 epoch
+                history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, callbacks=callbacks, verbose=verbose)
+                # plot in graph
+                tab_x.append(x)
+                tab_acc.append(history.history['acc'])
+                tab_loss.append(history.history['loss'])
+                tab_val_acc.append(history.history['val_acc'])
+                tab_val_loss.append(history.history['val_loss'])
+                self.graph.plot(tab_x, tab_acc, "g", label="Accuracy")
+                self.graph.plot(tab_x, tab_loss, "y", label="Loss")
+                self.graph.plot(tab_x, tab_val_acc, "b", label="Validation Accuracy")
+                self.graph.plot(tab_x, tab_val_loss, "r", label="Validation Loss")
+                self.graph.autoscale(enable=None, axis='both', tight=True)
+                self.graph_canvas.draw()
+                x = x + 1
 
+            res = askquestion("Success", "Training done on %d epochs \n Save trained model ?" % epochs)
+            if res == "yes":
+                filename = asksaveasfilename(title = "Save Model", defaultextension=".h5", filetypes = (("h5py files","*.h5"),("all files","*.*")))
+                if filename :
+                    self.model.save(filename)
         else:
             showwarning("Error", "Incompatible model / dataset")
 

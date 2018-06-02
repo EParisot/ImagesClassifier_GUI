@@ -630,7 +630,7 @@ class ThirdTab(object):
 
         model.compile(optimizer=opti, loss=loss, metrics=['accuracy'])
 
-        model.save(self.filename.split('.')[0] + ".h5py");
+        model.save(self.filename.split('.')[0] + ".h5");
 
         if self.devMode:
             model.summary()
