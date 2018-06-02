@@ -131,6 +131,9 @@ class FourthTab(object):
         
         self.check_label = Label(command_frame)
         self.check_label.grid(row=1, column=2, padx=10, pady=5, sticky="ne")
+
+        self.check = BooleanVar()
+        self.check.set(False)
         
         load_model_handler = lambda: self.load_model(self)
         self.load_model_but = Button(command_frame)
@@ -233,7 +236,7 @@ class FourthTab(object):
             self.h_in.set(str(self.images.shape[1]))
             self.pix_in.set(str(self.images.shape[3]))
             self.out_dataset.set(str(self.labels.shape[1]))
-            self.check()
+            self.check_model()
             
             showinfo('Success', '%d Images and labels loaded' % nb_images)
             self.app.config(cursor="")
@@ -375,7 +378,7 @@ class FourthTab(object):
             self.w_in.set(str(self.images.shape[2]))
             self.h_in.set(str(self.images.shape[1]))
             self.pix_in.set(str(self.images.shape[3]))
-            self.check()
+            self.check_model()
             
             self.labo_photos_frame.destroy()
             self.labo_photos_but.config(state="disabled")
@@ -397,13 +400,13 @@ class FourthTab(object):
                 self.h_out.set(str(self.input_shape[1]))
                 self.pix_out.set(str(self.input_shape[3]))
                 self.out_model.set(str(self.model.layers[-1].get_output_at(0).get_shape().as_list()[1]))
-                self.check()
+                self.check_model()
                 
                 showinfo("Model Loaded", "Model '%s' loaded" % (self.model_filename.split('/')[-1]))
         else:
             showwarning("Error", "Load a dataset before you import a model");
 
-    def check(self):
+    def check_model(self):
         try:
             if int(self.w_in.get()) != int(self.w_out.get()) or \
                             int(self.h_in.get()) != int(self.h_out.get()) or \
@@ -411,13 +414,18 @@ class FourthTab(object):
                             int(self.out_dataset.get()) != int(self.out_model.get()):
                 self.check_label.config(image=self.nok_pic)
                 self.check_label.image = self.nok_pic
+                self.check.set(False)
             else:
                 self.check_label.config(image=self.ok_pic)
                 self.check_label.image = self.ok_pic
+                self.check.set(True)
         except ValueError:
             pass
 
     def train_model(self, event):
-        pass
-        # TODO : get hyper parameters and start train, print history each epoch
+        if self.check.get() is True:
+            pass
+            # TODO : get hyper parameters, start thread and start train, print history each epoch
+        else:
+            showwarning("Erorr", "Incompatible model / dataset")
         
