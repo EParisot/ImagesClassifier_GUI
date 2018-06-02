@@ -2,7 +2,7 @@
 
 from srcs.const import *
 import sys
-import threading
+#import threading
 
 import tkinter as tk
 from tkinter import ttk
@@ -17,7 +17,6 @@ import configparser
 from time import time, localtime, strftime, sleep
 
 import srcs.Tk_Tooltips as ttp
-from srcs.keras_classes import CustomModelCheckPoint
 
 import json
 import numpy as np
@@ -29,8 +28,8 @@ class FourthTab(object):
         self.app = app
         self.devMode = devMode
 
-        self.thread = threading.Thread(target=self.training, args=())
-        self.stopEvent = threading.Event()
+        #self.thread = threading.Thread(target=self.training, args=())
+        #self.stopEvent = threading.Event()
         self.model = None
         self.model_filename = None
         self.input_shape = None
@@ -434,14 +433,15 @@ class FourthTab(object):
 
     def train_model(self, event):
         if self.check.get() is True:
-            if self.thread.is_alive():
-                showwarning("Training already running", "Please stop the current training you start again")
-            else:
-                self.thread = threading.Thread(target=self.training, args=())
-                self.stopEvent = threading.Event()
-            sleep(0.2)
-            self.thread.start()
-            self.stop_train_but.config(state="normal")
+##            if self.thread.is_alive():
+##                showwarning("Training already running", "Please stop the current training you start again")
+##            else:
+##                self.thread = threading.Thread(target=self.training, args=())
+##                self.stopEvent = threading.Event()
+##            sleep(0.2)
+##            self.thread.start()
+            self.training()
+##            self.stop_train_but.config(state="normal")
         else:
             showwarning("Error", "Incompatible model / dataset")
 
@@ -474,21 +474,25 @@ class FourthTab(object):
 
         import keras
         import keras.backend as K
+        from srcs.keras_classes import CustomModelCheckPoint
         
         checkpoint = CustomModelCheckPoint()
 
         early_stop = None
         if self.stop_on.get() == 1:
             early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=patience, verbose=0, mode='auto', baseline=None)
-        
-        h = self.model.fit(self.images, self.labels, batch_size=batch, epochs=epochs, validation_split=split, callbacks=[checkpoint, early_stop], verbose=verbose)
-
-        self.stop_train_but.config(state="disabled")
-
-    def stop_train(self, event):
-        if self.thread.is_alive():
-            self.thread._Thread_stop()
+            callbacks = [checkpoint, early_stop]
         else:
-            showwarning("Error", "No training running")
-        self.stop_train_but.config(state="disabled")
+            callbacks = [checkpoint]
+        
+        h = self.model.fit(self.images, self.labels, batch_size=batch, epochs=epochs, validation_split=split, callbacks=callbacks, verbose=verbose)
+
+##        self.stop_train_but.config(state="disabled")
+
+##    def stop_train(self, event):
+##        if self.thread.is_alive():
+##            self.thread._Thread_stop()
+##        else:
+##            showwarning("Error", "No training running")
+##        self.stop_train_but.config(state="disabled")
 
