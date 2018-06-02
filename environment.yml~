@@ -12,3 +12,4 @@ dependencies:
   - imutils
   - tensorflow
   - keras
+  - pandastable

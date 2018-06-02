@@ -22,14 +22,17 @@ import json
 import numpy as np
 import pandas as pd
 
+##import matplotlib
+##matplotlib.use("TkAgg")
+##from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+##from matplotlib.figure import Figure
+
 class FourthTab(object):
 
     def __init__(self, app, devMode):
         self.app = app
         self.devMode = devMode
 
-        #self.thread = threading.Thread(target=self.training, args=())
-        #self.stopEvent = threading.Event()
         self.model = None
         self.model_filename = None
         self.input_shape = None
@@ -42,6 +45,7 @@ class FourthTab(object):
         self.train_frame.grid_columnconfigure(0, weight=1)
         self.train_frame.grid_columnconfigure(1, weight=1)
         self.train_frame.grid_rowconfigure(0, weight=1)
+        self.train_frame.grid_rowconfigure(1, weight=1)
 
         command_frame = Frame(self.train_frame)
         command_frame.grid(row=0, column=1, sticky='nw')
@@ -205,6 +209,7 @@ class FourthTab(object):
 
         accolade_label = Label(command_frame, image=self.accolade_pic)
         accolade_label.grid(row=1, column=5, sticky="new")
+
 
     def grey_patience(self):
         if self.stop_on.get() == 1:
@@ -453,18 +458,19 @@ class FourthTab(object):
 
             import keras
             import keras.backend as K
-            from srcs.keras_classes import CustomModelCheckPoint
             
-            checkpoint = CustomModelCheckPoint()
+            #from srcs.keras_classes import CustomModelCheckPoint
+            #checkpoint = CustomModelCheckPoint(graph=self.graph, canvas=self.graph_canvas)
 
             early_stop = None
             if self.stop_on.get() == 1:
                 early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=patience, verbose=0, mode='auto', baseline=None)
-                callbacks = [checkpoint, early_stop]
+                callbacks = [early_stop]
             else:
-                callbacks = [checkpoint]
+                callbacks = None
             
-            h = self.model.fit(self.images, self.labels, batch_size=batch, epochs=epochs, validation_split=split, callbacks=callbacks, verbose=verbose)
+            history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=epochs, validation_split=split, callbacks=callbacks, verbose=verbose)
+
 
         else:
             showwarning("Error", "Incompatible model / dataset")
