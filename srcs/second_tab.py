@@ -36,7 +36,7 @@ class SecondTab(object):
         self.label_frame.grid_rowconfigure(0, weight=1)
 
         self.command_frame = Frame(self.label_frame)
-        self.command_frame.grid(row=0, column=0, sticky='n')
+        self.command_frame.grid(row=0, column=0)
         self.command_frame.grid_rowconfigure(0, weight=1)
         self.command_frame.grid_rowconfigure(1, weight=1)
         self.command_frame.grid_rowconfigure(2, weight=1)
@@ -44,6 +44,7 @@ class SecondTab(object):
         self.command_frame.grid_rowconfigure(4, weight=1)
         self.command_frame.grid_rowconfigure(5, weight=1)
         self.command_frame.grid_columnconfigure(0, weight=1)
+        self.command_frame.grid_columnconfigure(1, weight=1)
 
         load_handler = lambda: self.load(self)
         self.reload_pic = ImageTk.PhotoImage(Image.open('assets/reload.png'))
@@ -78,7 +79,7 @@ class SecondTab(object):
                 msgFunc=None, delay=1, follow=True)
 
         self.button_frame = Frame(self.command_frame)
-        self.button_frame.grid(row=4, column=0, sticky='n')
+        self.button_frame.grid(row=0, column=1, rowspan=4, padx=10)
         self.button_frame.grid_rowconfigure(0, weight=1)
         self.button_frame.grid_rowconfigure(1, weight=1)
         self.button_frame.grid_rowconfigure(2, weight=1)
@@ -245,23 +246,26 @@ class SecondTab(object):
             self.h2.set(pic.size[1])
             self.w1.set(0)
             self.w2.set(pic.size[0])
+            self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
+            self.pic_canvas.image = image
+            self.draw_h1(self.h1.get(), pic.size[0])
+            self.draw_h2(self.h2.get(), pic.size[0], pic.size[1])
+            self.draw_w1(self.w1.get(), pic.size[1])
+            self.draw_w2(self.w2.get(), pic.size[0], pic.size[1])
 
         else:
-            pic = Image.open('assets/prev.png')
+            pic = Image.open('assets/no_pic.png')
             image = ImageTk.PhotoImage(pic)
             self.h1.set(0)
             self.h2.set(0)
             self.w1.set(0)
             self.w2.set(0)
+            self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
+            self.pic_canvas.config(height=SNAP_H, width=SNAP_W)
+            self.pic_canvas.image = image
+            self.pic_canvas.grid_propagate(0)
 
-        self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
-        self.pic_canvas.image = image
-        self.draw_h1(self.h1.get(), pic.size[0])
-        self.draw_h2(self.h2.get(), pic.size[0], pic.size[1])
-        self.draw_w1(self.w1.get(), pic.size[1])
-        self.draw_w2(self.w2.get(), pic.size[0], pic.size[1])
         lab = self.get_label()
-
         if lab == '':
             self.lab_info2.config(text='No label')
         else:
@@ -281,7 +285,7 @@ class SecondTab(object):
             pic = Image.open(self.photos[self.photo_act])
             image = ImageTk.PhotoImage(pic)
         else:
-            pic = Image.open('assets/prev.png')
+            pic = Image.open('assets/no_pic.png')
             image = ImageTk.PhotoImage(pic)
 
         self.pic_frame = Frame(self.label_frame)
@@ -296,7 +300,7 @@ class SecondTab(object):
         self.pic_frame.grid_propagate(0)
 
         self.pic_canvas = Canvas(self.pic_frame, borderwidth=2, relief="sunken")
-        self.pic_canvas.grid(row=1, column=1, sticky="nsew")
+        self.pic_canvas.grid(row=1, column=1)
 
         self.h1 = IntVar()
         self.h1.set(0)
@@ -329,13 +333,13 @@ class SecondTab(object):
             self.slide_width2 = Scale(self.pic_frame, from_=0, to=pic.size[0], orient=HORIZONTAL, length=pic.size[0], variable=self.w2, command=w2_handler)
             self.slide_width2.grid(row=2, column=1, sticky="new")
 
-        self.lab_info1 = Label(self.label_frame, height=2, width=15, font=("Courier", 20))
+        self.lab_info1 = Label(self.label_frame, height=2, width=10, font=("Courier", 20))
         self.lab_info1.config(borderwidth=2, relief="sunken", text='Photo(s) : \n' + str(self.photo_act) + '/' + str(len(self.photos)))
-        self.lab_info1.grid(row=0, column=2, padx=20, sticky="ew")
+        self.lab_info1.grid(row=0, column=2, padx=10, sticky="e")
 
-        self.lab_info2 = Label(self.command_frame, height=2, width=15, font=("Courier", 20))
+        self.lab_info2 = Label(self.command_frame, height=2, width=10, font=("Courier", 20))
         self.lab_info2.config(borderwidth=2, relief="sunken", text='Label: ' + self.get_label())
-        self.lab_info2.grid(row=5, column=0, columnspan=2, padx=20, sticky="nsew")
+        self.lab_info2.grid(row=5, column=0, columnspan=2, padx=10, sticky="nsew")
 
         self.print_win()
 
@@ -423,7 +427,7 @@ class SecondTab(object):
                 if self.photo_act >= len(self.photos):
                     self.photo_act = 0
             except:
-               showwarning("File not found", "No file to remove") 
+               showwarning("File not found", "No picture to remove") 
         else:
-            showwarning("File not found", "No file to remove")
+            showwarning("File not found", "No picture to remove")
         self.print_win()

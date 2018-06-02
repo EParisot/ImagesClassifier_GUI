@@ -125,18 +125,18 @@ class FirstTab():
         del_but.grid(row=5, column=0, sticky="se", pady=5)
         del_but = ttp.ToolTip(del_but, 'Remove last Snap', msgFunc=None, delay=1, follow=True)
  
-        count_frame = Frame(command_frame, borderwidth=2, relief="sunken")
-        count_frame.grid(row=6, column=0, sticky='w', padx=5)
+        count_frame = Frame(self.snap_frame, borderwidth=2, relief="sunken")
+        count_frame.grid(row=0, column=2, sticky='e', padx=20)
         count_frame.grid_columnconfigure(0, weight=1)
         count_frame.grid_rowconfigure(0, weight=1)
         count_frame.grid_rowconfigure(1, weight=1)
 
         snap_count_title = Label(count_frame)
-        snap_count_title.config(text="Photos :", font=("Helvetica", 16))
+        snap_count_title.config(text="Photos :", font=("Courier", 20))
         snap_count_title.grid(row=0, column=0, padx=10)
 
         snap_count = Label(count_frame)
-        snap_count.config(font=("Helvetica", 16), textvariable=self.count)
+        snap_count.config(font=("Courier", 20), textvariable=self.count)
         snap_count.grid(row=1, column=0, padx=10)
 
     def videoLoop(self):
