@@ -285,11 +285,11 @@ class FourthTab(object):
                 # load an image from file
                 pre_image = load_img(filename)
                 if i == 0:
-                    min_size = [pre_image.size[0], pre_image.size[1]]
+                    self.min_size = [pre_image.size[0], pre_image.size[1]]
                     i = i + 1
                 if i > 0:
-                    if pre_image.size[0] < min_size[0] or pre_image.size[1] < min_size[1]:
-                        min_size = [pre_image.size[0], pre_image.size[1]]
+                    if pre_image.size[0] < self.min_size[0] or pre_image.size[1] < self.min_size[1]:
+                        self.min_size = [pre_image.size[0], pre_image.size[1]]
                         size_diff = True
                 # convert the image pixels to a numpy array
                 image = img_to_array(pre_image)
@@ -307,7 +307,7 @@ class FourthTab(object):
             if ret == "no":
                 return [], []
             elif ret == "yes":
-                images = self.resize(pre_images, (min_size[0], min_size[1]))
+                images = self.resize(pre_images, (self.min_size[0], self.min_size[1]))
         return images, labels
 
     def resize(self, images, min_size):
@@ -316,7 +316,7 @@ class FourthTab(object):
         for image in images:
             if image.size[0] != min_size[0] or image.size[1] != min_size[1]:
                 image = image.resize(min_size)
-            images[i] = img_to_array(image)    
+            images[i] = img_to_array(image) 
             i = i + 1
         return images
             
@@ -325,17 +325,26 @@ class FourthTab(object):
         if self.dataset_dir and len(self.images) > 0:
 
             self.labo_photos_frame = tk.Toplevel()
-            self.labo_photos_frame.geometry("%dx%d+%d+%d" % (SNAP_W + 100, SNAP_H + 200, self.app.winfo_x(), self.app.winfo_y()))
             self.labo_photos_frame.title("PhotoLab")
             self.labo_photos_frame.transient(self.app)
             self.labo_photos_frame.grab_set()
 
             first_pic = None
             i = 0
-            while i + 1 < len(os.listdir(self.dataset_dir)) and not os.listdir(self.dataset_dir)[i].endswith(EXT_PHOTOS):
-                i = i + 1
-            first_pic = os.listdir(self.dataset_dir)[i]
-            pic = Image.open(self.dataset_dir + '/' + first_pic)
+            while i + 1 <= len(os.listdir(self.dataset_dir)):
+                if not os.listdir(self.dataset_dir)[i].endswith(EXT_PHOTOS):
+                    i = i + 1
+                    continue
+                first_pic = os.listdir(self.dataset_dir)[i]
+                pic = Image.open(self.dataset_dir + '/' + first_pic)
+                if pic.size[0] != self.min_size[0] or pic.size[1] != self.min_size[1]:
+                    i = i + 1
+                    continue
+                else:
+                    break
+                
+            self.labo_photos_frame.geometry("%dx%d+%d+%d" % (pic.size[0] + 100, pic.size[1] + 200, self.app.winfo_x(), self.app.winfo_y()))
+            
             image = ImageTk.PhotoImage(pic)
 
             command_frame = Frame(self.labo_photos_frame)
