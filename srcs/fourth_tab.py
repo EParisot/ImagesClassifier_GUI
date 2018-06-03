@@ -453,7 +453,7 @@ class FourthTab(object):
     def train_model(self, event):
         if self.check.get() is True:
             self.app.config(cursor="wait")
-            self.stop_train_but.config(state="normal")
+##            self.stop_train_but.config(state="normal")
 ##            self.stop.set(False)
             
             if self.devMode:
@@ -512,7 +512,7 @@ class FourthTab(object):
             handles, labels = self.graph.get_legend_handles_labels()
             self.graph.legend(handles, labels)
 
-            while x < epochs and self.stop.get() == False:
+            while x < epochs: # and self.stop.get() == False:
                 # Train on 1 epoch
                 history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, callbacks=callbacks, verbose=verbose)
                 # plot in graph

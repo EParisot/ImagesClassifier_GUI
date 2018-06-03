@@ -247,7 +247,9 @@ class SecondTab(object):
             self.w1.set(0)
             self.w2.set(pic.size[0])
             self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
+            self.pic_canvas.config(height=SNAP_H, width=SNAP_W)
             self.pic_canvas.image = image
+            self.pic_canvas.grid_propagate(0)
             self.draw_h1(self.h1.get(), pic.size[0])
             self.draw_h2(self.h2.get(), pic.size[0], pic.size[1])
             self.draw_w1(self.w1.get(), pic.size[1])
