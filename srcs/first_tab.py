@@ -316,9 +316,6 @@ class FirstTab():
     def on_quit(self):
         if self.thread.is_alive():
             showwarning("Video running", "Please stop the video before you quit")
-            return
-        if self.app.layers_list and self.app.third_tab.saved.get() == False:
-            res = askquestion("Quit", "This action may destroy unsaved model... \n Quit anyway ?", icon='warning')
-            if res == 'no':
-                return
-        self.app.quit()
+            return 0
+        else:
+            return 1

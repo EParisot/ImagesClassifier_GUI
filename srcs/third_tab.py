@@ -639,3 +639,13 @@ class ThirdTab(object):
 
 
         self.app.config(cursor="")
+
+    def on_quit(self):
+        if self.app.layers_list and self.saved.get() == False:
+            res = askquestion("Quit", "This action may destroy unsaved model... \n Quit anyway ?", icon='warning')
+            if res == 'no':
+                return 0
+            else:
+                return 1
+        else:
+            return 1

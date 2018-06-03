@@ -2,6 +2,7 @@
 
 from srcs.const import *
 import sys
+import threading
 
 import tkinter as tk
 from tkinter import ttk
@@ -38,8 +39,10 @@ class FourthTab(object):
         self.dataset_dir = None
         self.images = None
         self.labels = None
-##        self.stop = BooleanVar()
-##        self.stop.set(False)
+
+        self.tf_graph = None
+        self.thread = threading.Thread(target=self.train_loop, args=())
+        self.stopEvent = threading.Event()
         
         self.train_frame = Frame(app.fourth_tab)
         self.train_frame.grid(row=0, column=0, stick='nsew')
@@ -163,11 +166,11 @@ class FourthTab(object):
         self.train_model_but.grid(row=0, column=0, padx=10, pady=5, sticky="n")
         self.train_model_ttp = ttp.ToolTip(self.train_model_but, 'Train Model', msgFunc=None, delay=1, follow=True)
 
-##        stop_train_handler = lambda: self.stop_train(self)
-##        self.stop_train_but = Button(train_label)
-##        self.stop_train_but.config(image=self.stop_pic, command=stop_train_handler, state="disabled")
-##        self.stop_train_but.grid(row=0, column=1, padx=10, pady=5, sticky="s")
-##        self.stop_train_ttp = ttp.ToolTip(self.stop_train_but, 'Stop Training', msgFunc=None, delay=1, follow=True)
+        stop_train_handler = lambda: self.stop_train(self)
+        self.stop_train_but = Button(train_label)
+        self.stop_train_but.config(image=self.stop_pic, command=stop_train_handler, state="disabled")
+        self.stop_train_but.grid(row=0, column=1, padx=10, pady=5, sticky="s")
+        self.stop_train_ttp = ttp.ToolTip(self.stop_train_but, 'Stop Training', msgFunc=None, delay=1, follow=True)
 
         hyper_param_frame = Frame(command_frame, borderwidth=2, relief="sunken")
         hyper_param_frame.grid(row=0, column=5, sticky='nw', padx=5, pady=10)
@@ -416,6 +419,11 @@ class FourthTab(object):
             if self.model_filename:
                 import keras
                 from keras.models import load_model
+                import keras.backend as K
+                import tensorflow as tf
+
+                self.tf_graph = tf.get_default_graph()
+                
                 self.model = load_model(self.model_filename)
                 self.train_model_but.config(state="normal")
 
@@ -453,40 +461,61 @@ class FourthTab(object):
     def train_model(self, event):
         if self.check.get() is True:
             self.app.config(cursor="wait")
-##            self.stop_train_but.config(state="normal")
-##            self.stop.set(False)
-            
-            if self.devMode:
-                verbose = 1
-                self.model.summary()
-            try:
-                batch = int(self.batch.get())
-                if batch <= 0 :
-                    self.app.config(cursor="")
-                    showwarning("Error", "Null or negative batch size value")
-                    return
-                epochs = int(self.epochs.get())
-                if epochs <= 0 :
-                    self.app.config(cursor="")
-                    showwarning("Error", "Null or negative epochs value")
-                    return
-                split = round(float(self.split.get()), 2)
-                if split <= 0 :
-                    self.app.config(cursor="")
-                    showwarning("Error", "Null or negative split value")
-                    return
-                patience = int(self.patience.get())
-                if patience <= 0 :
-                    self.app.config(cursor="")
-                    showwarning("Error", "Null or negative patience value")
-                    return
-            except ValueError:
+            self.stop_train_but.config(state="normal")
+
+            if self.thread.is_alive():
+                self.stop_train_but.config(state="disabled")
                 self.app.config(cursor="")
-                showwarning("Error", "Wrong hyper-parameter value")
+                showwarning("Error", "Training already running")
                 return
 
-            import keras
-            import keras.backend as K
+            # Start training thread
+            self.thread = threading.Thread(target=self.train_loop, args=())
+            self.stopEvent = threading.Event()
+            self.thread.start()
+
+        else:
+            self.app.config(cursor="")
+            showwarning("Error", "Incompatible model / dataset")
+
+    def train_loop(self):
+        if self.devMode:
+            verbose = 1
+            self.model.summary()
+
+        try:
+            batch = int(self.batch.get())
+            if batch <= 0 :
+                self.stop_train_but.config(state="disabled")
+                self.app.config(cursor="")
+                showwarning("Error", "Null or negative batch size value")
+                return
+            epochs = int(self.epochs.get())
+            if epochs <= 0 :
+                self.stop_train_but.config(state="disabled")
+                self.app.config(cursor="")
+                showwarning("Error", "Null or negative epochs value")
+                return
+            split = round(float(self.split.get()), 2)
+            if split <= 0 :
+                self.stop_train_but.config(state="disabled")
+                self.app.config(cursor="")
+                showwarning("Error", "Null or negative split value")
+                return
+            patience = int(self.patience.get())
+            if patience <= 0 :
+                self.stop_train_but.config(state="disabled")
+                self.app.config(cursor="")
+                showwarning("Error", "Null or negative patience value")
+                return
+        except ValueError:
+            self.stop_train_but.config(state="disabled")
+            self.app.config(cursor="")
+            showwarning("Error", "Wrong hyper-parameter value")
+            return
+
+        # use default graph on thread
+        with self.tf_graph.as_default():
 
             callbacks=[]
             if self.stop_on.get() == 1:
@@ -511,8 +540,10 @@ class FourthTab(object):
             self.graph.autoscale(enable=None, axis='both', tight=True)
             handles, labels = self.graph.get_legend_handles_labels()
             self.graph.legend(handles, labels)
-
-            while x < epochs: # and self.stop.get() == False:
+            
+            while x < epochs:
+                if  self.stopEvent.is_set():
+                    return
                 # Train on 1 epoch
                 history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, callbacks=callbacks, verbose=verbose)
                 # plot in graph
@@ -529,19 +560,29 @@ class FourthTab(object):
                 self.graph_canvas.draw()
                 x = x + 1
 
-            self.app.config(cursor="")
-            res = askquestion("Success", "Training done on %d epochs \n Save trained model ?" % epochs)
-##            self.stop_train_but.config(state="disabled")
-            if res == "yes":
-                filename = asksaveasfilename(title = "Save Model", defaultextension=".h5", filetypes = (("h5py files","*.h5"),("all files","*.*")))
-                if filename :
-                    self.model.save(filename)
-        else:
-            self.app.config(cursor="")
-            showwarning("Error", "Incompatible model / dataset")
-##            self.stop_train_but.config(state="disabled")
+        self.stop_train_but.config(state="disabled")
+        self.app.config(cursor="")
+        res = askquestion("Success", "Training done on %d epochs \n Save trained model ?" % x)
 
-##    def stop_train(self, event):
-##        self.stop.set(True)
-##        self.stop_train_but.config(state="disabled")
+        if res == "yes":
+            filename = asksaveasfilename(title = "Save Model", defaultextension=".h5", filetypes = (("h5py files","*.h5"),("all files","*.*")))
+            if filename :
+                self.model.save(filename)
+
+    def stop_train(self, event):
+        if self.thread.is_alive():
+            self.stopEvent.set()
+            self.stop_train_but.config(state="disabled")
+            self.app.config(cursor="")
+        else:
+           showwarning("Error", "No training running")
+
+    def on_quit(self):
+        if self.thread.is_alive():
+            showwarning("Training running", "Please stop the training before you quit")
+            return 0
+        else:
+            return 1
+            
+            
 

@@ -194,4 +194,9 @@ class App(tk.Tk):
             options_frame.destroy()
 
     def on_Quit(self):
-        self.first_tab.on_quit()
+        ret = 0
+        ret += self.first_tab.on_quit()
+        ret += self.third_tab.on_quit()
+        ret += self.fourth_tab.on_quit()
+        if ret == 3:
+            self.quit()
