@@ -264,7 +264,6 @@ class FourthTab(object):
             self.out_dataset.set(str(self.labels.shape[1]))
             self.check_model()
             
-            showinfo('Success', '%d Images and labels loaded' % nb_images)
             self.app.config(cursor="")
             self.labo_photos_but.config(state="normal")
             self.load_model_but.config(state="normal")
@@ -308,7 +307,65 @@ class FourthTab(object):
                 return [], []
             elif ret == "yes":
                 images = self.resize(pre_images, (self.min_size[0], self.min_size[1]))
+        elif len(images) > 0:
+            ret = askquestion("Success", "%d Images and labels loaded \nResize images ?" % len(images))
+            if ret == "yes":
+                self.get_size(pre_images)
         return images, labels
+
+    def get_size(self, pre_images):
+        self.size_frame = tk.Toplevel()
+        self.size_frame.title("New Size")
+        self.size_frame.geometry("%dx%d+%d+%d" % (200, 200, self.app.winfo_x(), self.app.winfo_y()))
+        self.size_frame.transient(self.app)
+        self.size_frame.grab_set()
+
+        command_frame = Frame(self.size_frame)
+        command_frame.grid(row=0, column=0, sticky='nw')
+        command_frame.grid_rowconfigure(0, weight=1)
+        command_frame.grid_rowconfigure(1, weight=1)
+        command_frame.grid_rowconfigure(2, weight=1)
+        command_frame.grid_columnconfigure(0, weight=1)
+        command_frame.grid_columnconfigure(1, weight=1)
+
+        w_label = Label(command_frame, text="Width :", font=("Helvetica", 16))
+        w_label.grid(row=0, column=0, padx=5)
+
+        self.w = StringVar()
+        self.w.set(self.min_size[0])
+
+        w_entry = Entry(command_frame, textvariable=self.w)
+        w_entry.grid(row=0, column=1, padx=5)
+        
+        h_label = Label(command_frame, text="Height :", font=("Helvetica", 16))
+        h_label.grid(row=1, column=0, padx=5)
+
+        self.h = StringVar()
+        self.h.set(self.min_size[1])
+
+        h_entry = Entry(command_frame, textvariable=self.h)
+        h_entry.grid(row=1, column=1, padx=5)
+
+        size_handler = lambda : self.close_size(pre_images, self.w, self.h)
+        size_but = Button(command_frame, text="Confirm", font=("Helvetica", 16), command=size_handler)
+        size_but.grid(row=2, column=0, columnspan=2, pady=10)
+
+    def close_size(self, pre_images,  w, h):
+        try:
+            w = int(w.get())
+            h = int(h.get())
+        except ValueError:
+            showwarning("Error", "Value Error")
+            self.size_frame.destroy()
+            return
+        self.images = self.resize(pre_images, (w, h))
+        self.images = np.array(self.images)
+        # update images dim
+        self.w_in.set(str(self.images.shape[2]))
+        self.h_in.set(str(self.images.shape[1]))
+        self.pix_in.set(str(self.images.shape[3]))
+        self.check_model()
+        self.size_frame.destroy()
 
     def resize(self, images, min_size):
         from keras.preprocessing.image import img_to_array
@@ -319,7 +376,6 @@ class FourthTab(object):
             images[i] = img_to_array(image) 
             i = i + 1
         return images
-            
 
     def labo_photos(self, images):
         if self.dataset_dir and len(self.images) > 0:
@@ -457,7 +513,7 @@ class FourthTab(object):
     def load_model(self, event):
         if self.dataset_dir:
             self.app.config(cursor="wait")
-            self.model_filename =  askopenfilename(title = "Select Model", filetypes = (("h5py files","*.h5py"),("all files","*.*")))
+            self.model_filename =  askopenfilename(title = "Select Model", filetypes = (("h5py files","*.h5"),("all files","*.*")))
             if self.model_filename:
                 import keras
                 from keras.models import load_model
@@ -480,6 +536,8 @@ class FourthTab(object):
                 
                 self.app.config(cursor="")
                 showinfo("Model Loaded", "Model '%s' loaded" % (self.model_filename.split('/')[-1]))
+            else:
+                self.app.config(cursor="")
         else:
             self.app.config(cursor="")
             showwarning("Error", "Load a dataset before you import a model")
