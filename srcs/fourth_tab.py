@@ -245,7 +245,7 @@ class FourthTab(object):
             self.images, self.labels = self.load_data(self.dataset_dir)
             nb_images = len(self.images)
             if nb_images == 0:
-                showwarning('Error', 'No Images found in %s' % dataset_dir)
+                showwarning('Error', 'No Images loaded from %s' % dataset_dir)
                 self.app.config(cursor="")
                 return
             
@@ -273,20 +273,53 @@ class FourthTab(object):
     def load_data(self, directory):
         from keras.preprocessing.image import load_img
         from keras.preprocessing.image import img_to_array
+        pre_images = []
         images = []
         labels = []
+        i = 0
+        size_diff = False
+        # check sizes and get values as lists
         for name in os.listdir(directory):
             if name.endswith(EXT_PHOTOS):
                 filename = directory + '/' + name
                 # load an image from file
-                image = load_img(filename)
+                pre_image = load_img(filename)
+                if i == 0:
+                    min_size = [pre_image.size[0], pre_image.size[1]]
+                    i = i + 1
+                if i > 0:
+                    if pre_image.size[0] < min_size[0] or pre_image.size[1] < min_size[1]:
+                        min_size = [pre_image.size[0], pre_image.size[1]]
+                        size_diff = True
                 # convert the image pixels to a numpy array
-                image = img_to_array(image)
+                image = img_to_array(pre_image)
                 # get image id + labels
-                value = int(name.split('_')[0])
-                labels.append(value)
+                if len(name.split('_')) > 1:
+                    value = int(name.split('_')[0])
+                    labels.append(value)
+                else:
+                    showwarning("Error", "Missing Label")
+                    return [], []
                 images.append(image)
+                pre_images.append(pre_image)
+        if len(images) > 0 and size_diff == True:
+            ret = askquestion("Warning", "Different image's size in folder... \nResize all images to the smallest one's size ? \n(Training needs uniform batches of images)")
+            if ret == "no":
+                return [], []
+            elif ret == "yes":
+                images = self.resize(pre_images, (min_size[0], min_size[1]))
         return images, labels
+
+    def resize(self, images, min_size):
+        from keras.preprocessing.image import img_to_array
+        i = 0
+        for image in images:
+            if image.size[0] != min_size[0] or image.size[1] != min_size[1]:
+                image = image.resize(min_size)
+            images[i] = img_to_array(image)    
+            i = i + 1
+        return images
+            
 
     def labo_photos(self, images):
         if self.dataset_dir and len(self.images) > 0:
@@ -583,6 +616,4 @@ class FourthTab(object):
             return 0
         else:
             return 1
-            
-            
 
