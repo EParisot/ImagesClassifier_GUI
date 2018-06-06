@@ -37,7 +37,6 @@ class ThirdTab(object):
         self.model_frame.grid_rowconfigure(1, weight=1)
         self.model_frame.grid_rowconfigure(2, weight=1)
 
-        self.input_pic = ImageTk.PhotoImage(Image.open('assets/photo.png'))
         self.trash_pic = ImageTk.PhotoImage(Image.open('assets/trash.png'))
         self.in_layer_pic = ImageTk.PhotoImage(Image.open('assets/in_layer.png'))
         self.conv2d_layer_pic = ImageTk.PhotoImage(Image.open('assets/hidden_layer1.png'))

@@ -37,6 +37,7 @@ class App(tk.Tk):
         current_theme = style.theme_use()
 
         self.dir_open_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
+        self.dir_photos_pic = ImageTk.PhotoImage(Image.open('assets/dir_photos.png'))
         self.save_pic = ImageTk.PhotoImage(Image.open('assets/save.png'))
 
         self.cfg = configparser.ConfigParser()
@@ -146,7 +147,7 @@ class App(tk.Tk):
         self.path1_result.insert(END, self.cfg.get('paths', 'snap_path'))
         self.path1_result.grid(row=0, column=1, columnspan=2, sticky='we')
         path1_button = Button(paths_frame)
-        path1_button.config(image=self.dir_open_pic, font=("Helvetica", 14), command=self.get_IN_Folder)
+        path1_button.config(image=self.dir_photos_pic, font=("Helvetica", 14), command=self.get_IN_Folder)
         path1_button.grid(row=0, column=3, padx=10, pady=10)
 
         path2_label = Label(paths_frame)

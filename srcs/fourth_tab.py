@@ -65,7 +65,7 @@ class FourthTab(object):
         command_frame.grid_columnconfigure(5, weight=1)
         command_frame.grid_columnconfigure(6, weight=1)
 
-        self.load_dataset_pic = ImageTk.PhotoImage(Image.open('assets/dir_open.png'))
+        self.load_dataset_pic = ImageTk.PhotoImage(Image.open('assets/dir_photos.png'))
         self.load_model_pic = ImageTk.PhotoImage(Image.open('assets/import.png'))
         self.labo_photos_pic = ImageTk.PhotoImage(Image.open('assets/edit_pic.png'))
         self.resize_pic = ImageTk.PhotoImage(Image.open('assets/resize.png'))
@@ -93,6 +93,7 @@ class FourthTab(object):
         checks_label.grid_rowconfigure(1, weight=1)
         checks_label.grid_rowconfigure(2, weight=1)
         checks_label.grid_rowconfigure(3, weight=1)
+        checks_label.grid_rowconfigure(4, weight=1)
         checks_label.grid_columnconfigure(0, weight=1)
         checks_label.grid_columnconfigure(1, weight=1)
         checks_label.grid_columnconfigure(2, weight=1)
@@ -105,11 +106,14 @@ class FourthTab(object):
         pix_label.grid(row=2, column=0, sticky='nwe')
         out_label = Label(checks_label, text="Classes :", font=("Helvetica", 16))
         out_label.grid(row=3, column=0, sticky='nwe')
+        nb_label = Label(checks_label, text="Datas :", font=("Helvetica", 16))
+        nb_label.grid(row=4, column=0, sticky='nwe')
 
         self.w_in = StringVar()
         self.h_in = StringVar()
         self.pix_in = StringVar()
         self.out_dataset = StringVar()
+        self.data_nb = StringVar()
 
         w_in = Label(checks_label, textvariable=self.w_in, font=("Helvetica", 16), borderwidth=2, relief="ridge", width=5)
         w_in.grid(row=0, column=1, sticky='nwe', padx=5)
@@ -119,6 +123,8 @@ class FourthTab(object):
         pix_in.grid(row=2, column=1, sticky='nwe', padx=5)
         out_dataset = Label(checks_label, textvariable=self.out_dataset, font=("Helvetica", 16), borderwidth=2, relief="ridge", width=5)
         out_dataset.grid(row=3, column=1, sticky='nwe', padx=5)
+        data_nb = Label(checks_label, textvariable=self.data_nb, font=("Helvetica", 16), borderwidth=2, relief="ridge", width=5)
+        data_nb.grid(row=4, column=1, sticky='nwe', padx=5)
 
         self.w_out = StringVar()
         self.h_out = StringVar()
@@ -268,6 +274,7 @@ class FourthTab(object):
             self.h_in.set(str(self.images.shape[1]))
             self.pix_in.set(str(self.images.shape[3]))
             self.out_dataset.set(str(self.labels.shape[1]))
+            self.data_nb.set(str(self.labels.shape[0]))
             self.check_model()
             
             self.app.config(cursor="")
@@ -381,6 +388,7 @@ class FourthTab(object):
                 image = image.resize(min_size)
             images[i] = img_to_array(image) 
             i = i + 1
+        showinfo("Success", "%d Images and labels resized to (%d, %d)" % (len(images), min_size[0], min_size[1]))
         return images
 
     def labo_photos(self, images):
