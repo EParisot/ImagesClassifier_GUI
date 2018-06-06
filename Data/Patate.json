@@ -1,0 +1,126 @@
+{
+    "output_type": "Categorical",
+    "optimizer": "adadelta",
+    "2": {
+        "tag": "In",
+        "dim_1": "88",
+        "dim_2": "160",
+        "dim_3": "3",
+        "x": 5.0,
+        "y": 105.0
+    },
+    "4": {
+        "tag": "Conv2d",
+        "filters": "24",
+        "kernel_size_x": "5",
+        "kernel_size_y": "5",
+        "stride_x": "2",
+        "stride_y": "2",
+        "padding": 0,
+        "x": 49.0,
+        "y": 81.0
+    },
+    "7": {
+        "tag": "Relu",
+        "x": 93.0,
+        "y": 77.0
+    },
+    "9": {
+        "tag": "Conv2d",
+        "filters": "32",
+        "kernel_size_x": "5",
+        "kernel_size_y": "5",
+        "stride_x": "2",
+        "stride_y": "2",
+        "padding": 0,
+        "x": 137.0,
+        "y": 78.0
+    },
+    "11": {
+        "tag": "Relu",
+        "x": 181.0,
+        "y": 78.0
+    },
+    "13": {
+        "tag": "Conv2d",
+        "filters": "64",
+        "kernel_size_x": "5",
+        "kernel_size_y": "5",
+        "stride_x": "2",
+        "stride_y": "2",
+        "padding": 0,
+        "x": 225.0,
+        "y": 79.0
+    },
+    "15": {
+        "tag": "Relu",
+        "x": 269.0,
+        "y": 77.0
+    },
+    "17": {
+        "tag": "Conv2d",
+        "filters": "64",
+        "kernel_size_x": "3",
+        "kernel_size_y": "3",
+        "stride_x": "2",
+        "stride_y": "2",
+        "padding": 0,
+        "x": 313.0,
+        "y": 77.0
+    },
+    "20": {
+        "tag": "Relu",
+        "x": 357.0,
+        "y": 79.0
+    },
+    "23": {
+        "tag": "Flatten",
+        "x": 401.0,
+        "y": 75.0
+    },
+    "27": {
+        "tag": "Dense",
+        "neurons": "100",
+        "x": 445.0,
+        "y": 73.0
+    },
+    "29": {
+        "tag": "Relu",
+        "x": 489.0,
+        "y": 74.0
+    },
+    "31": {
+        "tag": "Dropout",
+        "ratio": "0.2",
+        "x": 533.0,
+        "y": 73.0
+    },
+    "33": {
+        "tag": "Dense",
+        "neurons": "50",
+        "x": 577.0,
+        "y": 74.0
+    },
+    "35": {
+        "tag": "Relu",
+        "x": 621.0,
+        "y": 71.0
+    },
+    "37": {
+        "tag": "Dropout",
+        "ratio": "0.2",
+        "x": 665.0,
+        "y": 70.0
+    },
+    "39": {
+        "tag": "Dense",
+        "neurons": "3",
+        "x": 709.0,
+        "y": 69.0
+    },
+    "41": {
+        "tag": "Softmax",
+        "x": 753.0,
+        "y": 67.0
+    }
+}

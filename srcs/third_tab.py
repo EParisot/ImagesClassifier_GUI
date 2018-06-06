@@ -559,56 +559,36 @@ class ThirdTab(object):
 
             # If Layer is Relu
             elif sorted_data[item]['tag'] == 'Relu':
-                if sorted_data[items_list[i-1]]['tag'] == 'Dense' or sorted_data[items_list[i-1]]['tag'] == 'Conv2d' or sorted_data[items_list[i-1]]['tag'] == 'Max_pooling':
-                    # Build Relu Layer with Keras Sequential API
-                    model.add(Activation('relu'))
-                else:
-                    showwarning("Error", "Activation layer {} is invalid after {} layer".format(sorted_data[item]['tag'], sorted_data[iitems_list[i-1]]['tag']));
-                    self.app.config(cursor="")
-                    return
+                # Build Relu Layer with Keras Sequential API
+                model.add(Activation('relu'))
                 
             # If Layer is Sigmoid
             elif sorted_data[item]['tag'] == 'Sigmoid':
-                if sorted_data[items_list[i-1]]['tag'] == 'Dense' or sorted_data[items_list[i-1]]['tag'] == 'Conv2d' or sorted_data[items_list[i-1]]['tag'] == 'Max_pooling':
-                    # Build Sigmoid Layer with Keras Sequential API
-                    model.add(Activation('sigmoid'))
-                else:
-                    showwarning("Error", "Activation layer {} is invalid after {} layer".format(sorted_data[item]['tag'], sorted_data[items_list[i-1]]['tag']));
-                    self.app.config(cursor="")
-                    return
+                # Build Sigmoid Layer with Keras Sequential API
+                model.add(Activation('sigmoid'))
 
             # If Layer is Softmax
             elif sorted_data[item]['tag'] == 'Softmax':
-                if sorted_data[items_list[i-1]]['tag'] == 'Dense' or sorted_data[items_list[i-1]]['tag'] == 'Conv2d' or sorted_data[items_list[i-1]]['tag'] == 'Max_pooling':
-                    # Build Softmax Layer with Keras Sequential API
-                    model.add(Activation('softmax'))
-                else:
-                    showwarning("Error", "Activation layer {} is invalid after {} layer".format(sorted_data[item]['tag'], sorted_data[items_list[i-1]]['tag']));
-                    self.app.config(cursor="")
-                    return
+                # Build Softmax Layer with Keras Sequential API
+                model.add(Activation('softmax'))
 
             # If Layer is Dropout
             elif sorted_data[item]['tag'] == 'Dropout':
-                if sorted_data[items_list[i-1]]['tag'] == 'Dense' or sorted_data[items_list[i-1]]['tag'] == 'Conv2d' or sorted_data[items_list[i-1]]['tag'] == 'Max_pooling':
-                    try:
-                        if int(sorted_data[item]['ratio']) > 0:
-                            ratio = int(sorted_data[item]['ratio'])
-                        else:
-                            showwarning("Error", "Negative or null 'ratio' value in {} layer".format(sorted_data[item]['tag']));
-                            self.app.config(cursor="")
-                            return
-                        # Build Dropout Layer with Keras Sequential API
-                        model.add(Activation('dropout', ratio))
-                    
-                    except ValueError:
-                        showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[item]['tag']));
+                try:
+                    if float(sorted_data[item]['ratio']) > 0:
+                        ratio = float(sorted_data[item]['ratio'])
+                    else:
+                        showwarning("Error", "Negative or null 'ratio' value in {} layer".format(sorted_data[item]['tag']));
                         self.app.config(cursor="")
                         return
-                else:
-                    showwarning("Error", "Activation layer {} is invalid after {} layer".format(sorted_data[item]['tag'], sorted_data[items_list[i-1]]['tag']));
+                    # Build Dropout Layer with Keras Sequential API
+                    model.add(Dropout(ratio))
+                
+                except ValueError:
+                    showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[item]['tag']));
                     self.app.config(cursor="")
                     return
-            
+                
             i = i + 1
 
         output = self.out_type.get()

@@ -12,6 +12,7 @@ from tkinter.scrolledtext import ScrolledText
 
 from PIL import Image, ImageTk
 
+import random
 import os
 import configparser
 from time import time, localtime, strftime, sleep
@@ -231,9 +232,9 @@ class FourthTab(object):
 
     def grey_patience(self):
         if self.stop_on.get() == 1:
-            self.stop_entry.config(state="normal")
+            self.patience_entry.config(state="normal")
         else:
-            self.stop_entry.config(state="disabled")
+            self.patience_entry.config(state="disabled")
 
     def load_dataset(self, event):
         dataset_dir =  askdirectory(title = "Select Dataset folder")
@@ -248,16 +249,18 @@ class FourthTab(object):
                 showwarning('Error', 'No Images loaded from %s' % dataset_dir)
                 self.app.config(cursor="")
                 return
+            # Shuffle images
+            random.shuffle(self.images)
             
-            #normalise datas
+            # Normalise datas
             self.images = np.array(self.images)
             self.images /= 255
     
-            #convert labels to dummy values
+            # Convert labels to dummy values
             self.labels = np.array(self.labels)
             self.labels = np.array(pd.get_dummies(self.labels))
 
-            # show images and out dim
+            # Show images and out dim
             self.w_in.set(str(self.images.shape[2]))
             self.h_in.set(str(self.images.shape[1]))
             self.pix_in.set(str(self.images.shape[3]))
@@ -399,7 +402,7 @@ class FourthTab(object):
                 else:
                     break
                 
-            self.labo_photos_frame.geometry("%dx%d+%d+%d" % (pic.size[0] + 100, pic.size[1] + 200, self.app.winfo_x(), self.app.winfo_y()))
+            #self.labo_photos_frame.geometry("%dx%d+%d+%d" % (pic.size[0] + 100, pic.size[1] + 200, self.app.winfo_x(), self.app.winfo_y()))
             
             image = ImageTk.PhotoImage(pic)
 
@@ -579,10 +582,7 @@ class FourthTab(object):
             showwarning("Error", "Incompatible model / dataset")
 
     def train_loop(self):
-        if self.devMode:
-            verbose = 1
-            self.model.summary()
-
+        self.model.summary()
         try:
             batch = int(self.batch.get())
             if batch <= 0 :
@@ -615,11 +615,13 @@ class FourthTab(object):
             return
 
         # use default graph on thread
+        import keras
         with self.tf_graph.as_default():
 
             callbacks=[]
             if self.stop_on.get() == 1:
-                early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=patience, verbose=0, mode='auto', baseline=None)
+                # Set EarlyStop TODO CHECK IT
+                early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=patience, verbose=1, mode='auto')
                 callbacks.append(early_stop)
 
             # init graph values
@@ -645,7 +647,7 @@ class FourthTab(object):
                 if  self.stopEvent.is_set():
                     return
                 # Train on 1 epoch
-                history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, callbacks=callbacks, verbose=verbose)
+                history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, callbacks=callbacks, verbose=1)
                 # plot in graph
                 tab_x.append(x)
                 tab_acc.append(history.history['acc'])
@@ -657,6 +659,7 @@ class FourthTab(object):
                 self.graph.plot(tab_x, tab_val_acc, "b", label="Validation Accuracy")
                 self.graph.plot(tab_x, tab_val_loss, "r", label="Validation Loss")
                 self.graph.autoscale(enable=None, axis='both', tight=True)
+                self.graph.set_ylim(0, 1)
                 self.graph_canvas.draw()
                 x = x + 1
 
