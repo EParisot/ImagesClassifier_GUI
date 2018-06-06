@@ -249,8 +249,11 @@ class FourthTab(object):
                 showwarning('Error', 'No Images loaded from %s' % dataset_dir)
                 self.app.config(cursor="")
                 return
-            # Shuffle images
-            random.shuffle(self.images)
+
+            # Shuffle images and labels
+            zipped_list = list(zip(self.images, self.labels))
+            random.shuffle(zipped_list)
+            self.images, self.labels = zip(*zipped_list)
             
             # Normalise datas
             self.images = np.array(self.images)
