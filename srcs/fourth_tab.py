@@ -388,6 +388,7 @@ class FourthTab(object):
 
             self.labo_photos_frame = tk.Toplevel()
             self.labo_photos_frame.title("PhotoLab")
+            self.labo_photos_frame.geometry("+%d+%d" % (self.app.winfo_x(), self.app.winfo_y()))
             self.labo_photos_frame.transient(self.app)
             self.labo_photos_frame.grab_set()
 
@@ -405,12 +406,10 @@ class FourthTab(object):
                 else:
                     break
                 
-            #self.labo_photos_frame.geometry("%dx%d+%d+%d" % (pic.size[0] + 100, pic.size[1] + 200, self.app.winfo_x(), self.app.winfo_y()))
-            
             image = ImageTk.PhotoImage(pic)
 
             command_frame = Frame(self.labo_photos_frame)
-            command_frame.grid(row=0, column=0, sticky='nw')
+            command_frame.grid(row=0, column=0)
             command_frame.grid_rowconfigure(0, weight=1)
             command_frame.grid_rowconfigure(1, weight=1)
             command_frame.grid_columnconfigure(0, weight=1)
@@ -418,7 +417,7 @@ class FourthTab(object):
             command_frame.grid_columnconfigure(2, weight=1)
 
             self.pic_frame = Frame(command_frame)
-            self.pic_frame.grid(row=0, column=1, sticky='nsew')
+            self.pic_frame.grid(row=0, column=1)
             self.pic_frame.grid_rowconfigure(0, weight=1)
             self.pic_frame.grid_rowconfigure(1, weight=1)
             self.pic_frame.grid_rowconfigure(2, weight=1)
@@ -427,7 +426,7 @@ class FourthTab(object):
             self.pic_frame.grid_columnconfigure(2, weight=1)
 
             self.pic_canvas = Canvas(self.pic_frame)
-            self.pic_canvas.grid(row=1, column=1, sticky="nsew")
+            self.pic_canvas.grid(row=1, column=1)
             canvas_image = self.pic_canvas.create_image(0, 0, image=image, anchor=NW)
             self.pic_canvas.image = image
 
