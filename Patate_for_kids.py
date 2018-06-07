@@ -9,6 +9,7 @@ from srcs.first_tab import FirstTab
 from srcs.second_tab import SecondTab
 from srcs.third_tab import ThirdTab
 from srcs.fourth_tab import FourthTab
+from srcs.fifth_tab import FifthTab
 
 import tkinter as tk
 from tkinter import ttk
@@ -49,6 +50,7 @@ if __name__ == '__main__':
     app.second_tab = SecondTab(app, devMode)
     app.third_tab = ThirdTab(app, devMode)
     app.fourth_tab = FourthTab(app, devMode)
+    app.fifth_tab = FifthTab(app, devMode)
 
     app.wm_protocol("WM_DELETE_WINDOW", app.on_Quit)
 

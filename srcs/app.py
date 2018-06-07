@@ -26,6 +26,7 @@ class App(tk.Tk):
         self.bind("<KeyPress>", self.onKeyPress)
         self.bind("<KeyRelease>", self.onKeyRelease)
 
+        self.devMode = False
         self.l_ctrl_pressed = False;
 
         self.title("Patate for Kids")
@@ -72,7 +73,10 @@ class App(tk.Tk):
         self.tabs.add(self.fourth_tab, text=TRAIN_NAME, compound=LEFT)
         self.fourth_tab.grid_columnconfigure(0, weight=1)
         self.fourth_tab.grid_rowconfigure(0, weight=1)
-        self.devMode = False
+        self.fifth_tab = ttk.Frame(self.tabs)
+        self.tabs.add(self.fifth_tab, text=TEST_NAME, compound=LEFT)
+        self.fifth_tab.grid_columnconfigure(0, weight=1)
+        self.fifth_tab.grid_rowconfigure(0, weight=1)
 
     def setDevMode(self, devMode):
         self.devMode = devMode
@@ -199,5 +203,6 @@ class App(tk.Tk):
         ret += self.first_tab.on_quit()
         ret += self.third_tab.on_quit()
         ret += self.fourth_tab.on_quit()
-        if ret == 3:
+        ret += self.fifth_tab.on_quit()
+        if ret == 4:
             self.quit()

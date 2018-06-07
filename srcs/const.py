@@ -27,6 +27,7 @@ SNAP_NAME = 'Snap'
 LABEL_NAME = 'Labelize'
 MODEL_NAME = 'Model'
 TRAIN_NAME = 'Train'
+TEST_NAME = 'Test'
 #####
 
 ##### snap
