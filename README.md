@@ -3,9 +3,10 @@ Graphic implementation of the famous "Patate42"
 
 
 
-#### Download and Install Anaconda Python 3
+#### Windows and MACOS users only : Download and Install Anaconda Python 3
 
 https://www.continuum.io/downloads
+
 
 #### Clone Repo
 ```
