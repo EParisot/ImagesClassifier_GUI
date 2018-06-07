@@ -286,8 +286,8 @@ class FourthTab(object):
         from keras.preprocessing.image import load_img
         from keras.preprocessing.image import img_to_array
         pre_images = []
-        images = []
-        labels = []
+        self.images = []
+        self.labels = []
         i = 0
         size_diff = False
         # check sizes and get values as lists
@@ -300,31 +300,34 @@ class FourthTab(object):
                     self.min_size = [pre_image.size[0], pre_image.size[1]]
                     i = i + 1
                 if i > 0:
+                    if pre_image.size[0] != self.min_size[0] or pre_image.size[1] != self.min_size[1]:
+                        size_diff = True
                     if pre_image.size[0] < self.min_size[0] or pre_image.size[1] < self.min_size[1]:
                         self.min_size = [pre_image.size[0], pre_image.size[1]]
-                        size_diff = True
                 # convert the image pixels to a numpy array
                 image = img_to_array(pre_image)
                 # get image id + labels
                 if len(name.split('_')) > 1:
                     value = int(name.split('_')[0])
-                    labels.append(value)
+                    self.labels.append(value)
                 else:
                     showwarning("Error", "Missing Label")
                     return [], []
-                images.append(image)
+                self.images.append(image)
                 pre_images.append(pre_image)
-        if len(images) > 0 and size_diff == True:
+        if len(self.images) > 0 and size_diff == True:
             ret = askquestion("Warning", "Different image's size in folder... \nResize all images to the smallest one's size ? \n(Training needs uniform batches of images)")
             if ret == "no":
                 return [], []
             elif ret == "yes":
-                images = self.resize(pre_images, (self.min_size[0], self.min_size[1]))
-        elif len(images) > 0:
+                self.get_size(pre_images)
+                self.size_frame.wait_window()
+        elif len(self.images) > 0:
             ret = askquestion("Success", "%d Images and labels loaded \nResize images ?" % len(images))
             if ret == "yes":
                 self.get_size(pre_images)
-        return images, labels
+                self.size_frame.wait_window()
+        return self.images, self.labels
 
     def get_size(self, pre_images):
         self.size_frame = tk.Toplevel()
@@ -372,12 +375,6 @@ class FourthTab(object):
             self.size_frame.destroy()
             return
         self.images = self.resize(pre_images, (w, h))
-        self.images = np.array(self.images)
-        # update images dim
-        self.w_in.set(str(self.images.shape[2]))
-        self.h_in.set(str(self.images.shape[1]))
-        self.pix_in.set(str(self.images.shape[3]))
-        self.check_model()
         self.size_frame.destroy()
 
     def resize(self, images, min_size):
