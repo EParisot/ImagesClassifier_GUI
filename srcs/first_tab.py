@@ -146,7 +146,7 @@ class FirstTab():
                     break
                 ret, self.video = self.vs.read()
                 if ret is True:
-                    self.video = imutils.resize(self.video, width=self.snap_w.get() - 10)
+                    self.video = imutils.resize(self.video, width=self.snap_w.get())
                     image = cv2.cvtColor(self.video, cv2.COLOR_BGR2RGB)
                     image = Image.fromarray(image)
                     try:
@@ -157,9 +157,11 @@ class FirstTab():
                         self.panel = Label(self.video_frame, image=image)
                         self.panel.image = image
                         self.panel.grid()
+                        self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                     else:
                         self.panel.configure(image=image)
                         self.panel.image = image
+                        self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 else:
                     self.stop(self, self.path)
                     break
@@ -182,9 +184,11 @@ class FirstTab():
                     self.panel = Label(self.video_frame, image=image)
                     self.panel.image = image
                     self.panel.grid()
+                    self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 else:
                     self.panel.configure(image=image)
                     self.panel.image = image
+                    self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 self.rawCapture.truncate(0)
             self.panel.image = None
             self.frame = None
@@ -215,7 +219,7 @@ class FirstTab():
         label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
 
         self.width = tk.StringVar()
-        self.width.set(str(self.snap_w.get() - 10))
+        self.width.set(str(self.snap_w.get()))
         
         val_1 = tk.Entry(labels, width=10, textvariable=self.width)
         val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
@@ -246,7 +250,7 @@ class FirstTab():
     def save_video_param(self, width, heigth):
         try:
             if int(width.get()) <= SNAP_W and int(heigth.get()) <= SNAP_H:
-                self.snap_w.set(int(width.get()) + 10)
+                self.snap_w.set(int(width.get()))
                 self.snap_h.set(int(heigth.get()))
                 self.video_param_frame.destroy()
             else:

@@ -52,6 +52,8 @@ class FifthTab(object):
         self.model = None
         self.preds = StringVar()
         self.preds.set("None")
+        self.inference = StringVar()
+        self.inference.set("None")
 
         self.snap_w = IntVar()
         self.snap_w.set(SNAP_W)
@@ -85,7 +87,6 @@ class FifthTab(object):
         self.load_model_pic = ImageTk.PhotoImage(Image.open('assets/import.png'))
         self.cam_pic = ImageTk.PhotoImage(Image.open('assets/webcam.png'))
         self.stop_pic = ImageTk.PhotoImage(Image.open('assets/stop.png'))
-        self.settings_pic = ImageTk.PhotoImage(Image.open('assets/settings.png'))
 
         if SYSTEM == 'Rpi':
             self.camera = PiCamera()
@@ -111,17 +112,11 @@ class FifthTab(object):
         load_model_handler = lambda: self.load_model(self)
         cam_handler = lambda: self.open_cam(self)
         stop_handler = lambda: self.stop(self)
-        settings_handler = lambda: self.set_video_param(self)
 
         self.load_model_but = Button(command_frame)
         self.load_model_but.config(image=self.load_model_pic, command=load_model_handler)
         self.load_model_but.grid(row=0, column=0, padx=10, pady=10)
-        self.load_model_ttp = ttp.ToolTip(self.load_model_but, 'Import Model', msgFunc=None, delay=1, follow=True)
-
-        settings_but = Button(command_frame)
-        settings_but.config(image=self.settings_pic, command=settings_handler)
-        settings_but.grid(row=1, column=0, padx=10, pady=5)
-        settings_ttp = ttp.ToolTip(settings_but, 'Setup Camera', msgFunc=None, delay=1, follow=True)     
+        self.load_model_ttp = ttp.ToolTip(self.load_model_but, 'Import Model', msgFunc=None, delay=1, follow=True)   
 
         self.play_but = Button(command_frame)
         self.play_but.config(image=self.cam_pic, command=cam_handler, state="disabled")
@@ -138,6 +133,8 @@ class FifthTab(object):
         label_frame.grid_columnconfigure(0, weight=1)
         label_frame.grid_rowconfigure(0, weight=1)
         label_frame.grid_rowconfigure(1, weight=1)
+        label_frame.grid_rowconfigure(2, weight=1)
+        label_frame.grid_rowconfigure(3, weight=1)
 
         label_frame_title = Label(label_frame)
         label_frame_title.config(text="Prediction :", font=("Courier", 20))
@@ -146,6 +143,14 @@ class FifthTab(object):
         snap_label = Label(label_frame)
         snap_label.config(font=("Courier", 20), textvariable=self.preds)
         snap_label.grid(row=1, column=0, padx=10)
+
+        label_frame_inf = Label(label_frame)
+        label_frame_inf.config(text="Inference (sec):", font=("Courier", 20))
+        label_frame_inf.grid(row=2, column=0, padx=10)
+
+        inf_label = Label(label_frame)
+        inf_label.config(font=("Courier", 20), textvariable=self.inference)
+        inf_label.grid(row=3, column=0, padx=10)
 
     def load_model(self, event):
         self.app.config(cursor="wait")
@@ -187,7 +192,10 @@ class FifthTab(object):
                     with self.tf_graph.as_default():
                         test_image = np.array(image)
                         test_image = np.array([test_image[self.h1.get():self.h2.get(), self.w1.get():self.w2.get(), :]])
+                        start = time()
                         preds = self.model.predict(test_image)
+                        end = time()
+                        self.inference.set(str(round(end - start, 2)))
                         self.preds.set(str(np.argmax(preds, axis=1)))
                         
                     image = Image.fromarray(image)
@@ -199,9 +207,11 @@ class FifthTab(object):
                         self.panel = Label(self.video_frame, image=image)
                         self.panel.image = image
                         self.panel.grid()
+                        self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                     else:
                         self.panel.configure(image=image)
                         self.panel.image = image
+                        self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 else:
                     self.stop(self, self.path)
                     break
@@ -209,6 +219,7 @@ class FifthTab(object):
             self.vs.release()
             self.frame = None
             self.preds.set("None")
+            self.inference.set("None")
             
         else:
             for frame in self.camera.capture_continuous(self.rawCapture, format="rgb", use_video_port=True):
@@ -221,7 +232,10 @@ class FifthTab(object):
                 with self.tf_graph.as_default():
                     test_image = np.array(self.image)
                     test_image = np.array([test_image[self.h1.get():self.h2.get(), self.w1.get():self.w2.get(), :]])
+                    start = time()
                     preds = self.model.predict(test_image)
+                    end = time()
+                    self.inference.set(str(round(end - start, 2)))
                     self.preds.set(str(np.argmax(preds, axis=1)))
                     
                 image = Image.fromarray(self.image)
@@ -233,67 +247,16 @@ class FifthTab(object):
                     self.panel = Label(self.video_frame, image=image)
                     self.panel.image = image
                     self.panel.grid()
+                    self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 else:
                     self.panel.configure(image=image)
                     self.panel.image = image
+                    self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 self.rawCapture.truncate(0)
             self.panel.image = None
             self.frame = None
             self.preds.set("None")
-
-    def set_video_param(self, event):
-        self.video_param_frame = tk.Toplevel()
-        self.video_param_frame.geometry("%dx%d+%d+%d" % (LAYER_INFO_W, LAYER_INFO_H, 200, 200))
-        self.video_param_frame.title("Set Video Size")
-        self.video_param_frame.transient(self.app)
-        self.video_param_frame.grab_set()
-
-        labels = tk.Label(self.video_param_frame)
-        labels.grid(row=0, column=0, sticky='nsw')
-        labels.grid_rowconfigure(0, weight=1)
-        labels.grid_rowconfigure(1, weight=1)
-        labels.grid_rowconfigure(2, weight=1)
-        labels.grid_rowconfigure(3, weight=1)
-        labels.grid_columnconfigure(0, weight=1)
-        labels.grid_columnconfigure(1, weight=1)
-        labels.grid_columnconfigure(2, weight=1)
-
-        label_0 = tk.Label(labels)
-        label_0.config(text='Video Settings:', font=("Helvetica", 18))
-        label_0.grid(row=0, column=0, sticky='new', columnspan=3, padx=10, pady=10)
-        
-        label_1 = tk.Label(labels)
-        label_1.config(text='Width:', font=("Helvetica", 14))
-        label_1.grid(row=1, column=0, sticky='nsw', padx=5, pady=10)
-
-        self.width = tk.StringVar()
-        self.width.set(str(self.snap_w.get() - 10))
-        
-        val_1 = tk.Entry(labels, width=10, textvariable=self.width)
-        val_1.grid(row=1, column=2, sticky='nse', padx=5, pady=10)
-
-        self.heigth = tk.StringVar()
-        self.heigth.set(str(self.snap_h.get()))
-
-        if SYSTEM == 'Rpi':
-            label_2 = tk.Label(labels)
-            label_2.config(text='Heigth:', font=("Helvetica", 14))
-            label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
-
-            val_2 = tk.Entry(labels, width=10, textvariable=self.heigth)
-            val_2.grid(row=2, column=2, sticky='nse', padx=5, pady=10)
-        else:
-            self.heigth.set(str(round((3/4) * int(self.width.get()))))
-            
-        save_dense = lambda _: self.save_video_param(self.width, self.heigth)
-        
-        save_but = tk.Button(labels)
-        save_but.config(text='Save', font=("Helvetica", 16))
-        save_but.bind("<ButtonPress-1>", save_dense)
-        save_but.bind("<Return>", save_dense)
-        save_but.grid(row=3, column=1, sticky='nsew', padx=5, pady=10)
-
-        val_1.focus_set()
+            self.inference.set("None")
 
     def save_video_param(self, width, heigth):
         if width <= SNAP_W and heigth <= SNAP_H:
