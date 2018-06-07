@@ -249,7 +249,7 @@ class FourthTab(object):
             self.app.update()
             self.dataset_dir = dataset_dir
             # Load images and labels
-            self.images, self.labels = self.load_data(self.dataset_dir)
+            self.load_data(self.dataset_dir)
             nb_images = len(self.images)
             if nb_images == 0:
                 showwarning('Error', 'No Images loaded from %s' % dataset_dir)
@@ -312,13 +312,15 @@ class FourthTab(object):
                     self.labels.append(value)
                 else:
                     showwarning("Error", "Missing Label")
-                    return [], []
+                    self.images = []
+                    self.labels = []
                 self.images.append(image)
                 pre_images.append(pre_image)
         if len(self.images) > 0 and size_diff == True:
             ret = askquestion("Warning", "Different image's size in folder... \nResize all images to the smallest one's size ? \n(Training needs uniform batches of images)")
             if ret == "no":
-                return [], []
+                self.images = []
+                self.labels = []
             elif ret == "yes":
                 self.get_size(pre_images)
                 self.size_frame.wait_window()
@@ -327,7 +329,6 @@ class FourthTab(object):
             if ret == "yes":
                 self.get_size(pre_images)
                 self.size_frame.wait_window()
-        return self.images, self.labels
 
     def get_size(self, pre_images):
         self.size_frame = tk.Toplevel()
