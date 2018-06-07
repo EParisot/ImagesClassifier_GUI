@@ -140,7 +140,7 @@ class FifthTab(object):
         label_frame.grid_rowconfigure(1, weight=1)
 
         label_frame_title = Label(label_frame)
-        label_frame_title.config(text="Label :", font=("Courier", 20))
+        label_frame_title.config(text="Prediction :", font=("Courier", 20))
         label_frame_title.grid(row=0, column=0, padx=10)
 
         snap_label = Label(label_frame)
