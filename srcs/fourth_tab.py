@@ -314,6 +314,7 @@ class FourthTab(object):
                     showwarning("Error", "Missing Label")
                     self.images = []
                     self.labels = []
+                    return
                 self.images.append(image)
                 pre_images.append(pre_image)
         if len(self.images) > 0 and size_diff == True:
@@ -321,6 +322,7 @@ class FourthTab(object):
             if ret == "no":
                 self.images = []
                 self.labels = []
+                return
             elif ret == "yes":
                 self.get_size(pre_images)
                 self.size_frame.wait_window()
