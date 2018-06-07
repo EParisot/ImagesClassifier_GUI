@@ -241,6 +241,8 @@ class SecondTab(object):
     def print_win(self):
         if len(self.photos) > 0:
             pic = Image.open(self.photos[self.photo_act])
+            if pic.size[0] > 800 or pic.size[1] > 600:
+                pic = pic.resize((800,600))
             image = ImageTk.PhotoImage(pic)
             self.h1.set(0)
             self.h2.set(pic.size[1])

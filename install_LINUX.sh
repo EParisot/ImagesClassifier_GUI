@@ -5,6 +5,8 @@ virtualenv patate_for_kids
 cd patate_for_kids
 source bin/activate
 #dependencies
+sudo pip3 install opencv
+sudo pip3 install imutils
 sudo pip3 install pillow
 sudo pip3 install pandas
 sudo pip3 install numpy
