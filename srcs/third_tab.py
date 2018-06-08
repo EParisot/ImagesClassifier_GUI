@@ -369,7 +369,7 @@ class ThirdTab(object):
 ##                    return
                 
             # If First Layer is Conv2D
-            elif sorted_data[first_layer_id]['tag'] == 'Conv2d':
+            if sorted_data[first_layer_id]['tag'] == 'Conv2d':
                 try:  
                     if int(sorted_data[first_layer_id]['filters']) > 0:
                         filters = int(sorted_data[first_layer_id]['filters'])
