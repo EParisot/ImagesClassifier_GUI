@@ -327,7 +327,7 @@ class FourthTab(object):
                 self.get_size(pre_images)
                 self.size_frame.wait_window()
         elif len(self.images) > 0:
-            ret = askquestion("Success", "%d Images and labels loaded \nResize images ?" % len(images))
+            ret = askquestion("Success", "%d Images and labels loaded \nResize images ?" % len(self.images))
             if ret == "yes":
                 self.get_size(pre_images)
                 self.size_frame.wait_window()
