@@ -338,6 +338,8 @@ class FourthTab(object):
         self.size_frame.geometry("%dx%d+%d+%d" % (200, 200, self.app.winfo_x(), self.app.winfo_y()))
         self.size_frame.transient(self.app)
         self.size_frame.grab_set()
+        on_close_size_handler = lambda: self.on_close_size()
+        self.size_frame.protocol("WM_DELETE_WINDOW", on_close_size_handler)
 
         command_frame = Frame(self.size_frame)
         command_frame.grid(row=0, column=0, sticky='nw')
@@ -348,26 +350,35 @@ class FourthTab(object):
         command_frame.grid_columnconfigure(1, weight=1)
 
         w_label = Label(command_frame, text="Width :", font=("Helvetica", 16))
-        w_label.grid(row=0, column=0, padx=5)
+        w_label.grid(row=0, column=0, padx=5, pady=10)
 
         self.w = StringVar()
         self.w.set(self.min_size[0])
 
-        w_entry = Entry(command_frame, textvariable=self.w)
-        w_entry.grid(row=0, column=1, padx=5)
+        w_entry = Entry(command_frame, width=10, textvariable=self.w)
+        w_entry.grid(row=0, column=1, padx=5, pady=10)
         
         h_label = Label(command_frame, text="Height :", font=("Helvetica", 16))
-        h_label.grid(row=1, column=0, padx=5)
+        h_label.grid(row=1, column=0, padx=5, pady=10)
 
         self.h = StringVar()
         self.h.set(self.min_size[1])
 
-        h_entry = Entry(command_frame, textvariable=self.h)
-        h_entry.grid(row=1, column=1, padx=5)
+        h_entry = Entry(command_frame, width=10, textvariable=self.h)
+        h_entry.grid(row=1, column=1, padx=5, pady=10)
 
-        size_handler = lambda : self.close_size(pre_images, self.w, self.h)
-        size_but = Button(command_frame, text="Confirm", font=("Helvetica", 16), command=size_handler)
+        size_handler = lambda _: self.close_size(pre_images, self.w, self.h)
+        size_but = Button(command_frame, text="Confirm", font=("Helvetica", 16))
         size_but.grid(row=2, column=0, columnspan=2, pady=10)
+        size_but.bind("<ButtonPress-1>", size_handler)
+        size_but.bind("<Return>", size_handler)
+
+    def on_close_size(self):
+        ret = askquestion("Cancel resizing", "This action will cancel loading, \nAre you sure ?")
+        if ret == "yes":
+            self.images = []
+            self.labels = []
+            self.size_frame.destroy()
 
     def close_size(self, pre_images,  w, h):
         try:
