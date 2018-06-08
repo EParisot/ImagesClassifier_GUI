@@ -692,6 +692,7 @@ class FourthTab(object):
             filename = asksaveasfilename(title = "Save Model", defaultextension=".h5", filetypes = (("h5py files","*.h5"),("all files","*.*")))
             if filename :
                 self.model.save(filename)
+                showinfo("Success", "Model saved in %s" % filename)
 
     def stop_train(self, event):
         if self.thread.is_alive():
