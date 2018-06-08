@@ -5,6 +5,7 @@ __pycache__/
 *.h5
 *.h5py
 *.jpg
+*.json
 
 # C extensions
 *.so
