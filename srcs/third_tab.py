@@ -349,24 +349,24 @@ class ThirdTab(object):
         try:
             first_layer_id = items_list[1]
 
-            # If First Layer is Dense
-            if sorted_data[first_layer_id]['tag'] == 'Dense':
-                try:
-                    if int(sorted_data[first_layer_id]['neurons']) > 0:
-                        neurons = int(sorted_data[first_layer_id]['neurons'])
-                        
-                        # Build Dense Layer with Keras Sequential API
-                        model.add(Dense(units=neurons, input_shape=input_shape))
-
-                    else:
-                        showwarning("Error", "Negative or null 'neurons' value in {} layer".format(sorted_data[first_layer_id]['tag']));
-                        self.app.config(cursor="")
-                        return
-                    
-                except ValueError:
-                    showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[first_layer_id]['tag']));
-                    self.app.config(cursor="")
-                    return
+##            # If First Layer is Dense
+##            if sorted_data[first_layer_id]['tag'] == 'Dense':
+##                try:
+##                    if int(sorted_data[first_layer_id]['neurons']) > 0:
+##                        neurons = int(sorted_data[first_layer_id]['neurons'])
+##                        
+##                        # Build Dense Layer with Keras Sequential API
+##                        model.add(Dense(units=neurons, input_shape=input_shape))
+##
+##                    else:
+##                        showwarning("Error", "Negative or null 'neurons' value in {} layer".format(sorted_data[first_layer_id]['tag']));
+##                        self.app.config(cursor="")
+##                        return
+##                    
+##                except ValueError:
+##                    showwarning("Error", "Incorrect or empty value(s) in {}".format(sorted_data[first_layer_id]['tag']));
+##                    self.app.config(cursor="")
+##                    return
                 
             # If First Layer is Conv2D
             elif sorted_data[first_layer_id]['tag'] == 'Conv2d':
