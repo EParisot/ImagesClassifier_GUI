@@ -306,8 +306,6 @@ class DnD_Container:
                 self.test_val.master.config(bg='lightgrey')
                 for widget in self.test_val.master.winfo_children():
                     widget.config(bg='lightgrey')
-                #    for elem in widget.winfo_children():
-                #        elem.config(bg='lightgrey')
                 
                 # IN
                 if source.tags[0] == "In":
@@ -689,8 +687,6 @@ class DnD_Container:
         self.test_val.master.config(bg='SystemButtonFace')
         for widget in self.test_val.master.winfo_children():
             widget.config(bg='SystemButtonFace')
-            #for elem in widget.winfo_children():
-            #    elem.config(bg='SystemButtonFace')
         self.param_frame.destroy()
 
     def on_close(self, id):
@@ -702,8 +698,6 @@ class DnD_Container:
         self.test_val.master.config(bg='SystemButtonFace')
         for widget in self.test_val.master.winfo_children():
             widget.config(bg='SystemButtonFace')
-            #for elem in widget.winfo_children():
-            #    elem.config(bg='SystemButtonFace')
         self.param_frame.destroy()
         
 
