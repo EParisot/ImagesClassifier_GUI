@@ -33,3 +33,15 @@ wait for Anaconda to build environnement
 ```
 
 ### Enjoy !!
+
+## Uninstall:
+
+*Windows and MACOS:
+```
+	conda env remove -n patate_for_kids
+```
+
+*Linux:
+```
+	rm -rf patate_for_kids
+```
