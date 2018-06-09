@@ -201,7 +201,7 @@ class FifthTab(object):
                         end = time()
                         self.inference.set(str(round(end - start, 2)))
                         if sig == 1:
-                            self.preds.set(str(preds)
+                            self.preds.set(str((round(preds[0][0], 1) > 0.5)))
                         else:
                             self.preds.set(str(np.argmax(preds, axis=1)))
                         
@@ -244,7 +244,7 @@ class FifthTab(object):
                     end = time()
                     self.inference.set(str(round(end - start, 2)))
                     if sig == 1:
-                        self.preds.set(str(preds)
+                        self.preds.set(str((round(preds[0][0], 1) > 0.5)))
                     else:
                         self.preds.set(str(np.argmax(preds, axis=1)))
                     
