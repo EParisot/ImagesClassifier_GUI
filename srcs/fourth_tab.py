@@ -563,6 +563,8 @@ class FourthTab(object):
                     self.labels = np.array([np.argmax(x) for x in self.labels])
                 else:
                     self.out_model.set(str(self.model.layers[-1].get_output_at(0).get_shape().as_list()[1]))
+                    if len(self.labels.shape) == 1:
+                        self.labels = np.array(pd.get_dummies(self.labels))
                 self.check_model()
                 
                 self.app.config(cursor="")
