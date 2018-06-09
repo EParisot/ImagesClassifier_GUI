@@ -558,7 +558,11 @@ class FourthTab(object):
                 self.w_out.set(str(self.input_shape[2]))
                 self.h_out.set(str(self.input_shape[1]))
                 self.pix_out.set(str(self.input_shape[3]))
-                self.out_model.set(str(self.model.layers[-1].get_output_at(0).get_shape().as_list()[1]))
+                if model_dict['config'][-1]['config']['activation'] == 'sigmoid':
+                    self.out_model.set('2')
+                    self.labels = np.array([np.argmax(x) for x in self.labels])
+                else:
+                    self.out_model.set(str(self.model.layers[-1].get_output_at(0).get_shape().as_list()[1]))
                 self.check_model()
                 
                 self.app.config(cursor="")
