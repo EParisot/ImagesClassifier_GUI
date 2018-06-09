@@ -72,7 +72,7 @@ class ThirdTab(object):
 
         output_label = Label(self.param_frame, text="Output type :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
         output_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        output = ["Binary", "Categorical", "MSE"]
+        output = ["Binary", "Categorical"] # Add MSE
         self.out_type = StringVar()
         output_box = ttk.Combobox(self.param_frame, textvariable=self.out_type, values=output, justify="center", width=10)
         output_box.grid(row=1, column=0, padx=5, pady=5, sticky="n")
