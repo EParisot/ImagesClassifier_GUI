@@ -1,14 +1,16 @@
-name: patate_for_kids
+name: IC_GUI
 channels:
 - !!python/unicode
   'defaults'
 dependencies:
+- python=3.5
 - pip
 - numpy
 - pandas
 - h5py
 - matplotlib
+- pillow==4.0.0
 - pip:
   - imutils
-  - tensorflow
   - keras
+  - tensorflow

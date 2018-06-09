@@ -1,8 +1,8 @@
 #!/bin/bash
 
 sudo pip install virtualenv
-virtualenv patate_for_kids
-cd patate_for_kids
+virtualenv IC_GUI
+cd IC_GUI
 source bin/activate
 #dependencies
 sudo pip3 install pillow
