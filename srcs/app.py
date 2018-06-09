@@ -29,7 +29,7 @@ class App(tk.Tk):
         self.devMode = False
         self.l_ctrl_pressed = False;
 
-        self.title("Patate for Kids")
+        self.title("Images Classifier GUI")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1000)

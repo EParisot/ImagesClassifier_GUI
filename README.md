@@ -1,5 +1,5 @@
-# Patate_for_kids
-Graphic implementation of the famous "Patate42"
+# ImagesClassifier_GUI
+Machine Learning Images Classification in Graphical User Interface
 
 
 
@@ -10,13 +10,13 @@ https://www.continuum.io/downloads
 
 #### Clone Repo
 ```
-git clone "https://github.com/EParisot/Patate_for_kids.git"
+git clone "https://github.com/EParisot/IC_GUI.git"
 ```
 
 #### Change to repo's folder:
 
 ```
-cd Patate_for_kids
+cd IC_GUI
 ```
 
 #### Install for your system (WIN, MACOS, RPI):
@@ -38,10 +38,10 @@ wait for Anaconda to build environnement
 
 *Windows and MACOS:
 ```
-	conda env remove -n patate_for_kids
+	conda env remove -n IC_GUI
 ```
 
 *Linux:
 ```
-	rm -rf patate_for_kids
+	rm -rf IC_GUI
 ```

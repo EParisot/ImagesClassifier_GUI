@@ -23,11 +23,7 @@ from time import time, localtime, strftime, sleep
 
 from srcs.app import App
 
-#################################################################################
-'''
-This is a graphic implementation of the famous "Patate42"
-'''
-#################################################################################
+
 
 if __name__ == '__main__':
 
