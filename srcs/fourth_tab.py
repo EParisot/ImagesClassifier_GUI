@@ -228,7 +228,7 @@ class FourthTab(object):
         accolade_label.grid(row=1, column=5, sticky="new")
 
         self.output_text = ScrolledText(self.train_frame)
-        self.output_text.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
+        self.output_text.grid(row=1, column=0, padx=10, pady=30, sticky="nsew")
 
         self.fig = Figure(figsize=(5, 2), dpi=100)
         self.graph = self.fig.add_subplot(111)
@@ -236,7 +236,7 @@ class FourthTab(object):
         self.graph.set_title("Training history")
         self.graph_canvas = FigureCanvasTkAgg(self.fig, self.train_frame)
         self.graph_canvas.draw()
-        self.graph_canvas.get_tk_widget().grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
+        self.graph_canvas.get_tk_widget().grid(row=1, column=1, padx=10, pady=30, sticky="nsew")
 
 
     def grey_patience(self):
