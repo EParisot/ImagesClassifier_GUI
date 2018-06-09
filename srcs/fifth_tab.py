@@ -200,7 +200,7 @@ class FifthTab(object):
                         preds = self.model.predict(test_image)
                         end = time()
                         self.inference.set(str(round(end - start, 2)))
-                        if sig == 1
+                        if sig == 1:
                             self.preds.set(str(preds)
                         else:
                             self.preds.set(str(np.argmax(preds, axis=1)))
@@ -243,7 +243,7 @@ class FifthTab(object):
                     preds = self.model.predict(test_image)
                     end = time()
                     self.inference.set(str(round(end - start, 2)))
-                    if sig == 1
+                    if sig == 1:
                         self.preds.set(str(preds)
                     else:
                         self.preds.set(str(np.argmax(preds, axis=1)))
