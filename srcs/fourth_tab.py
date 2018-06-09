@@ -639,11 +639,11 @@ class FourthTab(object):
         import keras
         with self.tf_graph.as_default():
 
-            callbacks=[]
             if self.stop_on.get() == 1:
-                # Set EarlyStop TODO CHECK IT
-                early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=patience, verbose=1, mode='auto')
-                callbacks.append(early_stop)
+                # Early Stop manager
+                last_val_loss = 0
+                diff = 0
+
 
             # init graph values
             x = 0
@@ -668,7 +668,7 @@ class FourthTab(object):
                 if  self.stopEvent.is_set():
                     return
                 # Train on 1 epoch
-                history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, callbacks=callbacks, verbose=1)
+                history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, verbose=1)
                 # plot in graph
                 tab_x.append(x)
                 tab_acc.append(history.history['acc'])
@@ -682,6 +682,18 @@ class FourthTab(object):
                 self.graph.autoscale(enable=None, axis='both', tight=True)
                 self.graph.set_ylim(0, 1)
                 self.graph_canvas.draw()
+                # Check earlyStop
+                if self.stop_on.get() == 1:
+                    if last_val_loss == 0:
+                        last_val_loss = tab_val_loss[-1][-1]
+                    else:
+                        if (last_val_loss - tab_val_loss[-1][-1] > 0 and last_val_loss - tab_val_loss[-1][-1] < 0.1) or (tab_val_loss[-1][-1] - last_val_loss > 0 and tab_val_loss[-1][-1] - last_val_loss < 0.1):
+                            diff = diff + 1
+                        else:
+                            diff = 0
+                    if diff == patience:
+                        self.stopEvent.set()
+                        break
                 x = x + 1
 
         self.stop_train_but.config(state="disabled")
