@@ -168,17 +168,27 @@ class FifthTab(object):
 
             # Set model input_dim on camera
             model_dict = json.loads(self.model.to_json())
-            self.input_shape = model_dict['config'][0]['config']['batch_input_shape']
-            w = self.input_shape[2]
-            h = self.input_shape[1]
-            self.save_video_param(w, h)
+            if model_dict['config']:
+                self.input_shape = model_dict['config'][0]['config']['batch_input_shape']
+                w = self.input_shape[2]
+                h = self.input_shape[1]
+                self.save_video_param(w, h)
+            else:
+                self.app.config(cursor="")
+                showwarning("Error", "Model '%s' is not Conv2D" % (self.model_filename.split('/')[-1]))
+                return
             
             self.app.config(cursor="")
             showinfo("Model Loaded", "Model '%s' loaded" % (self.model_filename.split('/')[-1]))
         else:
             self.app.config(cursor="")
+            showwarning("Error", "Model '%s' not found" % (self.model_filename.split('/')[-1]))
 
     def videoLoop(self):
+        model_dict = json.loads(self.model.to_json())
+        sig = 0
+        if model_dict['config'][-1]['config']['activation'] == 'sigmoid':
+            sig = 1
         if SYSTEM != 'Rpi':
             while not self.stopEvent.is_set():
                 if self.stopEvent.is_set():
@@ -196,7 +206,10 @@ class FifthTab(object):
                         preds = self.model.predict(test_image)
                         end = time()
                         self.inference.set(str(round(end - start, 2)))
-                        self.preds.set(str(np.argmax(preds, axis=1)))
+                        if sig == 1:
+                            self.preds.set(str((round(preds[0][0], 1) > 0.5)))
+                        else:
+                            self.preds.set(str(np.argmax(preds, axis=1)))
                         
                     image = Image.fromarray(image)
                     try:
@@ -236,7 +249,10 @@ class FifthTab(object):
                     preds = self.model.predict(test_image)
                     end = time()
                     self.inference.set(str(round(end - start, 2)))
-                    self.preds.set(str(np.argmax(preds, axis=1)))
+                    if sig == 1:
+                        self.preds.set(str((round(preds[0][0], 1) > 0.5)))
+                    else:
+                        self.preds.set(str(np.argmax(preds, axis=1)))
                     
                 image = Image.fromarray(self.image)
                 try:
