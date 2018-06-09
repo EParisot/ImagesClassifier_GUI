@@ -179,6 +179,10 @@ class FifthTab(object):
             self.app.config(cursor="")
 
     def videoLoop(self):
+        model_dict = json.loads(self.model.to_json())
+        sig = 0
+        if model_dict['config'][-1]['config']['activation'] == 'sigmoid':
+            sig = 1
         if SYSTEM != 'Rpi':
             while not self.stopEvent.is_set():
                 if self.stopEvent.is_set():
@@ -196,7 +200,10 @@ class FifthTab(object):
                         preds = self.model.predict(test_image)
                         end = time()
                         self.inference.set(str(round(end - start, 2)))
-                        self.preds.set(str(np.argmax(preds, axis=1)))
+                        if sig == 1
+                            self.preds.set(str(preds)
+                        else:
+                            self.preds.set(str(np.argmax(preds, axis=1)))
                         
                     image = Image.fromarray(image)
                     try:
@@ -236,7 +243,10 @@ class FifthTab(object):
                     preds = self.model.predict(test_image)
                     end = time()
                     self.inference.set(str(round(end - start, 2)))
-                    self.preds.set(str(np.argmax(preds, axis=1)))
+                    if sig == 1
+                        self.preds.set(str(preds)
+                    else:
+                        self.preds.set(str(np.argmax(preds, axis=1)))
                     
                 image = Image.fromarray(self.image)
                 try:
