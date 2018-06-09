@@ -168,15 +168,21 @@ class FifthTab(object):
 
             # Set model input_dim on camera
             model_dict = json.loads(self.model.to_json())
-            self.input_shape = model_dict['config'][0]['config']['batch_input_shape']
-            w = self.input_shape[2]
-            h = self.input_shape[1]
-            self.save_video_param(w, h)
+            if model_dict['config']:
+                self.input_shape = model_dict['config'][0]['config']['batch_input_shape']
+                w = self.input_shape[2]
+                h = self.input_shape[1]
+                self.save_video_param(w, h)
+            else:
+                self.app.config(cursor="")
+                showwarning("Error", "Model '%s' is not Conv2D" % (self.model_filename.split('/')[-1]))
+                return
             
             self.app.config(cursor="")
             showinfo("Model Loaded", "Model '%s' loaded" % (self.model_filename.split('/')[-1]))
         else:
             self.app.config(cursor="")
+            showwarning("Error", "Model '%s' not found" % (self.model_filename.split('/')[-1]))
 
     def videoLoop(self):
         model_dict = json.loads(self.model.to_json())
