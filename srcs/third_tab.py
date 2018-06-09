@@ -420,7 +420,7 @@ class ThirdTab(object):
                     return
  
             else:
-                showwarning("Error", "Incorrect first layer, \nUse Conv or Dense as first layer (after In)");
+                showwarning("Error", "Incorrect first layer, \nUse Conv2D as first layer (after In)");
                 self.app.config(cursor="")
                 return
             
