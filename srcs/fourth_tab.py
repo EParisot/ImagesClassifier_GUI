@@ -53,7 +53,7 @@ class FourthTab(object):
         self.train_frame.grid_rowconfigure(1, weight=1)
 
         command_frame = Frame(self.train_frame)
-        command_frame.grid(row=0, column=1, sticky='nw')
+        command_frame.grid(row=0, column=0, columnspan=2, sticky='nw', padx=20)
         command_frame.grid_rowconfigure(0, weight=1)
         command_frame.grid_rowconfigure(1, weight=1)
         command_frame.grid_rowconfigure(2, weight=1)
@@ -180,7 +180,7 @@ class FourthTab(object):
         self.stop_train_ttp = ttp.ToolTip(self.stop_train_but, 'Stop Training', msgFunc=None, delay=1, follow=True)
 
         hyper_param_frame = Frame(command_frame, borderwidth=2, relief="sunken")
-        hyper_param_frame.grid(row=0, column=5, sticky='nw', padx=5, pady=10)
+        hyper_param_frame.grid(row=0, column=5, sticky='nw', padx=20, pady=10)
         hyper_param_frame.grid_rowconfigure(0, weight=1)
         hyper_param_frame.grid_rowconfigure(1, weight=1)
         hyper_param_frame.grid_columnconfigure(0, weight=1)
@@ -227,13 +227,16 @@ class FourthTab(object):
         accolade_label = Label(command_frame, image=self.accolade_pic)
         accolade_label.grid(row=1, column=5, sticky="new")
 
-        self.fig = Figure(figsize=(10, 2), dpi=100)
+        self.output_text = ScrolledText(self.train_frame)
+        self.output_text.grid(row=1, column=0, padx=10, pady=30, sticky="nsew")
+
+        self.fig = Figure(figsize=(5, 2), dpi=100)
         self.graph = self.fig.add_subplot(111)
         
         self.graph.set_title("Training history")
         self.graph_canvas = FigureCanvasTkAgg(self.fig, self.train_frame)
         self.graph_canvas.draw()
-        self.graph_canvas.get_tk_widget().grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.graph_canvas.get_tk_widget().grid(row=1, column=1, padx=10, pady=30, sticky="nsew")
 
 
     def grey_patience(self):
@@ -603,7 +606,6 @@ class FourthTab(object):
             showwarning("Error", "Incompatible model / dataset")
 
     def train_loop(self):
-        self.model.summary()
         try:
             batch = int(self.batch.get())
             if batch <= 0 :
@@ -635,15 +637,19 @@ class FourthTab(object):
             showwarning("Error", "Wrong hyper-parameter value")
             return
 
+        # Change history output to tk.Text
+        base_stdout = sys.stdout
+        sys.stdout = Std_redirector(self.output_text)
+        self.output_text.delete("1.0", "end")
+        self.model.summary()
+        
         # use default graph on thread
-        import keras
         with self.tf_graph.as_default():
 
-            callbacks=[]
             if self.stop_on.get() == 1:
-                # Set EarlyStop TODO CHECK IT
-                early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.01, patience=patience, verbose=1, mode='auto')
-                callbacks.append(early_stop)
+                # Early Stop manager
+                last_val_loss = 0
+                diff = 0
 
             # init graph values
             x = 0
@@ -666,10 +672,10 @@ class FourthTab(object):
             
             while x < epochs:
                 if  self.stopEvent.is_set():
-                    return
+                    break
                 # Train on 1 epoch
-                history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, callbacks=callbacks, verbose=1)
-                # plot in graph
+                history = self.model.fit(self.images, self.labels, batch_size=batch, epochs=1, validation_split=split, verbose=1)
+                # Plot history in graph
                 tab_x.append(x)
                 tab_acc.append(history.history['acc'])
                 tab_loss.append(history.history['loss'])
@@ -682,12 +688,24 @@ class FourthTab(object):
                 self.graph.autoscale(enable=None, axis='both', tight=True)
                 self.graph.set_ylim(0, 1)
                 self.graph_canvas.draw()
+                # Check earlyStop
+                if self.stop_on.get() == 1:
+                    if last_val_loss == 0:
+                        last_val_loss = tab_val_loss[-1][-1]
+                    else:
+                        if (last_val_loss - tab_val_loss[-1][-1] > 0 and last_val_loss - tab_val_loss[-1][-1] < 0.1) or (tab_val_loss[-1][-1] - last_val_loss > 0 and tab_val_loss[-1][-1] - last_val_loss < 0.1):
+                            diff = diff + 1
+                        else:
+                            diff = 0
+                    if diff == patience:
+                        self.stopEvent.set()
+                        break
                 x = x + 1
 
+        sys.stdout = base_stdout
         self.stop_train_but.config(state="disabled")
         self.app.config(cursor="")
         res = askquestion("Success", "Training done on %d epochs \n Save trained model ?" % x)
-
         if res == "yes":
             filename = asksaveasfilename(title = "Save Model", defaultextension=".h5", filetypes = (("h5py files","*.h5"),("all files","*.*")))
             if filename :
@@ -709,3 +727,13 @@ class FourthTab(object):
         else:
             return 1
 
+class Std_redirector(object):
+    def __init__(self,widget):
+        self.widget = widget
+
+    def write(self,string):
+        self.widget.insert('end',string)
+        self.widget.see('end')
+
+    def flush(self):
+        pass
