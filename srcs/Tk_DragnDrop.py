@@ -343,7 +343,7 @@ class DnD_Container:
                     label_2.grid(row=2, column=0, sticky='nsw', padx=5, pady=10)
                     
                     self.dim_2 = tk.StringVar()
-                    self.dim_2.set(str(self.app.first_tab.snap_w.get() - 10))
+                    self.dim_2.set(str(self.app.first_tab.snap_w.get()))
                     
                     val_2 = tk.Entry(labels, width=10, textvariable=self.dim_2)
                     val_2.grid(row=2, column=2, sticky='nsw', padx=5, pady=10)
