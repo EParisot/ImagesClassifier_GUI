@@ -1,10 +1,10 @@
 # ImagesClassifier_GUI
 
 Machine Learning Images Classification in Graphical User Interface
-*Take pictures
-*Labelize them
-*Define a Model Design
-*Train it and Test your model
+* Take pictures
+* Labelize them
+* Define a Model Design
+* Train it and Test your model
 
 # Without any line of code !
 
