@@ -17,9 +17,8 @@ from PIL import Image, ImageTk
 import configparser
 from pathlib import Path
 
-import imutils
-
 if SYSTEM != 'Rpi':
+    import imutils
     from imutils.video import VideoStream
     import cv2
 else:
