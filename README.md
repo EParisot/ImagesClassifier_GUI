@@ -17,6 +17,16 @@ Machine Learning Images Classification in Graphical User Interface
 
 https://www.continuum.io/downloads
 
+#### Linux and RaspberryPi users only : Download and Install Python3.5 for your system :
+
+```
+wget https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tar.xz
+tar -xvf Python-3.5.2.tar.xz
+cd Python-3.5.2
+./configure
+make
+make altinstall
+```
 
 #### Clone Repo
 ```
