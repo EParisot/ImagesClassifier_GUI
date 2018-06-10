@@ -6,8 +6,11 @@ Machine Learning Images Classification in Graphical User Interface
 * Define a Model Design
 * Train it and Test your model
 
-# Without any line of code !
+### Without any line of code !
 
+
+
+## Installation :
 
 #### Windows and MACOS users only : Download and Install Anaconda Python 3
 
