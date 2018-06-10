@@ -5,11 +5,12 @@ virtualenv --python=python3.5 IC_GUI
 cd IC_GUI
 source bin/activate
 #dependencies
+sudo pip3 install picamera
 sudo pip3 install pillow
-sudo pip install pandas
-sudo pip install numpy
-sudo pip install tensorflow
-sudo pip install keras
-sudo pip install matplotlib
+sudo pip3 install pandas
+sudo pip3 install numpy
+sudo pip3 install tensorflow
+sudo pip3 install keras
+sudo pip3 install matplotlib
 #quit venv
 deactivate
