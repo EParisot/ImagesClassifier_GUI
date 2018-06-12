@@ -52,7 +52,6 @@ wait for Anaconda to build environnement
 ./run.sh
 ```
 
-### Enjoy !!
 
 ## Uninstall:
 
@@ -65,3 +64,4 @@ wait for Anaconda to build environnement
 ```
 	rm -rf IC_GUI
 ```
+
