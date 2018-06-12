@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt-get install virtualenv
-virtualen -p python3.5 IC_GUI
+virtualenv -p python3.5 IC_GUI
 cd IC_GUI
 source bin/activate
 #dependencies
