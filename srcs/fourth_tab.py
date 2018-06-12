@@ -321,7 +321,7 @@ class FourthTab(object):
                 self.images.append(image)
                 pre_images.append(pre_image)
         if len(self.images) > 0 and size_diff == True:
-            ret = askquestion("Warning", "Different image's size in folder... \nResize all images to the smallest one's size ? \n(Training needs uniform batches of images)")
+            ret = askquestion("Warning", "Different image's size in folder... \nResize all images ? \n(Training needs uniform batches of images)")
             if ret == "no":
                 self.images = []
                 self.labels = []
