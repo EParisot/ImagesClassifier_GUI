@@ -54,6 +54,8 @@ class FifthTab(object):
         self.preds.set("None")
         self.inference = StringVar()
         self.inference.set("None")
+        self.confidence = StringVar()
+        self.confidence.set("None")
 
         self.snap_w = IntVar()
         self.snap_w.set(SNAP_W)
@@ -135,6 +137,8 @@ class FifthTab(object):
         label_frame.grid_rowconfigure(1, weight=1)
         label_frame.grid_rowconfigure(2, weight=1)
         label_frame.grid_rowconfigure(3, weight=1)
+        label_frame.grid_rowconfigure(4, weight=1)
+        label_frame.grid_rowconfigure(5, weight=1)
 
         label_frame_title = Label(label_frame)
         label_frame_title.config(text="Prediction :", font=("Courier", 20))
@@ -151,6 +155,14 @@ class FifthTab(object):
         inf_label = Label(label_frame)
         inf_label.config(font=("Courier", 20), textvariable=self.inference)
         inf_label.grid(row=3, column=0, padx=10)
+
+        label_frame_conf = Label(label_frame)
+        label_frame_conf.config(text="Confidence (%):", font=("Courier", 20))
+        label_frame_conf.grid(row=4, column=0, padx=10)
+
+        conf_label = Label(label_frame)
+        conf_label.config(font=("Courier", 20), textvariable=self.confidence)
+        conf_label.grid(row=5, column=0, padx=10)
 
     def load_model(self, event):
         self.app.config(cursor="wait")
@@ -208,8 +220,10 @@ class FifthTab(object):
                         self.inference.set(str(round(end - start, 2)))
                         if sig == 1:
                             self.preds.set(str((round(preds[0][0], 1) > 0.5)))
+                            self.confidence.set(preds[0][0])
                         else:
                             self.preds.set(str(np.argmax(preds, axis=1)))
+                            self.confidence.set(preds[0][np.argmax(preds, axis=1)])
                         
                     image = Image.fromarray(image)
                     try:
@@ -233,6 +247,7 @@ class FifthTab(object):
             self.frame = None
             self.preds.set("None")
             self.inference.set("None")
+            self.confidence.set("None")
             
         else:
             for frame in self.camera.capture_continuous(self.rawCapture, format="rgb", use_video_port=True):
@@ -251,8 +266,10 @@ class FifthTab(object):
                     self.inference.set(str(round(end - start, 2)))
                     if sig == 1:
                         self.preds.set(str((round(preds[0][0], 1) > 0.5)))
+                        self.confidence.set(preds[0][0])
                     else:
                         self.preds.set(str(np.argmax(preds, axis=1)))
+                        self.confidence.set(preds[0][np.argmax(preds, axis=1)])
                     
                 image = Image.fromarray(self.image)
                 try:
