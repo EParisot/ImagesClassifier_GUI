@@ -59,7 +59,7 @@ class ThirdTab(object):
         self.model_canvas.config(borderwidth=2, relief="sunken", height=MODEL_H, width=MODEL_W)
         self.model_canvas.grid(row=0, column=1, padx=20, pady=10, sticky="w")
         self.model_canvas.grid_propagate(0)
-        model_ttp = ttp.ToolTip(self.model_canvas, 'Drop a to add it to the model \n \
+        model_ttp = ttp.ToolTip(self.model_canvas, 'Drop a layer to add it to the model \n \
                                         Double clic on a layer to edit it', msgFunc=None, delay=1, follow=True)
 
         self.param_frame = Frame(self.model_frame)
@@ -72,7 +72,7 @@ class ThirdTab(object):
 
         output_label = Label(self.param_frame, text="Output type :", font=("Helvetica", 16), borderwidth=2, relief="ridge")
         output_label.grid(row=0, column=0, padx=5, pady=5, sticky="n")
-        output = ["Binary", "Categorical"] # Add MSE
+        output = ["Binary", "Categorical"] # Add MSE ?
         self.out_type = StringVar()
         output_box = ttk.Combobox(self.param_frame, textvariable=self.out_type, values=output, justify="center", width=10)
         output_box.grid(row=1, column=0, padx=5, pady=5, sticky="n")
