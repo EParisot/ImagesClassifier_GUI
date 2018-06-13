@@ -290,9 +290,10 @@ class ThirdTab(object):
         # Order Datas
         items_sorted = sorted(self.app.layers_list, key=lambda x: self.app.layers_list[x]['x'])
         sorted_data = {}
+        items_list = []
         for item in items_sorted:
             sorted_data[item] = self.app.layers_list[item]
-        items_list = list(sorted_data.keys())
+            items_list.append(item)
         
         # Check and Get In Layer
         try:
