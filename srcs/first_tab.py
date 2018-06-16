@@ -162,7 +162,7 @@ class FirstTab():
                         self.panel.image = image
                         self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 else:
-                    self.stop(self, self.path)
+                    self.stop()
                     break
             self.panel.image = None
             self.vs.release()
