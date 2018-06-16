@@ -5,13 +5,14 @@ virtualenv IC_GUI
 cd IC_GUI
 source bin/activate
 #dependencies
-sudo pip3 install opencv
-sudo pip3 install imutils
-sudo pip3 install pillow
-sudo pip3 install pandas
-sudo pip3 install numpy
-sudo pip3 install tensorflow
-sudo pip3 install keras
-sudo pip2 install matplotlib
+apt-get install python3-tk
+pip3 install opencv-python
+pip3 install imutils
+pip3 install Pillow
+pip3 install pandas
+pip3 install numpy
+pip3 install tensorflow
+pip3 install keras
+pip3 install matplotlib
 #quit venv
 deactivate
