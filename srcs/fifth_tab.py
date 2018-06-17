@@ -239,9 +239,10 @@ class FifthTab(object):
                         self.panel.image = image
                         self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 else:
-                    self.stop(self, self.path)
+                    self.stop(self)
                     break
-            self.panel.image = None
+            if self.panel.image is not None:
+                self.panel.image = None
             self.vs.release()
             self.frame = None
             self.preds.set("None")
@@ -285,7 +286,8 @@ class FifthTab(object):
                     self.panel.image = image
                     self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
                 self.rawCapture.truncate(0)
-            self.panel.image = None
+            if self.panel.image is not None:
+                self.panel.image = None
             self.frame = None
             self.preds.set("None")
             self.inference.set("None")
