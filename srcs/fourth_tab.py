@@ -248,7 +248,7 @@ class FourthTab(object):
     def load_dataset(self, event):
         dataset_dir =  askdirectory(title = "Select Dataset folder")
         if dataset_dir:
-            self.app.config(cursor="wait")
+            self.app.config(cursor="watch")
             self.app.update()
             self.dataset_dir = dataset_dir
             # Load images and labels
@@ -321,7 +321,7 @@ class FourthTab(object):
                 self.images.append(image)
                 pre_images.append(pre_image)
         if len(self.images) > 0 and size_diff == True:
-            ret = askquestion("Warning", "Different image's size in folder... \nResize all images to the smallest one's size ? \n(Training needs uniform batches of images)")
+            ret = askquestion("Warning", "Different image's size in folder... \nResize all images ? \n(Training needs uniform batches of images)")
             if ret == "no":
                 self.images = []
                 self.labels = []
@@ -523,7 +523,7 @@ class FourthTab(object):
     def crop(self, h1, h2, w1, w2):
         if h1 < self.images.shape[1] and h2 <= self.images.shape[1] and w1 < self.images.shape[2] and w2 <= self.images.shape[2]:
             # crop images
-            self.app.config(cursor="wait")
+            self.app.config(cursor="watch")
             self.images = self.images[:, h1:h2, w1:w2, :]
             
             # update images dim
@@ -539,7 +539,7 @@ class FourthTab(object):
 
     def load_model(self, event):
         if self.dataset_dir:
-            self.app.config(cursor="wait")
+            self.app.config(cursor="watch")
             self.model_filename =  askopenfilename(title = "Select Model", filetypes = (("h5py files","*.h5"),("all files","*.*")))
             if self.model_filename:
                 import keras
@@ -593,7 +593,7 @@ class FourthTab(object):
 
     def train_model(self, event):
         if self.check.get() is True:
-            self.app.config(cursor="wait")
+            self.app.config(cursor="watch")
             self.stop_train_but.config(state="normal")
 
             if self.thread.is_alive():
