@@ -303,6 +303,7 @@ class DnD_Container:
                 self.param_frame.grab_set()
                 on_close_handler = lambda: srcs.Tk_DragnDrop.DnD_Container.on_close(self, source.id)
                 self.param_frame.protocol("WM_DELETE_WINDOW", on_close_handler)
+                self.orig_color = self.test_val.master.cget("bg")
                 self.test_val.master.config(bg='lightgrey')
                 for widget in self.test_val.master.winfo_children():
                     widget.config(bg='lightgrey')
@@ -672,11 +673,11 @@ class DnD_Container:
         if id in self.app.layers_list:
             res = askquestion("Modify Layer", "Layer already exists and will be overwriten...", icon='warning')
             if res == "no":
-                self.test_val.master.config(bg='SystemButtonFace')
+                self.test_val.master.config(bg=self.orig_color)
                 for widget in self.test_val.master.winfo_children():
-                    widget.config(bg='SystemButtonFace')
+                    widget.config(bg=self.orig_color)
                     for elem in widget.winfo_children():
-                        elem.config(bg='SystemButtonFace')
+                        elem.config(bg=self.orig_color)
                 self.param_frame.destroy()
                 return
         layer_dict = {}
@@ -684,9 +685,9 @@ class DnD_Container:
         for key in kwargs:
             layer_dict[key] = kwargs[key].get()
         self.app.layers_list[id] = layer_dict
-        self.test_val.master.config(bg='SystemButtonFace')
+        self.test_val.master.config(bg=self.orig_color)
         for widget in self.test_val.master.winfo_children():
-            widget.config(bg='SystemButtonFace')
+            widget.config(bg=self.orig_color)
         self.param_frame.destroy()
 
     def on_close(self, id):
@@ -695,9 +696,9 @@ class DnD_Container:
             ret = askquestion("Layer not saved", "Layer is not saved in model, quit anyway ? \n(you can save it later by double-clicking it)", icon='warning')
             if ret == "no":
                 return
-        self.test_val.master.config(bg='SystemButtonFace')
+        self.test_val.master.config(bg=self.orig_color)
         for widget in self.test_val.master.winfo_children():
-            widget.config(bg='SystemButtonFace')
+            widget.config(bg=self.orig_color)
         self.param_frame.destroy()
         
 
