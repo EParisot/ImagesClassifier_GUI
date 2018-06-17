@@ -194,7 +194,6 @@ class FifthTab(object):
             showinfo("Model Loaded", "Model '%s' loaded" % (self.model_filename.split('/')[-1]))
         else:
             self.app.config(cursor="")
-            showwarning("Error", "Model '%s' not found" % (self.model_filename.split('/')[-1]))
 
     def videoLoop(self):
         model_dict = json.loads(self.model.to_json())
