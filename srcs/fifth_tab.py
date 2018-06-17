@@ -165,7 +165,7 @@ class FifthTab(object):
         conf_label.grid(row=5, column=0, padx=10)
 
     def load_model(self, event):
-        self.app.config(cursor="wait")
+        self.app.config(cursor="watch")
         self.model_filename =  askopenfilename(title = "Select Model", filetypes = (("h5py files","*.h5"),("all files","*.*")))
         if self.model_filename:
             import keras

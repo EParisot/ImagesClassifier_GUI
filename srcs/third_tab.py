@@ -284,7 +284,7 @@ class ThirdTab(object):
         if self.saved.get() == False:
             showwarning("Error", "Save model before you export it.");
             return
-        self.app.config(cursor="wait")
+        self.app.config(cursor="watch")
         self.app.update()
 
         # Order Datas
