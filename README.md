@@ -17,7 +17,7 @@ Machine Learning Images Classification in Graphical User Interface
 
 https://www.continuum.io/downloads
 
-#### Linux and RaspberryPi users only : Download and Install Python3.5 for your system :
+#### Linux users only : Download and Install Python3.5 for your system :
 
 ```
 wget https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tar.xz
@@ -60,7 +60,7 @@ wait for Anaconda to build environnement
 	conda env remove -n IC_GUI
 ```
 
-*Linux and RPi:
+*Linux :
 ```
 	rm -rf IC_GUI
 ```
