@@ -327,7 +327,7 @@ class FifthTab(object):
             self.preds.set("None")
             self.inference.set("None")
             self.confidence.set("None")
-            showwarning("Woops", "Looks like video need to be croped...\n Please set crop values in Labels Tab")
+            showwarning("Woops", "Looks like video need to be croped...\n Please set crop values in 'Labelize' Tab")
     def save_video_param(self, width, heigth):
         if width <= SNAP_W and heigth <= SNAP_H:
             self.snap_w.set(width + 10)
