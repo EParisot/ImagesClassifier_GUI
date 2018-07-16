@@ -235,6 +235,7 @@ class SecondTab(object):
             else:
                 self.photos[i] = self.dir_srcs + self.photos[i]
         if self.is_init:
+            self.init_win()
             self.print_win()
 
 
