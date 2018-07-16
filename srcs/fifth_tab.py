@@ -200,18 +200,91 @@ class FifthTab(object):
         sig = 0
         if model_dict['config'][-1]['config']['activation'] == 'sigmoid':
             sig = 1
-        if SYSTEM != 'Rpi':
-            while not self.stopEvent.is_set():
-                if self.stopEvent.is_set():
-                    break
-                ret, self.video = self.vs.read()
-                if ret is True:
-                    self.video = imutils.resize(self.video, width=self.snap_w.get() - 10)
-                    image = cv2.cvtColor(self.video, cv2.COLOR_BGR2RGB)
+            
+        self.h1 = IntVar()
+        if self.app.second_tab.h1.get():
+            self.h1.set(self.app.second_tab.h1.get())
+        else:
+            self.h1.set(0)
+
+        self.h2 = IntVar()
+        if self.app.second_tab.h2.get():
+            self.h2.set(self.app.second_tab.h2.get())
+        else:
+            self.h2.set(self.snap_h.get())
+
+        self.w1 = IntVar()
+        if self.app.second_tab.w1.get():
+            self.w1.set(self.app.second_tab.w1.get())
+        else:
+            self.w1.set(0)
+
+        self.w2 = IntVar()
+        if self.app.second_tab.w2.get():
+            self.w2.set(self.app.second_tab.w2.get())
+        else:
+            self.w2.set(self.snap_w.get())
+            
+        try:
+            if SYSTEM != 'Rpi':
+                while not self.stopEvent.is_set():
+                    if self.stopEvent.is_set():
+                        break
+                    ret, self.video = self.vs.read()
+                    if ret is True:
+                        self.video = imutils.resize(self.video, width=self.snap_w.get() - 10)
+                        image = cv2.cvtColor(self.video, cv2.COLOR_BGR2RGB)
+                        
+                        # Test model
+                        with self.tf_graph.as_default():
+                            test_image = np.array(image)
+                            test_image = np.array([test_image[self.h1.get():self.h2.get(), self.w1.get():self.w2.get(), :]])
+                            start = time()
+                            preds = self.model.predict(test_image)
+                            end = time()
+                            self.inference.set(str(round(end - start, 2)))
+                            if sig == 1:
+                                self.preds.set(str((round(preds[0][0], 1) > 0.5)))
+                                self.confidence.set(preds[0][0])
+                            else:
+                                self.preds.set(str(np.argmax(preds, axis=1)))
+                                self.confidence.set(preds[0][np.argmax(preds, axis=1)])
+                            
+                        image = Image.fromarray(image)
+                        try:
+                            image = ImageTk.PhotoImage(image)
+                        except RuntimeError:
+                            break
+                        if self.panel is None:
+                            self.panel = Label(self.video_frame, image=image)
+                            self.panel.image = image
+                            self.panel.grid()
+                            self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
+                        else:
+                            self.panel.configure(image=image)
+                            self.panel.image = image
+                            self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
+                    else:
+                        self.stop(self)
+                        break
+                if self.panel.image is not None:
+                    self.panel.image = None
+                self.vs.release()
+                self.frame = None
+                self.preds.set("None")
+                self.inference.set("None")
+                self.confidence.set("None")
+                
+            else:
+                for frame in self.camera.capture_continuous(self.rawCapture, format="rgb", use_video_port=True):
+                    if self.stopEvent.is_set():
+                        self.rawCapture.truncate(0)
+                        break
+                    self.image = frame.array
                     
                     # Test model
                     with self.tf_graph.as_default():
-                        test_image = np.array(image)
+                        test_image = np.array(self.image)
                         test_image = np.array([test_image[self.h1.get():self.h2.get(), self.w1.get():self.w2.get(), :]])
                         start = time()
                         preds = self.model.predict(test_image)
@@ -224,7 +297,7 @@ class FifthTab(object):
                             self.preds.set(str(np.argmax(preds, axis=1)))
                             self.confidence.set(preds[0][np.argmax(preds, axis=1)])
                         
-                    image = Image.fromarray(image)
+                    image = Image.fromarray(self.image)
                     try:
                         image = ImageTk.PhotoImage(image)
                     except RuntimeError:
@@ -238,60 +311,23 @@ class FifthTab(object):
                         self.panel.configure(image=image)
                         self.panel.image = image
                         self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
-                else:
-                    self.stop(self)
-                    break
-            if self.panel.image is not None:
-                self.panel.image = None
-            self.vs.release()
+                    self.rawCapture.truncate(0)
+                if self.panel.image is not None:
+                    self.panel.image = None
+                self.frame = None
+                self.preds.set("None")
+                self.inference.set("None")
+        except ValueError:
+            self.stop(self)
+            if SYSTEM != 'Rpi':
+                self.vs.release()
+            else:
+                self.rawCapture.truncate(0)
             self.frame = None
             self.preds.set("None")
             self.inference.set("None")
             self.confidence.set("None")
-            
-        else:
-            for frame in self.camera.capture_continuous(self.rawCapture, format="rgb", use_video_port=True):
-                if self.stopEvent.is_set():
-                    self.rawCapture.truncate(0)
-                    break
-                self.image = frame.array
-                
-                # Test model
-                with self.tf_graph.as_default():
-                    test_image = np.array(self.image)
-                    test_image = np.array([test_image[self.h1.get():self.h2.get(), self.w1.get():self.w2.get(), :]])
-                    start = time()
-                    preds = self.model.predict(test_image)
-                    end = time()
-                    self.inference.set(str(round(end - start, 2)))
-                    if sig == 1:
-                        self.preds.set(str((round(preds[0][0], 1) > 0.5)))
-                        self.confidence.set(preds[0][0])
-                    else:
-                        self.preds.set(str(np.argmax(preds, axis=1)))
-                        self.confidence.set(preds[0][np.argmax(preds, axis=1)])
-                    
-                image = Image.fromarray(self.image)
-                try:
-                    image = ImageTk.PhotoImage(image)
-                except RuntimeError:
-                    break
-                if self.panel is None:
-                    self.panel = Label(self.video_frame, image=image)
-                    self.panel.image = image
-                    self.panel.grid()
-                    self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
-                else:
-                    self.panel.configure(image=image)
-                    self.panel.image = image
-                    self.panel.place(x=SNAP_W/2, y=SNAP_H/2, anchor="center")
-                self.rawCapture.truncate(0)
-            if self.panel.image is not None:
-                self.panel.image = None
-            self.frame = None
-            self.preds.set("None")
-            self.inference.set("None")
-
+            showwarning("Woops", "Looks like video need to be croped...\n Please set crop values in Labels Tab")
     def save_video_param(self, width, heigth):
         if width <= SNAP_W and heigth <= SNAP_H:
             self.snap_w.set(width + 10)
