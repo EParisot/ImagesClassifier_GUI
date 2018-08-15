@@ -1,5 +1,7 @@
 # ImagesClassifier_GUI
 
+(This repo isn't maintained anymore, take a look at the Django/web version : https://github.com/EParisot/IC_GUI_web)
+
 Machine Learning Images Classification in Graphical User Interface
 * Take pictures
 * Labelize them
